@@ -12,6 +12,8 @@ import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
+import { DarkCustomTheme, LightCustomTheme } from "../constants/Theme";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -33,7 +35,9 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider
+      value={colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme}
+    >
       <Stack>
         <Stack.Screen
           name="(tabs)"

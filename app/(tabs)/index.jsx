@@ -1,12 +1,13 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, SafeAreaView } from "react-native";
 import React from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
 export default function Home() {
+
   return (
-    <View className="bg-bgColor h-full">
+    <SafeAreaView className="">
       <Stack.Screen
         options={{
           headerTitle: "CoinTrack",
@@ -20,7 +21,8 @@ export default function Home() {
           },
         }}
       />
-      <ScrollView>
+
+      <ScrollView >
         {/* Total Income */}
 
         <View className="rounded-xl bg-cardColor justify-center mx-4 p-2 mt-4">
@@ -116,7 +118,8 @@ export default function Home() {
             </View>
           </View>
         </View>
+
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
