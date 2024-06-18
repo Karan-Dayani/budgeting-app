@@ -4,7 +4,7 @@ import React from "react";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -12,7 +12,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors.dark.icon,
         headerShown: true,
         headerShadowVisible: false,
       }}
@@ -25,7 +25,8 @@ export default function TabLayout() {
             height: 70,
             paddingBottom: 8,
             borderTopLeftRadius: 20,
-            borderTopRightRadius: 20
+            borderTopRightRadius: 20,
+            backgroundColor: "#3D2C8D",
           },
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
@@ -35,6 +36,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="Expenses"
         options={{
@@ -43,10 +45,10 @@ export default function TabLayout() {
             height: 70,
             paddingBottom: 8,
             borderTopLeftRadius: 20,
-            borderTopRightRadius: 20
+            borderTopRightRadius: 20,
+            backgroundColor: "#3D2C8D",
           },
           tabBarIcon: ({ color, focused }) => (
-
             <FontAwesome name="dollar" size={24} color={color} />
           ),
         }}

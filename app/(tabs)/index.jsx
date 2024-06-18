@@ -6,26 +6,21 @@ import { AntDesign } from "@expo/vector-icons";
 
 export default function Home() {
   return (
-    <View className="">
+    <View className="bg-bgColor h-full">
       <Stack.Screen
         options={{
           headerTitle: "CoinTrack",
-          headerTitleStyle: { fontSize: 25, fontFamily: "Nunito" },
+          headerTitleStyle: {
+            fontSize: 25,
+            fontFamily: "Nunito",
+            color: "white",
+          },
           headerStyle: {
             backgroundColor: "#191A19",
           },
-          headerRight: () => (
-            <Ionicons
-              name="person-circle-outline"
-              size={30}
-              color="white"
-              style={{ marginRight: 20 }}
-            />
-          ),
         }}
       />
       <ScrollView>
-
         {/* Total Income */}
 
         <View className="rounded-xl bg-cardColor justify-center mx-4 p-2 mt-4">
