@@ -4,6 +4,7 @@ import React from "react";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -20,11 +21,33 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
+          tabBarStyle: {
+            height: 70,
+            paddingBottom: 8,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20
+          },
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
               color={color}
             />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Expenses"
+        options={{
+          title: "Expenses",
+          tabBarStyle: {
+            height: 70,
+            paddingBottom: 8,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20
+          },
+          tabBarIcon: ({ color, focused }) => (
+
+            <FontAwesome name="dollar" size={24} color={color} />
           ),
         }}
       />
