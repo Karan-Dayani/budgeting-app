@@ -1,9 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, SafeAreaView, Pressable, Animated } from 'react-native';
-import { Link, Stack } from 'expo-router';
-import { Ionicons, AntDesign } from '@expo/vector-icons';
-import LoadingAnimation from '../../components/LoadingAnimation';
-import { Entypo } from '@expo/vector-icons';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  Pressable,
+  Animated,
+} from "react-native";
+import { Link, Stack } from "expo-router";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
+import LoadingAnimation from "../../components/LoadingAnimation";
+import { Entypo } from "@expo/vector-icons";
 
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -12,7 +19,11 @@ export default function Home() {
   const menuHeight = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(opacity, { toValue: 1, useNativeDriver: true, duration: 500 }).start();
+    Animated.timing(opacity, {
+      toValue: 1,
+      useNativeDriver: true,
+      duration: 500,
+    }).start();
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -21,27 +32,27 @@ export default function Home() {
   }, []);
 
   const toggleMenu = () => {
-    if (!menuVisible) {
-      setMenuVisible(true);
-      Animated.timing(menuHeight, {
-        toValue: 150,
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
-    } else {
-      Animated.timing(menuHeight, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: false,
-      }).start(() => {
-        setMenuVisible(false);
-      });
-    }
+    // if (!menuVisible) {
+    //   setMenuVisible(true);
+    //   Animated.timing(menuHeight, {
+    //     toValue: 150,
+    //     duration: 500,
+    //     useNativeDriver: false,
+    //   }).start();
+    // } else {
+    //   Animated.timing(menuHeight, {
+    //     toValue: 0,
+    //     duration: 100,
+    //     useNativeDriver: false,
+    //   }).start(() => {
+    //     setMenuVisible(false);
+    //   });
+    // }
+    setMenuVisible(!menuVisible);
   };
 
-
   return (
-    <SafeAreaView className="h-full" >
+    <SafeAreaView className="h-full">
       <Stack.Screen
         options={{
           headerTitle: "CoinTrack",
@@ -56,17 +67,15 @@ export default function Home() {
           headerRight: () => (
             <View className="right-5">
               <Pressable onPress={() => toggleMenu()}>
-                {/* <Ionicons
+                <Ionicons
                   name="person-circle-outline"
                   size={30}
                   color="white"
-                /> */}
-                <Entypo name="dots-three-vertical" size={30} color="white" />
+                />
+                {/* <Entypo name="dots-three-vertical" size={30} color="white" /> */}
               </Pressable>
               {menuVisible ? (
-                <Animated.View className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 " style={[
-                  { height: menuHeight },
-                ]}>
+                <Animated.View className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 ">
                   <Link
                     href={"/Expenses"}
                     className="text-white my-2 text-lg"
@@ -79,7 +88,6 @@ export default function Home() {
                     className="text-white my-2 text-lg "
                     onPress={() => toggleMenu()}
                   >
-
                     Support
                   </Link>
                   <Link
@@ -98,19 +106,21 @@ export default function Home() {
         }}
       />
 
-      < ScrollView className="w-full px-5" >
-        {
-          loading ? (
-            <>
-              <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
-              <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
-              <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
-            </>
-          ) : (
-            <>
+      <ScrollView className="w-full px-5">
+        {loading ? (
+          <>
+            <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
+            <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
+            <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
+          </>
+        ) : (
+          <>
+            <Animated.View className="gap-2 mt-2" style={{ opacity: opacity }}>
               {/* Total Income */}
-
-              <Animated.View className="rounded-xl bg-cardColor justify-center p-2 mt-4" style={{ opacity: opacity }}>
+              <Animated.View
+                className="rounded-xl bg-cardColor justify-center p-2 mt-4"
+                style={{ opacity: opacity }}
+              >
                 <View className="items-center justify-between flex-row mb-4">
                   <Text
                     className="text-white text-xl "
@@ -127,65 +137,35 @@ export default function Home() {
                 </View>
                 <Text className="text-white text-3xl ">₹1,00,000</Text>
               </Animated.View>
-              <Animated.View className="flex-row gap-2 mt-2  " style={{ opacity: opacity }}>
-                {/* Savings & Expenses */}
-                <View className="rounded-xl bg-green-800 p-2  shadow-2xl">
-                  <View className="items-center justify-between flex-row mb-4">
-                    <View className="flex-row items-center  gap-2">
-                      <Text
-                        className="text-white text-xl  "
-                        style={{ fontFamily: "Nunito" }}
-                      >
-                        Savings
-                      </Text>
-                      <Text className="text-green-400 text-lg ">+10%</Text>
-                    </View>
-                    <AntDesign
-                      name="right"
-                      size={14}
-                      color="white"
-                      style={{ marginRight: 10 }}
-                    />
-                  </View>
-                  <Text className="text-white text-3xl ">₹20,000</Text>
-                </View>
-                <View className=" rounded-xl bg-red-700 p-2 shadow-2xl">
-                  <View className="items-center justify-between flex-row mb-4 ">
+              {/* Savings */}
+              <View className="rounded-xl bg-green-800 p-2 shadow-2xl">
+                <View className="items-center justify-between flex-row mb-4">
+                  <View className="flex-row items-center gap-2">
                     <Text
                       className="text-white text-xl  "
                       style={{ fontFamily: "Nunito" }}
                     >
-                      Expenses
+                      Savings
                     </Text>
-                    <AntDesign
-                      name="right"
-                      size={14}
-                      color="white"
-                      style={{ marginRight: 10 }}
-                    />
+                    <Text className="text-green-400 text-lg ">+10%</Text>
                   </View>
-                  <Text className="text-white text-3xl">₹9,900</Text>
+                  <AntDesign
+                    name="right"
+                    size={14}
+                    color="white"
+                    style={{ marginRight: 10 }}
+                  />
                 </View>
-              </Animated.View>
-            </>
-          )}
-        {/* History */}
-
-        {
-          loading ? (
-            <>
-              <LoadingAnimation style={{ height: 250, borderRadius: 15 }} />
-            </>
-          ) : (
-            <>
-
-              <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 " style={{ opacity: opacity }}>
-                <View className="items-center justify-between flex-row mb-4 px-2 py-2">
+                <Text className="text-white text-3xl ">₹20,000</Text>
+              </View>
+              {/* Expenses */}
+              <View className="rounded-xl bg-red-700 p-2 shadow-2xl">
+                <View className="items-center justify-between flex-row mb-4">
                   <Text
-                    className="text-white text-2xl "
+                    className="text-white text-xl"
                     style={{ fontFamily: "Nunito" }}
                   >
-                    History
+                    Expenses
                   </Text>
                   <AntDesign
                     name="right"
@@ -194,32 +174,60 @@ export default function Home() {
                     style={{ marginRight: 10 }}
                   />
                 </View>
-                <View className="mx-2 mb-2">
-                  <View className="mb-2 py-1 flex-row justify-between">
-                    <Text className="text-white text-lg">Shopping</Text>
-                    <Text className="text-red-500 text-lg">- 1,000</Text>
-                  </View>
-                  <View className="mb-2 py-1 flex-row justify-between">
-                    <Text className="text-white text-lg">Snacks</Text>
-                    <Text className="text-red-500 text-lg">- 400</Text>
-                  </View>
-                  <View className="mb-2 py-1 flex-row justify-between">
-                    <Text className="text-white text-lg">Grossery</Text>
-                    <Text className="text-red-500 text-lg">- 2000</Text>
-                  </View>
-                  <View className="mb-2 py-1 flex-row justify-between">
-                    <Text className="text-white text-lg">Electril Bill</Text>
-                    <Text className="text-red-500 text-lg">- 6500</Text>
-                  </View>
+                <Text className="text-white text-3xl">₹9,900</Text>
+              </View>
+            </Animated.View>
+          </>
+        )}
+        {/* History */}
+
+        {loading ? (
+          <>
+            <LoadingAnimation style={{ height: 250, borderRadius: 15 }} />
+          </>
+        ) : (
+          <>
+            <Animated.View
+              className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 "
+              style={{ opacity: opacity }}
+            >
+              <View className="items-center justify-between flex-row mb-4 px-2 py-2">
+                <Text
+                  className="text-white text-2xl "
+                  style={{ fontFamily: "Nunito" }}
+                >
+                  History
+                </Text>
+                <AntDesign
+                  name="right"
+                  size={14}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
+              </View>
+              <View className="mx-2 mb-2">
+                <View className="mb-2 py-1 flex-row justify-between">
+                  <Text className="text-white text-lg">Shopping</Text>
+                  <Text className="text-red-500 text-lg">- 1,000</Text>
                 </View>
-              </Animated.View>
+                <View className="mb-2 py-1 flex-row justify-between">
+                  <Text className="text-white text-lg">Snacks</Text>
+                  <Text className="text-red-500 text-lg">- 400</Text>
+                </View>
+                <View className="mb-2 py-1 flex-row justify-between">
+                  <Text className="text-white text-lg">Grossery</Text>
+                  <Text className="text-red-500 text-lg">- 2000</Text>
+                </View>
+                <View className="mb-2 py-1 flex-row justify-between">
+                  <Text className="text-white text-lg">Electril Bill</Text>
+                  <Text className="text-red-500 text-lg">- 6500</Text>
+                </View>
+              </View>
+            </Animated.View>
+          </>
+        )}
 
-
-            </>
-          )
-        }
-
-        <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 mb-5" >
+        <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 mb-5">
           <View className="items-center justify-between flex-row mb-4 px-2 py-2">
             <Text
               className="text-white text-2xl"
@@ -254,12 +262,13 @@ export default function Home() {
               <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
                 <View className="bg-green-500 h-full w-1/4"></View>
               </View>
-              <Text className="text-white text-sm mt-1">₹50,000 / ₹2,00,000</Text>
+              <Text className="text-white text-sm mt-1">
+                ₹50,000 / ₹2,00,000
+              </Text>
             </View>
           </View>
         </Animated.View>
-
-      </ScrollView >
-    </SafeAreaView >
+      </ScrollView>
+    </SafeAreaView>
   );
 }
