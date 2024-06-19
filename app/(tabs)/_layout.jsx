@@ -12,7 +12,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.dark.icon,
+        tabBarActiveTintColor: Colors.dark.tint,
+        tabBarInactiveTintColor: Colors.dark.icon,
         headerShown: true,
         headerShadowVisible: false,
       }}
@@ -22,16 +23,17 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarStyle: {
-            height: 70,
-            paddingBottom: 8,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            height: 60,
+            paddingBottom: 2,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
 
           },
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
               color={color}
+              size={24}
             />
           ),
         }}
@@ -42,8 +44,8 @@ export default function TabLayout() {
         options={{
           title: "Expenses",
           tabBarStyle: {
-            height: 70,
-            paddingBottom: 8,
+            height: 60,
+            paddingBottom: 2,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
 

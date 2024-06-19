@@ -3,6 +3,7 @@
     "name": "budgeting-app",
     "slug": "budgeting-app",
     "version": "1.0.0",
+    "backgroundColor": "#0F0F0F",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",

@@ -5,12 +5,12 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function ExpensesPage() {
   return (
-    <View className="w-full bg-bgColor h-full">
+    <View className="">
       <Stack.Screen
         options={{
           headerShown: true,
           headerTitle: "",
-          headerStyle: { backgroundColor: "#191A19" },
+          headerStyle: { backgroundColor: "#0F0F0F" },
         }}
       />
       <ScrollView className="">

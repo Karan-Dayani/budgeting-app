@@ -43,7 +43,6 @@ export default function RootLayout() {
           name="(tabs)"
           options={{
             headerShown: false,
-            contentStyle: { backgroundColor: "#191A19" },
           }}
         />
       </Stack>

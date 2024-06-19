@@ -14,10 +14,10 @@ export const DarkCustomTheme = {
     dark: true,
     colors: {
         primary: 'rgb(255, 45, 85)',
-        background: '#191A19',
+        background: '#0F0F0F',
         card: '#3D2C8D',
         text: 'rgb(28, 28, 30)',
-        border: '#191A19',
+        border: '#0F0F0F',
         notification: 'rgb(255, 69, 58)',
     },
 };
