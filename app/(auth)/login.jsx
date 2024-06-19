@@ -1,8 +1,17 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, View, AppState, TextInput, Button, Text, Pressable } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  View,
+  AppState,
+  TextInput,
+  Button,
+  Text,
+  Pressable,
+} from "react-native";
 import { supabase } from "../../lib/supabase";
 
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -52,28 +61,43 @@ export default function Auth() {
     <View className="h-full justify-center px-5 ">
       <Stack.Screen options={{ headerShown: false }} />
       <View className=" bg-[#191A19] pb-8 justify-center rounded-xl px-5">
-        <Text className="text-white text-2xl text-center mt-5" style={{ fontFamily: "Nunito" }} style={{ fontFamily: "Nunito" }}>Login</Text>
+        <Text
+          className="text-white text-2xl text-center mt-5"
+          style={{ fontFamily: "Nunito" }}
+        >
+          Login
+        </Text>
         <View className="">
-          <Text className="text-xl text-white mb-2 mt-5" style={{ fontFamily: "Nunito" }}>Email</Text>
+          <Text
+            className="text-xl text-white mb-2 mt-5"
+            style={{ fontFamily: "Nunito" }}
+          >
+            Email
+          </Text>
           <TextInput
             label="Email"
             leftIcon={{ type: "font-awesome", name: "envelope" }}
             onChangeText={(text) => setEmail(text)}
             value={email}
-            className="placeholder-white border-2 p-2 rounded-lg bg-white"
+            className="placeholder-white border-2 p-2 rounded-lg bg-white text-black"
             placeholder="email@address.com"
             autoCapitalize={"none"}
           />
         </View>
-        <View >
-          <Text className="text-xl text-white mb-2 mt-2" style={{ fontFamily: "Nunito" }}>Password</Text>
+        <View>
+          <Text
+            className="text-xl text-white mb-2 mt-2"
+            style={{ fontFamily: "Nunito" }}
+          >
+            Password
+          </Text>
           <TextInput
             label="Password"
             leftIcon={{ type: "font-awesome", name: "lock" }}
             onChangeText={(text) => setPassword(text)}
             value={password}
             secureTextEntry={true}
-            className="placeholder-white border-2 p-2 rounded-lg bg-white"
+            className="placeholder-white border-2 p-2 rounded-lg bg-white text-black"
             placeholder="Password"
             autoCapitalize={"none"}
           />
@@ -83,17 +107,30 @@ export default function Auth() {
             className="bg-cardColor p-2 rounded-lg items-center"
             disabled={loading}
             onPress={() => signInWithEmail()}
-          ><Text className="text-lg text-white" style={{ fontFamily: "Nunito" }}>Sign In</Text></Pressable>
+          >
+            <Text
+              className="text-lg text-white"
+              style={{ fontFamily: "Nunito" }}
+            >
+              Sign In
+            </Text>
+          </Pressable>
         </View>
         <View className="mt-3">
           <Pressable
             className="bg-green-600 p-2 rounded-lg items-center"
             disabled={loading}
             onPress={() => signUpWithEmail()}
-          ><Text className="text-lg text-white" style={{ fontFamily: "Nunito" }}>Sign Up</Text></Pressable>
+          >
+            <Text
+              className="text-lg text-white"
+              style={{ fontFamily: "Nunito" }}
+            >
+              Sign Up
+            </Text>
+          </Pressable>
         </View>
       </View>
     </View>
   );
 }
-
