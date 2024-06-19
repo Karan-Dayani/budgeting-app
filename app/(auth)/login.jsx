@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, View, AppState, TextInput } from "react-native";
+import { Alert, StyleSheet, View, AppState, TextInput, Button, Text, Pressable } from "react-native";
 import { supabase } from "../../lib/supabase";
-import { Button } from "@rneui/themed";
+
 import { Stack } from "expo-router";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
@@ -49,58 +49,51 @@ export default function Auth() {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="h-full justify-center px-5 ">
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TextInput
-          label="Email"
-          leftIcon={{ type: "font-awesome", name: "envelope" }}
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          placeholder="email@address.com"
-          autoCapitalize={"none"}
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <TextInput
-          label="Password"
-          leftIcon={{ type: "font-awesome", name: "lock" }}
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={true}
-          placeholder="Password"
-          autoCapitalize={"none"}
-        />
-      </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title="Sign in"
-          disabled={loading}
-          onPress={() => signInWithEmail()}
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Button
-          title="Sign up"
-          disabled={loading}
-          onPress={() => signUpWithEmail()}
-        />
+      <View className=" bg-[#191A19] pb-8 justify-center rounded-xl px-5">
+        <Text className="text-white text-2xl text-center mt-5" style={{ fontFamily: "Nunito" }} style={{ fontFamily: "Nunito" }}>Login</Text>
+        <View className="">
+          <Text className="text-xl text-white mb-2 mt-5" style={{ fontFamily: "Nunito" }}>Email</Text>
+          <TextInput
+            label="Email"
+            leftIcon={{ type: "font-awesome", name: "envelope" }}
+            onChangeText={(text) => setEmail(text)}
+            value={email}
+            className="placeholder-white border-2 p-2 rounded-lg bg-white"
+            placeholder="email@address.com"
+            autoCapitalize={"none"}
+          />
+        </View>
+        <View >
+          <Text className="text-xl text-white mb-2 mt-2" style={{ fontFamily: "Nunito" }}>Password</Text>
+          <TextInput
+            label="Password"
+            leftIcon={{ type: "font-awesome", name: "lock" }}
+            onChangeText={(text) => setPassword(text)}
+            value={password}
+            secureTextEntry={true}
+            className="placeholder-white border-2 p-2 rounded-lg bg-white"
+            placeholder="Password"
+            autoCapitalize={"none"}
+          />
+        </View>
+        <View className="mt-5 ">
+          <Pressable
+            className="bg-cardColor p-2 rounded-lg items-center"
+            disabled={loading}
+            onPress={() => signInWithEmail()}
+          ><Text className="text-lg text-white" style={{ fontFamily: "Nunito" }}>Sign In</Text></Pressable>
+        </View>
+        <View className="mt-3">
+          <Pressable
+            className="bg-green-600 p-2 rounded-lg items-center"
+            disabled={loading}
+            onPress={() => signUpWithEmail()}
+          ><Text className="text-lg text-white" style={{ fontFamily: "Nunito" }}>Sign Up</Text></Pressable>
+        </View>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: "stretch",
-  },
-  mt20: {
-    marginTop: 20,
-  },
-});

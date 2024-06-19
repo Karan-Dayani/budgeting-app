@@ -67,12 +67,12 @@ export default function Home() {
           headerRight: () => (
             <View className="right-5">
               <Pressable onPress={() => toggleMenu()}>
-                <Ionicons
+                {/* <Ionicons
                   name="person-circle-outline"
                   size={30}
                   color="white"
-                />
-                {/* <Entypo name="dots-three-vertical" size={30} color="white" /> */}
+                /> */}
+                <Entypo name="dots-three-vertical" size={25} color="white" />
               </Pressable>
               {menuVisible ? (
                 <Animated.View className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 ">
