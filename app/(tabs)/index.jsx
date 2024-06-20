@@ -19,19 +19,23 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userIncome, setUserIncome] = useState(null);
+  const [userData, setUserData] = useState(null);
 
-  const getUserRow = async () => {
+  const getUserRow = async (user) => {
     const { data, err } = await supabase
       .from("User Data")
       .select("*")
       .eq("email", user?.user_metadata?.email);
-    console.log(data);
+    setUserData(data);
   };
-  getUserRow();
+
+  console.log(userData);
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setUser(user);
+        getUserRow(user);
       } else {
         Alert.alert("error accessing user");
       }
@@ -55,6 +59,13 @@ export default function Home() {
     setMenuVisible(!menuVisible);
   };
 
+  if (userData[0].income === null) {
+    return (
+      <View>
+        <Text className="text-white">Paisa bata lawdwe</Text>
+      </View>
+    );
+  }
   return (
     <SafeAreaView className="h-full">
       <Stack.Screen
