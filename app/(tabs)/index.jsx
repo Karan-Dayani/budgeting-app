@@ -11,6 +11,7 @@ import { Link, Stack } from "expo-router";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import LoadingAnimation from "../../components/LoadingAnimation";
 import { Entypo } from "@expo/vector-icons";
+import { supabase } from "../../lib/supabase";
 
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -51,6 +52,11 @@ export default function Home() {
     setMenuVisible(!menuVisible);
   };
 
+  const handleLogOut = async () => {
+    const { error } = await supabase.auth.signOut()
+    setMenuVisible(!menuVisible);
+  }
+
   return (
     <SafeAreaView className="h-full">
       <Stack.Screen
@@ -90,13 +96,12 @@ export default function Home() {
                   >
                     Support
                   </Link>
-                  <Link
-                    href={"/Expenses"}
-                    className="text-white my-2 text-lg"
-                    onPress={() => toggleMenu()}
+                  <Pressable
+
+                    onPress={() => handleLogOut()}
                   >
-                    Log out
-                  </Link>
+                    <Text className="text-red-400 my-2 text-lg">Log out</Text>
+                  </Pressable>
                 </Animated.View>
               ) : (
                 <></>

@@ -8,15 +8,12 @@ import {
   Button,
   Text,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 
 import { Redirect, Stack } from "expo-router";
 
-// Tells Supabase Auth to continuously refresh the session automatically if
-// the app is in the foreground. When this is added, you will continue to receive
-// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-// if the user's session is terminated. This should only be registered once.
 AppState.addEventListener("change", (state) => {
   if (state === "active") {
     supabase.auth.startAutoRefresh();
@@ -60,6 +57,7 @@ export default function Auth() {
   return (
     <View className="h-full justify-center px-5 ">
       <Stack.Screen options={{ headerShown: false }} />
+
       <View className=" bg-[#191A19] pb-8 justify-center rounded-xl px-5">
         <Text
           className="text-white text-2xl text-center mt-5"
@@ -102,34 +100,40 @@ export default function Auth() {
             autoCapitalize={"none"}
           />
         </View>
-        <View className="mt-5 ">
-          <Pressable
-            className="bg-cardColor p-2 rounded-lg items-center"
-            disabled={loading}
-            onPress={() => signInWithEmail()}
-          >
-            <Text
-              className="text-lg text-white"
-              style={{ fontFamily: "Nunito" }}
-            >
-              Sign In
-            </Text>
-          </Pressable>
-        </View>
-        <View className="mt-3">
-          <Pressable
-            className="bg-green-600 p-2 rounded-lg items-center"
-            disabled={loading}
-            onPress={() => signUpWithEmail()}
-          >
-            <Text
-              className="text-lg text-white"
-              style={{ fontFamily: "Nunito" }}
-            >
-              Sign Up
-            </Text>
-          </Pressable>
-        </View>
+        {loading ? (
+          <ActivityIndicator color="white" className="pt-10" size={25} />
+        ) : (
+          <>
+            <View className="mt-5 ">
+              <Pressable
+                className="bg-cardColor p-2 rounded-lg items-center"
+                disabled={loading}
+                onPress={() => signInWithEmail()}
+              >
+                <Text
+                  className="text-lg text-white"
+                  style={{ fontFamily: "Nunito" }}
+                >
+                  Sign In
+                </Text>
+              </Pressable>
+            </View>
+            <View className="mt-3">
+              <Pressable
+                className="bg-green-600 p-2 rounded-lg items-center"
+                disabled={loading}
+                onPress={() => signUpWithEmail()}
+              >
+                <Text
+                  className="text-lg text-white"
+                  style={{ fontFamily: "Nunito" }}
+                >
+                  Sign Up
+                </Text>
+              </Pressable>
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
