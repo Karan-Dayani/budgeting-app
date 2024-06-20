@@ -48,9 +48,17 @@ export default function Auth() {
       password: password,
     });
 
+    const addUser = async () => {
+      const { data, err } = await supabase
+        .from("User Data")
+        .insert([{ email: email }]);
+    };
+
     if (error) Alert.alert(error.message);
-    if (!session)
+    if (!session) {
+      addUser();
       Alert.alert("Please check your inbox for email verification!");
+    }
     setLoading(false);
   }
 

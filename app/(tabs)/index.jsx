@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   Pressable,
   Animated,
+  Alert,
 } from "react-native";
 import { Link, Stack } from "expo-router";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
@@ -16,15 +17,26 @@ import { supabase } from "../../lib/supabase";
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-  const opacity = useRef(new Animated.Value(0.5)).current;
-  const menuHeight = useRef(new Animated.Value(0)).current;
+  const [user, setUser] = useState(null);
+  const [userIncome, setUserIncome] = useState(null);
 
+  const getUserRow = async () => {
+    const { data, err } = await supabase
+      .from("User Data")
+      .select("*")
+      .eq("email", user?.user_metadata?.email);
+    console.log(data);
+  };
+  getUserRow();
   useEffect(() => {
-    Animated.timing(opacity, {
-      toValue: 1,
-      useNativeDriver: true,
-      duration: 500,
-    }).start();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user);
+      } else {
+        Alert.alert("error accessing user");
+      }
+    });
+
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -32,30 +44,16 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+  // console.log(user?.user_metadata?.email);
+
   const toggleMenu = () => {
-    // if (!menuVisible) {
-    //   setMenuVisible(true);
-    //   Animated.timing(menuHeight, {
-    //     toValue: 150,
-    //     duration: 500,
-    //     useNativeDriver: false,
-    //   }).start();
-    // } else {
-    //   Animated.timing(menuHeight, {
-    //     toValue: 0,
-    //     duration: 100,
-    //     useNativeDriver: false,
-    //   }).start(() => {
-    //     setMenuVisible(false);
-    //   });
-    // }
     setMenuVisible(!menuVisible);
   };
 
   const handleLogOut = async () => {
-    const { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut();
     setMenuVisible(!menuVisible);
-  }
+  };
 
   return (
     <SafeAreaView className="h-full">
@@ -96,10 +94,7 @@ export default function Home() {
                   >
                     Support
                   </Link>
-                  <Pressable
-
-                    onPress={() => handleLogOut()}
-                  >
+                  <Pressable onPress={() => handleLogOut()}>
                     <Text className="text-red-400 my-2 text-lg">Log out</Text>
                   </Pressable>
                 </Animated.View>
@@ -120,12 +115,9 @@ export default function Home() {
           </>
         ) : (
           <>
-            <Animated.View className="gap-2 mt-2" style={{ opacity: opacity }}>
+            <Animated.View className="gap-2 mt-2">
               {/* Total Income */}
-              <Animated.View
-                className="rounded-xl bg-cardColor justify-center p-2 mt-4"
-                style={{ opacity: opacity }}
-              >
+              <Animated.View className="rounded-xl bg-cardColor justify-center p-2 mt-4">
                 <View className="items-center justify-between flex-row mb-4">
                   <Text
                     className="text-white text-xl "
@@ -140,7 +132,9 @@ export default function Home() {
                     style={{ marginRight: 10 }}
                   />
                 </View>
-                <Text className="text-white text-3xl ">₹1,00,000</Text>
+                <Text className="text-white text-3xl ">
+                  Click to enter your income
+                </Text>
               </Animated.View>
               {/* Savings */}
               <View className="rounded-xl bg-green-800 p-2 shadow-2xl">
@@ -192,10 +186,7 @@ export default function Home() {
           </>
         ) : (
           <>
-            <Animated.View
-              className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 "
-              style={{ opacity: opacity }}
-            >
+            <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 ">
               <View className="items-center justify-between flex-row mb-4 px-2 py-2">
                 <Text
                   className="text-white text-2xl "
