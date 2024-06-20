@@ -8,7 +8,7 @@ import {
   Animated,
   Alert,
 } from "react-native";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, router } from "expo-router";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import LoadingAnimation from "../../components/LoadingAnimation";
 import { Entypo } from "@expo/vector-icons";
@@ -19,7 +19,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userIncome, setUserIncome] = useState(null);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState([]);
 
   const getUserRow = async (user) => {
     const { data, err } = await supabase
@@ -27,9 +27,14 @@ export default function Home() {
       .select("*")
       .eq("email", user?.user_metadata?.email);
     setUserData(data);
+
+    if (data[0]?.income === null) {
+      router.push("/profile");
+    }
   };
 
   console.log(userData);
+  console.log("rerun");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -59,13 +64,6 @@ export default function Home() {
     setMenuVisible(!menuVisible);
   };
 
-  if (userData[0].income === null) {
-    return (
-      <View>
-        <Text className="text-white">Paisa bata lawdwe</Text>
-      </View>
-    );
-  }
   return (
     <SafeAreaView className="h-full">
       <Stack.Screen
