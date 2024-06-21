@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, Animated } from 'react-native';
 
 export default function LoadingAnimation({ style }) {
-    const opacity = new Animated.Value(0.5);
+    const opacity = useRef(new Animated.Value(0.5)).current;
 
-    React.useEffect(() => {
-        Animated.loop(
+    useEffect(() => {
+        const loop = Animated.loop(
             Animated.sequence([
                 Animated.timing(opacity, {
                     toValue: 1,
@@ -18,10 +18,12 @@ export default function LoadingAnimation({ style }) {
                     useNativeDriver: true,
                 }),
             ])
-        ).start();
-    }, []);
+        );
+        loop.start();
+        return () => loop.stop();
+    }, [opacity]);
 
     return (
-        <Animated.View style={[style, { backgroundColor: '#B0B0B0', opacity, marginTop: 10 }]} />
+        <Animated.View style={[style, { backgroundColor: '#31363F', opacity, marginTop: 10 }]} />
     );
 }

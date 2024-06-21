@@ -7,12 +7,15 @@ import {
   Pressable,
   Animated,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { Link, Stack, router } from "expo-router";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import LoadingAnimation from "../../components/LoadingAnimation";
 import { Entypo } from "@expo/vector-icons";
 import { supabase } from "../../lib/supabase";
+import TotalIncome from "../../components/TotalIncome";
+import { BlurView } from "expo-blur";
 
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -21,34 +24,37 @@ export default function Home() {
   const [userIncome, setUserIncome] = useState(null);
   const [userData, setUserData] = useState([]);
 
+  const opacity = useRef(new Animated.Value(0.5)).current;
+
   const getUserRow = async (user) => {
     const { data, err } = await supabase
       .from("User Data")
       .select("*")
       .eq("email", user?.user_metadata?.email);
     setUserData(data);
-
-    if (data[0]?.income === null) {
-      router.push("/profile");
-    }
   };
 
-  console.log(userData);
-  console.log("rerun");
+
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setUser(user);
-        getUserRow(user);
+        getUserRow(user)
       } else {
         Alert.alert("error accessing user");
       }
     });
 
+    Animated.timing(opacity, {
+      toValue: 1,
+      useNativeDriver: true,
+      duration: 500,
+    }).start();
+
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -65,18 +71,19 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView className="h-full">
+    <SafeAreaView className="h-full ">
       <Stack.Screen
         options={{
           headerTitle: "CoinTrack",
           headerTitleStyle: {
             fontSize: 30,
-            fontFamily: "Nunito",
+            fontFamily: "Jost",
             color: "white",
           },
           headerStyle: {
-            backgroundColor: "#0F0F0F",
+            backgroundColor: "#0F0F0F"
           },
+
           headerRight: () => (
             <View className="right-5">
               <Pressable onPress={() => toggleMenu()}>
@@ -88,7 +95,7 @@ export default function Home() {
                 <Entypo name="dots-three-vertical" size={25} color="white" />
               </Pressable>
               {menuVisible ? (
-                <Animated.View className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 ">
+                <Animated.View className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 " style={{ opacity }}>
                   <Link
                     href={"/Expenses"}
                     className="text-white my-2 text-lg"
@@ -115,76 +122,20 @@ export default function Home() {
         }}
       />
 
-      <ScrollView className="w-full px-5">
+      <ScrollView className="p-5 ">
         {loading ? (
           <>
+
             <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
             <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
-            <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
+            {/* <LoadingAnimation style={{ height: 100, borderRadius: 15 }} /> */}
+
           </>
         ) : (
           <>
-            <Animated.View className="gap-2 mt-2">
-              {/* Total Income */}
-              <Animated.View className="rounded-xl bg-cardColor justify-center p-2 mt-4">
-                <View className="items-center justify-between flex-row mb-4">
-                  <Text
-                    className="text-white text-xl "
-                    style={{ fontFamily: "Nunito" }}
-                  >
-                    Total Income
-                  </Text>
-                  <AntDesign
-                    name="right"
-                    size={14}
-                    color="white"
-                    style={{ marginRight: 10 }}
-                  />
-                </View>
-                <Text className="text-white text-3xl ">
-                  Click to enter your income
-                </Text>
-              </Animated.View>
-              {/* Savings */}
-              <View className="rounded-xl bg-green-800 p-2 shadow-2xl">
-                <View className="items-center justify-between flex-row mb-4">
-                  <View className="flex-row items-center gap-2">
-                    <Text
-                      className="text-white text-xl  "
-                      style={{ fontFamily: "Nunito" }}
-                    >
-                      Savings
-                    </Text>
-                    <Text className="text-green-400 text-lg ">+10%</Text>
-                  </View>
-                  <AntDesign
-                    name="right"
-                    size={14}
-                    color="white"
-                    style={{ marginRight: 10 }}
-                  />
-                </View>
-                <Text className="text-white text-3xl ">₹20,000</Text>
-              </View>
-              {/* Expenses */}
-              <View className="rounded-xl bg-red-700 p-2 shadow-2xl">
-                <View className="items-center justify-between flex-row mb-4">
-                  <Text
-                    className="text-white text-xl"
-                    style={{ fontFamily: "Nunito" }}
-                  >
-                    Expenses
-                  </Text>
-                  <AntDesign
-                    name="right"
-                    size={14}
-                    color="white"
-                    style={{ marginRight: 10 }}
-                  />
-                </View>
-                <Text className="text-white text-3xl">₹9,900</Text>
-              </View>
-            </Animated.View>
+            <View className="w-full ">
+              <TotalIncome user={userData} />
+            </View>
           </>
         )}
         {/* History */}
@@ -195,7 +146,7 @@ export default function Home() {
           </>
         ) : (
           <>
-            <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 ">
+            <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 ">
               <View className="items-center justify-between flex-row mb-4 px-2 py-2">
                 <Text
                   className="text-white text-2xl "
@@ -232,7 +183,7 @@ export default function Home() {
           </>
         )}
 
-        <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center  p-2 mt-3 mb-5">
+        <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 mb-10">
           <View className="items-center justify-between flex-row mb-4 px-2 py-2">
             <Text
               className="text-white text-2xl"
@@ -277,3 +228,4 @@ export default function Home() {
     </SafeAreaView>
   );
 }
+

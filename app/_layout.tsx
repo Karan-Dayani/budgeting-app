@@ -22,8 +22,11 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Nunito: require("../assets/fonts/Nunito-Medium.ttf"),
+    Jost: require("../assets/fonts/Jost/Jost-VariableFont_wght.ttf"),
+    Cabin: require("../assets/fonts/Cabin/static/Cabin-SemiBold.ttf"),
+    Josefin: require("../assets/fonts/Josefin_Sans/static/JosefinSans-Medium.ttf"),
+    Red_Hat: require("../assets/fonts/Red_Hat_Display/static/RedHatDisplay-Medium.ttf"),
   });
-
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();

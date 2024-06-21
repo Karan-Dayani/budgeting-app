@@ -4,19 +4,39 @@ import { Redirect, router } from "expo-router";
 import { supabase } from "../lib/supabase";
 
 const index = () => {
+
+  const checkUserIncome = async (email) => {
+    const { data, error } = await supabase
+      .from('User Data')
+      .select('income')
+      .eq('email', email);
+
+    return data && data.income;
+
+  };
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        router.replace("/(tabs)/");
+        const hasIncome = await checkUserIncome(session.user.email)
+        if (hasIncome) {
+          router.replace("/(tabs)/");
+        } else {
+          router.replace("/profile/");
+        }
       } else {
-        console.log("no user");
+        router.replace("/(auth)/login");
       }
     });
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        router.replace("/(tabs)/");
+        const hasIncome = await checkUserIncome(session.user.email)
+        if (hasIncome) {
+          router.replace("/(tabs)/");
+        } else {
+          router.replace("/profile/");
+        }
       } else {
-        console.log("no user");
         router.replace("/(auth)/login");
       }
     });
