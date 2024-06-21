@@ -15,7 +15,6 @@ import LoadingAnimation from "../../components/LoadingAnimation";
 import { Entypo } from "@expo/vector-icons";
 import { supabase } from "../../lib/supabase";
 import TotalIncome from "../../components/TotalIncome";
-import { BlurView } from "expo-blur";
 
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -34,13 +33,11 @@ export default function Home() {
     setUserData(data);
   };
 
-
-
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setUser(user);
-        getUserRow(user)
+        getUserRow(user);
       } else {
         Alert.alert("error accessing user");
       }
@@ -81,7 +78,7 @@ export default function Home() {
             color: "white",
           },
           headerStyle: {
-            backgroundColor: "#0F0F0F"
+            backgroundColor: "#0F0F0F",
           },
 
           headerRight: () => (
@@ -95,9 +92,12 @@ export default function Home() {
                 <Entypo name="dots-three-vertical" size={25} color="white" />
               </Pressable>
               {menuVisible ? (
-                <Animated.View className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 " style={{ opacity }}>
+                <Animated.View
+                  className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 "
+                  style={{ opacity }}
+                >
                   <Link
-                    href={"/Expenses"}
+                    href={"/profile"}
                     className="text-white my-2 text-lg"
                     onPress={() => toggleMenu()}
                   >
@@ -125,11 +125,9 @@ export default function Home() {
       <ScrollView className="p-5 ">
         {loading ? (
           <>
-
             <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
             <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
             {/* <LoadingAnimation style={{ height: 100, borderRadius: 15 }} /> */}
-
           </>
         ) : (
           <>
@@ -228,4 +226,3 @@ export default function Home() {
     </SafeAreaView>
   );
 }
-
