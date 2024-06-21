@@ -1,13 +1,34 @@
 import { View, Text, TextInput, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack, router } from "expo-router";
+import { getUser } from "../api";
+import { supabase } from "../../lib/supabase";
 
 const Profile = () => {
   const [name, setName] = useState("");
   const [income, setIncome] = useState(0);
+  const [user, setUser] = useState()
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user);
+      } else {
+        Alert.alert("error accessing user");
+      }
+    });
+  }, [])
+
+  const addDetails = async () => {
+    const { data, err } = await supabase
+      .from("User Data")
+      .update({ income: income, username: name })
+      .eq("email", user?.user_metadata?.email)
+  };
+  console.log(income)
   const handleSubmit = () => {
-    router.replace("/(tabs)/");
+    addDetails()
+    router.replace("/(tabs)/")
   };
 
   return (
@@ -29,7 +50,7 @@ const Profile = () => {
           </Text>
           <TextInput
             value={name}
-            onChange={(text) => setName(text)}
+            onChangeText={(value) => setName(value)}
             className="rounded-lg my-3 text-white p-2 bg-[#31363F]"
             placeholderTextColor="white"
             placeholder="Username"
@@ -39,7 +60,7 @@ const Profile = () => {
           </Text>
           <TextInput
             value={income}
-            onChange={(num) => setIncome(num)}
+            onChangeText={(value) => setIncome(value)}
             className=" rounded-lg my-3 text-white p-2 bg-[#31363F]"
             placeholderTextColor="white"
             placeholder="Income"
