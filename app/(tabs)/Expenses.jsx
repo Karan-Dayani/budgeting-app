@@ -137,9 +137,30 @@ export default function ExpensesPage() {
           </View>
         </View>
         <ScrollView>
-          <View className="items-center ">
+          <View className="items-center">
             <View className="rounded-xl bg-[#413F42] mb-4 p-4 w-full">
-              <Text className="text-white">Expense details will be here</Text>
+              <View className="flex-row mb-5 border-b-2 justify-between pb-2">
+                <Text className="text-white text-md">Name</Text>
+                <View className="flex-row gap-10">
+                  <Text className="text-white text-md">Money</Text>
+                  <Text className="text-white text-md">Mode</Text>
+                </View>
+              </View>
+              {userExpenses ? (
+                <>
+                  {userExpenses?.map((item) => (
+                    <View className="flex-row justify-between">
+                      <Text className="text-white text-md">{item.expenseName}</Text>
+                      <View className="flex-row gap-10">
+                        <Text className="text-white text-md">{item.expenseAmount}</Text>
+                        <Text className="text-white text-md">{item.paymentMode}</Text>
+                      </View>
+                    </View>
+                  ))}
+                </>
+              ) : (
+                <Text className="text-white">Expense details will be here</Text>
+              )}
             </View>
           </View>
         </ScrollView>
