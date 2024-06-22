@@ -26,6 +26,7 @@ export default function ExpensesPage() {
     paymentMode: "",
     expenseDate: new Date().toDateString().slice(4),
   });
+  const [userExpenses, setUserExpenses] = useState([]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -36,6 +37,20 @@ export default function ExpensesPage() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      const { data, err } = await supabase
+        .from("User Data")
+        .select("expenses")
+        .eq("email", user?.user_metadata?.email);
+
+      setUserExpenses(data[0]?.expenses);
+    }
+    fetchData();
+  }, [user]);
+
+  console.log(userExpenses);
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
