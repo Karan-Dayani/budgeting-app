@@ -80,7 +80,6 @@ export default function Home() {
           headerStyle: {
             backgroundColor: "#0F0F0F",
           },
-
           headerRight: () => (
             <View className="right-5">
               <Pressable onPress={() => toggleMenu()}>
@@ -122,7 +121,9 @@ export default function Home() {
         }}
       />
 
-      <ScrollView className="p-5 ">
+      <ScrollView className="px-5 py-2
+      \
+      ">
         {loading ? (
           <>
             <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
@@ -131,7 +132,7 @@ export default function Home() {
           </>
         ) : (
           <>
-            <View className="w-full ">
+            <View className="w-full">
               <TotalIncome user={userData} />
             </View>
           </>

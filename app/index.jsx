@@ -11,7 +11,7 @@ const index = () => {
       .select('income')
       .eq('email', email);
 
-    return data && data.income;
+    return data && data[0].income;
 
   };
 
