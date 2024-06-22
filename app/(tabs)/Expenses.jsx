@@ -48,7 +48,7 @@ export default function ExpensesPage() {
       setUserExpenses(data[0]?.expenses);
     }
     fetchData();
-  }, [user]);
+  }, [user, expense]);
 
   console.log(userExpenses);
 
@@ -148,8 +148,8 @@ export default function ExpensesPage() {
               </View>
               {userExpenses ? (
                 <>
-                  {userExpenses?.map((item) => (
-                    <View className="flex-row justify-between">
+                  {userExpenses?.map((item, index) => (
+                    <View className="flex-row justify-between mb-5" key={index}>
                       <Text className="text-white text-md">{item.expenseName}</Text>
                       <View className="flex-row gap-10">
                         <Text className="text-white text-md">{item.expenseAmount}</Text>
