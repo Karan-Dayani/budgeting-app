@@ -7,15 +7,18 @@ import {
   Modal,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { supabase } from "../../lib/supabase";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export default function ExpensesPage() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toLocaleString("default", { month: "long", year: "numeric" })
   );
+  const [user, setUser] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [expense, setExpense] = useState({
     expenseName: "",
@@ -23,6 +26,16 @@ export default function ExpensesPage() {
     paymentMode: "",
     expenseDate: new Date().toDateString().slice(4),
   });
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user);
+      } else {
+        Alert.alert("error accessing user");
+      }
+    });
+  }, []);
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
@@ -35,10 +48,21 @@ export default function ExpensesPage() {
     setModalVisible(true);
   };
 
-  const handleSaveExpense = () => {
+  const handleSaveExpense = async () => {
     // Add your logic to save the expense
-    console.log(expense);
+    const { data, err } = await supabase
+      .from("User Data")
+      .select("expenses")
+      .eq("email", user?.user_metadata?.email);
 
+    const prevArray = data[0]?.expenses || [];
+    const updatedArray = [...prevArray, expense];
+    console.log(updatedArray);
+
+    await supabase
+      .from("User Data")
+      .update({ expenses: updatedArray })
+      .eq("email", user?.user_metadata?.email);
     // Reset form and close modal
     setExpense((prevData) => ({
       ...prevData,
