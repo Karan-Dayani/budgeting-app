@@ -162,7 +162,7 @@ export default function ExpensesPage() {
             <View className="w-full mb-16">
               {userExpenses?.map((expense, index) => (
                 <View key={index}>
-                  <View className="rounded-lg bg-gray-900 p-4 my-2" onStartShouldSetResponder={() => Alert.alert(`${expense.expenseName}`)}>
+                  <View className="rounded-lg bg-gray-900 p-4 my-2" >
                     <View className="flex-row justify-between mb-2">
                       <Text className="text-white text-xl" style={{ fontFamily: "Red_Hat" }}>
                         {expense.expenseName}
