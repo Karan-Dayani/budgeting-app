@@ -1,12 +1,17 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const TotalIncome = ({ user }) => {
 
     const income = new Intl.NumberFormat("en-IN", {
         maximumSignificantDigits: 3,
     }).format(user[0].income);
+
+    const handleExpensesClick = () => {
+        router.push('/(tabs)/Expenses');
+    };
 
     return (
         <View className="">
@@ -41,7 +46,7 @@ const TotalIncome = ({ user }) => {
                     </Text>
                 )}
             </View>
-            <View className="flex-row w-full justify-between">
+            <View className="flex-row w-full justify-between" >
                 <View className="flex-1 rounded-xl bg-green-800 p-2 shadow-2xl mr-2">
                     <View className="items-center justify-between flex-row mb-4">
                         <View className="flex-row items-center gap-2">
@@ -66,7 +71,7 @@ const TotalIncome = ({ user }) => {
                         ₹20,000
                     </Text>
                 </View>
-                <View className="flex-1 rounded-xl bg-red-700 p-2 shadow-2xl ml-0">
+                <View className="flex-1 rounded-xl bg-red-700 p-2 shadow-2xl ml-0" onStartShouldSetResponder={() => handleExpensesClick()}>
                     <View className="items-center justify-between flex-row mb-4">
                         <Text
                             className="text-white text-xl"

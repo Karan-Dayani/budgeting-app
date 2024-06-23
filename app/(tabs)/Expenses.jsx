@@ -6,15 +6,17 @@ import {
   Pressable,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../../lib/supabase";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { Dropdown } from "react-native-element-dropdown";
 
 export default function ExpensesPage() {
+  const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(
     new Date().toLocaleString("default", { month: "long", year: "numeric" })
   );
@@ -39,6 +41,7 @@ export default function ExpensesPage() {
   }, []);
 
   useEffect(() => {
+    setLoading(true)
     async function fetchData() {
       const { data, err } = await supabase
         .from("User Data")
@@ -48,9 +51,15 @@ export default function ExpensesPage() {
       setUserExpenses(data[0]?.expenses);
     }
     fetchData();
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+    setLoading(false)
   }, [user, expense]);
 
-  console.log(userExpenses);
+
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
@@ -71,8 +80,8 @@ export default function ExpensesPage() {
       .eq("email", user?.user_metadata?.email);
 
     const prevArray = data[0]?.expenses || [];
-    const updatedArray = [...prevArray, expense];
-    console.log(updatedArray);
+    const updatedArray = [expense, ...prevArray];
+
 
     await supabase
       .from("User Data")
@@ -88,18 +97,31 @@ export default function ExpensesPage() {
     setModalVisible(false);
   };
 
+  const getTotalExpense = () => {
+    if (userExpenses?.length === 0) return 0;
+    return userExpenses?.reduce((total, item) => total + item?.expenseAmount, 0);
+  };
+
+
+
+  const data = [
+    { label: "Cash", value: "Cash" },
+    { label: "Online", value: "Online" },
+    { label: "Card", value: "Card" },
+  ];
+
   return (
-    <View className="px-5 flex-1">
+    <View className="px-5 flex-1 ">
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: "Expenses",
+          headerTitle: "",
           headerTitleStyle: {
             color: "white",
             fontFamily: "Nunito",
             fontSize: 25,
           },
-          headerStyle: { backgroundColor: "#0F0F0F" },
+          headerStyle: { backgroundColor: "#0F0F0F", height: 50 },
         }}
       />
       <SafeAreaView className="h-full">
@@ -119,6 +141,7 @@ export default function ExpensesPage() {
             </Text>
           </View>
         </View>
+
         <View className="my-4">
           <Text className="text-lg text-gray-400 mb-2">Select Month:</Text>
           <View className="bg-[#1C1C1C] rounded-xl p-2">
@@ -135,35 +158,43 @@ export default function ExpensesPage() {
               <Picker.Item label="April 2024" value="April 2024" />
             </Picker>
           </View>
+          <Text className="text-xl text-white my-5">
+            Total Expense: ₹{getTotalExpense()}
+          </Text>
         </View>
-        <ScrollView>
-          <View className="items-center">
-            <View className="rounded-xl bg-[#413F42] mb-4 p-4 w-full">
-              <View className="flex-row mb-5 border-b-2 justify-between pb-2">
-                <Text className="text-white text-md">Name</Text>
-                <View className="flex-row gap-10">
-                  <Text className="text-white text-md">Money</Text>
-                  <Text className="text-white text-md">Mode</Text>
+        {loading ? <ActivityIndicator color="white" className="pt-10" size={35} /> :
+          <ScrollView className="">
+            {userExpenses ? (
+              <View className="">
+                <View className="rounded-xl bg-gradient-to-r from-[#413F42] to-[#2C2B2E] mb-4 w-full shadow-lg">
+                  <View className="flex-row mb-5 border-b-2 border-gray-500 justify-between pb-2 ">
+                    <Text className="text-white text-lg flex-1">Name</Text>
+                    <View className="flex-row flex-1 justify-between">
+                      <Text className="text-white text-lg font-semibold">Money</Text>
+                      <Text className="text-white text-lg font-semibold">Mode</Text>
+                    </View>
+                  </View>
+                  <>
+                    {userExpenses?.map((item, index) => (
+                      <View className="flex-row justify-between mb-5 py-5 px-3 rounded bg-[#2C2B2E] " key={index} >
+                        <Text className="text-white text-lg flex-1">{item.expenseName}</Text>
+                        <View className="flex-row flex-1 justify-between">
+                          <Text className="text-white text-lg">₹{item.expenseAmount}</Text>
+                          <Text className="text-white text-lg">{item.paymentMode}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </>
                 </View>
               </View>
-              {userExpenses ? (
-                <>
-                  {userExpenses?.map((item, index) => (
-                    <View className="flex-row justify-between mb-5" key={index}>
-                      <Text className="text-white text-md">{item.expenseName}</Text>
-                      <View className="flex-row gap-10">
-                        <Text className="text-white text-md">{item.expenseAmount}</Text>
-                        <Text className="text-white text-md">{item.paymentMode}</Text>
-                      </View>
-                    </View>
-                  ))}
-                </>
-              ) : (
-                <Text className="text-white">Expense details will be here</Text>
-              )}
-            </View>
-          </View>
-        </ScrollView>
+            ) : (
+              <View className="  "  >
+                <Text className="text-white text-lg">No expenses till yet</Text>
+              </View>
+            )}
+          </ScrollView>
+        }
+
       </SafeAreaView>
       <Modal
         animationType="slide"
@@ -175,7 +206,7 @@ export default function ExpensesPage() {
       >
         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
           <View className="bg-[#1C1C1C] rounded-xl p-5 w-4/5">
-            <Text className="text-xl text-white mb-4">Add Expense</Text>
+            <Text className="text-xl text-white mb-4">Name</Text>
             <TextInput
               placeholder="Expense Name"
               placeholderTextColor="gray"
@@ -184,6 +215,7 @@ export default function ExpensesPage() {
               }
               className="bg-[#31363F] text-white p-2 mb-4 rounded-lg"
             />
+            <Text className="text-xl text-white mb-4">Amount</Text>
             <TextInput
               placeholder="Expense Amount"
               placeholderTextColor="gray"
@@ -193,17 +225,32 @@ export default function ExpensesPage() {
               keyboardType="numeric"
               className="bg-[#31363F] text-white p-2 mb-4 rounded-lg"
             />
-            <TextInput
+            <Text className="text-xl text-white mb-4">Payment mode</Text>
+            {/* <TextInput
               placeholder="Payment Mode"
               placeholderTextColor="gray"
               onChangeText={(value) =>
                 handleExpenseChange("paymentMode", value)
               }
               className="bg-[#31363F] text-white p-2 mb-4 rounded-lg"
+            /> */}
+            <Dropdown
+              className="bg-[#31363F] rounded-lg px-2 py-3 mb-5 text-white"
+              placeholderStyle={{ color: "gray" }}
+              selectedTextStyle={{ color: "white" }}
+              data={data}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Payment Mode"
+              value={expense.paymentMode}
+              onChange={(value) =>
+                handleExpenseChange("paymentMode", value.value)
+              }
             />
             <Pressable
               onPress={handleSaveExpense}
-              className="bg-blue-500 p-3 rounded-lg mb-2"
+              className="bg-blue-500 p-3 rounded-lg mb-5"
             >
               <Text className="text-white text-center">Save Expense</Text>
             </Pressable>
