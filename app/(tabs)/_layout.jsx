@@ -40,6 +40,22 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="Expenses"
+        options={{
+          title: "Expenses",
+          tabBarStyle: {
+            height: 60,
+            paddingBottom: 2,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          },
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome name="dollar" size={24} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="Goals"
         options={{
           title: "Goals",
@@ -55,21 +71,6 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="Expenses"
-        options={{
-          title: "Expenses",
-          tabBarStyle: {
-            height: 60,
-            paddingBottom: 2,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          },
-          tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="dollar" size={24} color={color} />
-          ),
-        }}
-      />
     </Tabs>
   );
 }
