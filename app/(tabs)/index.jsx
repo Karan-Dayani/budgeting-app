@@ -15,6 +15,7 @@ import LoadingAnimation from "../../components/LoadingAnimation";
 import { Entypo } from "@expo/vector-icons";
 import { supabase } from "../../lib/supabase";
 import TotalIncome from "../../components/TotalIncome";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -22,6 +23,8 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [userIncome, setUserIncome] = useState(null);
   const [userData, setUserData] = useState([]);
+
+  const isFocused = useIsFocused()
 
   const opacity = useRef(new Animated.Value(0.5)).current;
 
@@ -32,6 +35,8 @@ export default function Home() {
       .eq("email", user?.user_metadata?.email);
     setUserData(data);
   };
+
+  const historyExpense = userData[0].expenses.slice(0, 4)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -54,7 +59,7 @@ export default function Home() {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isFocused]);
 
   // console.log(user?.user_metadata?.email);
 
@@ -163,22 +168,12 @@ export default function Home() {
                 />
               </View>
               <View className="mx-2 mb-2">
-                <View className="mb-2 py-1 flex-row justify-between">
-                  <Text className="text-white text-lg">Shopping</Text>
-                  <Text className="text-red-500 text-lg">- 1,000</Text>
-                </View>
-                <View className="mb-2 py-1 flex-row justify-between">
-                  <Text className="text-white text-lg">Snacks</Text>
-                  <Text className="text-red-500 text-lg">- 400</Text>
-                </View>
-                <View className="mb-2 py-1 flex-row justify-between">
-                  <Text className="text-white text-lg">Grossery</Text>
-                  <Text className="text-red-500 text-lg">- 2000</Text>
-                </View>
-                <View className="mb-2 py-1 flex-row justify-between">
-                  <Text className="text-white text-lg">Electril Bill</Text>
-                  <Text className="text-red-500 text-lg">- 6500</Text>
-                </View>
+                {historyExpense.map((itme, index) => (
+                  <View className="mb-2 py-1 flex-row justify-between" key={index}>
+                    <Text className="text-white text-lg">{itme.expenseName}</Text>
+                    <Text className="text-red-500 text-lg">- {itme.expenseAmount}</Text>
+                  </View>
+                ))}
               </View>
             </Animated.View>
           </>
