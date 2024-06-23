@@ -41,7 +41,7 @@ export default function ExpensesPage() {
   }, []);
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     async function fetchData() {
       const { data, err } = await supabase
         .from("User Data")
@@ -56,10 +56,8 @@ export default function ExpensesPage() {
     }, 2000);
 
     return () => clearTimeout(timer);
-    setLoading(false)
+    setLoading(false);
   }, [user, expense]);
-
-
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
@@ -82,7 +80,6 @@ export default function ExpensesPage() {
     const prevArray = data[0]?.expenses || [];
     const updatedArray = [expense, ...prevArray];
 
-
     await supabase
       .from("User Data")
       .update({ expenses: updatedArray })
@@ -99,10 +96,11 @@ export default function ExpensesPage() {
 
   const getTotalExpense = () => {
     if (userExpenses?.length === 0) return 0;
-    return userExpenses?.reduce((total, item) => total + item?.expenseAmount, 0);
+    return userExpenses?.reduce(
+      (total, item) => total + item?.expenseAmount,
+      0
+    );
   };
-
-
 
   const data = [
     { label: "Cash", value: "Cash" },
@@ -162,7 +160,9 @@ export default function ExpensesPage() {
             Total Expense: ₹{getTotalExpense()}
           </Text>
         </View>
-        {loading ? <ActivityIndicator color="white" className="pt-10" size={35} /> :
+        {loading ? (
+          <ActivityIndicator color="white" className="pt-10" size={35} />
+        ) : (
           <ScrollView className="">
             {userExpenses ? (
               <View className="">
@@ -170,17 +170,30 @@ export default function ExpensesPage() {
                   <View className="flex-row mb-5 border-b-2 border-gray-500 justify-between pb-2 ">
                     <Text className="text-white text-lg flex-1">Name</Text>
                     <View className="flex-row flex-1 justify-between">
-                      <Text className="text-white text-lg font-semibold">Money</Text>
-                      <Text className="text-white text-lg font-semibold">Mode</Text>
+                      <Text className="text-white text-lg font-semibold">
+                        Money
+                      </Text>
+                      <Text className="text-white text-lg font-semibold">
+                        Mode
+                      </Text>
                     </View>
                   </View>
                   <>
                     {userExpenses?.map((item, index) => (
-                      <View className="flex-row justify-between mb-5 py-5 px-3 rounded bg-[#2C2B2E] " key={index} >
-                        <Text className="text-white text-lg flex-1">{item.expenseName}</Text>
+                      <View
+                        className="flex-row justify-between mb-5 py-5 px-3 rounded bg-[#2C2B2E] "
+                        key={index}
+                      >
+                        <Text className="text-white text-lg flex-1">
+                          {item.expenseName}
+                        </Text>
                         <View className="flex-row flex-1 justify-between">
-                          <Text className="text-white text-lg">₹{item.expenseAmount}</Text>
-                          <Text className="text-white text-lg">{item.paymentMode}</Text>
+                          <Text className="text-white text-lg">
+                            ₹{item.expenseAmount}
+                          </Text>
+                          <Text className="text-white text-lg">
+                            {item.paymentMode}
+                          </Text>
                         </View>
                       </View>
                     ))}
@@ -188,13 +201,12 @@ export default function ExpensesPage() {
                 </View>
               </View>
             ) : (
-              <View className="  "  >
+              <View className="  ">
                 <Text className="text-white text-lg">No expenses till yet</Text>
               </View>
             )}
           </ScrollView>
-        }
-
+        )}
       </SafeAreaView>
       <Modal
         animationType="slide"

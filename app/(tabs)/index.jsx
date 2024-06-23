@@ -24,7 +24,7 @@ export default function Home() {
   const [userIncome, setUserIncome] = useState(null);
   const [userData, setUserData] = useState([]);
 
-  const isFocused = useIsFocused()
+  const isFocused = useIsFocused();
 
   const opacity = useRef(new Animated.Value(0.5)).current;
 
@@ -36,7 +36,7 @@ export default function Home() {
     setUserData(data);
   };
 
-  const historyExpense = userData[0].expenses.slice(0, 4)
+  const historyExpense = userData[0]?.expenses?.slice(0, 4);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -169,9 +169,16 @@ export default function Home() {
               </View>
               <View className="mx-2 mb-2">
                 {historyExpense.map((itme, index) => (
-                  <View className="mb-2 py-1 flex-row justify-between" key={index}>
-                    <Text className="text-white text-lg">{itme.expenseName}</Text>
-                    <Text className="text-red-500 text-lg">- {itme.expenseAmount}</Text>
+                  <View
+                    className="mb-2 py-1 flex-row justify-between"
+                    key={index}
+                  >
+                    <Text className="text-white text-lg">
+                      {itme.expenseName}
+                    </Text>
+                    <Text className="text-red-500 text-lg">
+                      - {itme.expenseAmount}
+                    </Text>
                   </View>
                 ))}
               </View>

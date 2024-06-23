@@ -5,6 +5,7 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -27,7 +28,6 @@ export default function TabLayout() {
             paddingBottom: 2,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
-
           },
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
@@ -35,6 +35,22 @@ export default function TabLayout() {
               color={color}
               size={24}
             />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="Goals"
+        options={{
+          title: "Goals",
+          tabBarStyle: {
+            height: 60,
+            paddingBottom: 2,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+          },
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name="finance" size={24} color={color} />
           ),
         }}
       />
@@ -48,7 +64,6 @@ export default function TabLayout() {
             paddingBottom: 2,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-
           },
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome name="dollar" size={24} color={color} />
