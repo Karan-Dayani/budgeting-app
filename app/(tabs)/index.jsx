@@ -121,9 +121,11 @@ export default function Home() {
         }}
       />
 
-      <ScrollView className="px-5 py-2
+      <ScrollView
+        className="px-5 py-2
       \
-      ">
+      "
+      >
         {loading ? (
           <>
             <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
