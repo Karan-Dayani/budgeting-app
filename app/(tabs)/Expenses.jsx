@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, SafeAreaView, Pressable, Modal, TextInput, ActivityIndicator, Alert, TouchableOpacity, Button } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  Pressable,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+  Button,
+} from "react-native";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../../lib/supabase";
 import { Dropdown } from "react-native-element-dropdown";
-import uuid from 'react-native-uuid';
-import DatePicker from 'react-native-neat-date-picker'
+import uuid from "react-native-uuid";
+
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date().toLocaleString("default", { month: "long", year: "numeric" }));
+  const [selectedDate, setSelectedDate] = useState("");
   const [user, setUser] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [expense, setExpense] = useState({
@@ -25,7 +37,21 @@ export default function ExpensesPage() {
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
 
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.log(new Date(date).toDateString().slice(4));
+    setSelectedDate(new Date(date).toDateString().slice(4));
+    hideDatePicker();
+  };
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -55,7 +81,7 @@ export default function ExpensesPage() {
 
     setLoading(false);
     return () => clearTimeout(timer);
-  }, [user, expense,]);
+  }, [user, expense]);
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
@@ -108,9 +134,11 @@ export default function ExpensesPage() {
       .eq("email", user?.user_metadata?.email);
 
     const prevArray = data[0]?.expenses || [];
-    const updatedArray = prevArray.filter(exp => exp.expenseId !== selectedExpense.expenseId);
+    const updatedArray = prevArray.filter(
+      (exp) => exp.expenseId !== selectedExpense.expenseId
+    );
 
-    console.log(updatedArray)
+    console.log(updatedArray);
 
     await supabase
       .from("User Data")
@@ -125,7 +153,10 @@ export default function ExpensesPage() {
 
   const getTotalExpense = () => {
     if (userExpenses?.length === 0) return 0;
-    return userExpenses?.reduce((total, item) => total + item?.expenseAmount, 0);
+    return userExpenses?.reduce(
+      (total, item) => total + item?.expenseAmount,
+      0
+    );
   };
 
   const data = [
@@ -157,11 +188,14 @@ export default function ExpensesPage() {
         </Pressable>
         <View className=" w-full">
           <View className="h-12 justify-start">
-            <Text className="text-white text-3xl" style={{ fontFamily: "Red_Hat" }}>
+            <Text
+              className="text-white text-3xl"
+              style={{ fontFamily: "Red_Hat" }}
+            >
               Monthly Expenses
             </Text>
           </View>
-          <Text className="text-gray-400 mb-2">Select month :</Text>
+          {/* <Text className="text-gray-400 mb-2">Select month :</Text>
           <View className="w-42 h-12  rounded-lg">
             <Picker
               selectedValue={selectedDate}
@@ -192,30 +226,56 @@ export default function ExpensesPage() {
               <Picker.Item label="November 2024" value="November 2024" />
               <Picker.Item label="December 2024" value="December 2024" />
             </Picker>
-
+          </View> */}
+          <View>
+            <Button title="Show Date Picker" onPress={showDatePicker} />
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
           </View>
         </View>
         {loading ? (
-          <ActivityIndicator size="large" color="white" className=" justify-center h-96" />
+          <ActivityIndicator
+            size="large"
+            color="white"
+            className=" justify-center h-96"
+          />
         ) : (
           <ScrollView className="mt-5">
             <View className="w-full mb-16">
               {userExpenses?.map((item, index) => (
                 <View key={index}>
-                  <TouchableOpacity onLongPress={() => handleExpenseDetail(item)}>
-                    <View className="rounded-lg bg-gray-900 p-4 my-2" >
+                  <TouchableOpacity
+                    onLongPress={() => handleExpenseDetail(item)}
+                  >
+                    <View className="rounded-lg bg-gray-900 p-4 my-2">
                       <View className="flex-row justify-between mb-2">
-                        <Text className="text-white text-xl" style={{ fontFamily: "Red_Hat" }}>
+                        <Text
+                          className="text-white text-xl"
+                          style={{ fontFamily: "Red_Hat" }}
+                        >
                           {item?.expenseName}
                         </Text>
-                        <Text className="text-white text-lg" style={{ fontFamily: "Red_Hat" }}>
+                        <Text
+                          className="text-white text-lg"
+                          style={{ fontFamily: "Red_Hat" }}
+                        >
                           ₹{item?.expenseAmount}
                         </Text>
                       </View>
-                      <Text className="text-gray-400" style={{ fontFamily: "Red_Hat" }}>
+                      <Text
+                        className="text-gray-400"
+                        style={{ fontFamily: "Red_Hat" }}
+                      >
                         Payment Mode: {item?.paymentMode}
                       </Text>
-                      <Text className="text-gray-400" style={{ fontFamily: "Red_Hat" }}>
+                      <Text
+                        className="text-gray-400"
+                        style={{ fontFamily: "Red_Hat" }}
+                      >
                         Date: {item?.expenseDate}
                       </Text>
                     </View>
@@ -234,25 +294,49 @@ export default function ExpensesPage() {
           >
             <View className="flex-1 justify-center items-center bg-black bg-opacity-70">
               <View className="bg-gray-900 rounded-lg p-6 w-11/12">
-                <Text className="text-white text-3xl mb-4" style={{ fontFamily: "Red_Hat" }}>
+                <Text
+                  className="text-white text-3xl mb-4"
+                  style={{ fontFamily: "Red_Hat" }}
+                >
                   {selectedExpense?.expenseName}
                 </Text>
-                <Text className="text-yellow-400 text-2xl mb-4" style={{ fontFamily: "Red_Hat" }}>
+                <Text
+                  className="text-yellow-400 text-2xl mb-4"
+                  style={{ fontFamily: "Red_Hat" }}
+                >
                   ₹{selectedExpense?.expenseAmount}
                 </Text>
-                <Text className="text-gray-400 text-xl mb-4" style={{ fontFamily: "Red_Hat" }}>
+                <Text
+                  className="text-gray-400 text-xl mb-4"
+                  style={{ fontFamily: "Red_Hat" }}
+                >
                   Date: {selectedExpense?.expenseDate}
                 </Text>
-                <Text className="text-gray-400 text-xl mb-4" style={{ fontFamily: "Red_Hat" }}>
+                <Text
+                  className="text-gray-400 text-xl mb-4"
+                  style={{ fontFamily: "Red_Hat" }}
+                >
                   Payment Mode: {selectedExpense?.paymentMode}
                 </Text>
-                <Pressable className="bg-red-500 p-3 rounded-lg mb-2" onPress={() => handleDeleteExpense()}>
-                  <Text className="text-white text-center text-lg" style={{ fontFamily: "Red_Hat" }}>
+                <Pressable
+                  className="bg-red-500 p-3 rounded-lg mb-2"
+                  onPress={() => handleDeleteExpense()}
+                >
+                  <Text
+                    className="text-white text-center text-lg"
+                    style={{ fontFamily: "Red_Hat" }}
+                  >
                     Delete
                   </Text>
                 </Pressable>
-                <Pressable onPress={closeExpenseDetail} className="bg-blue-500 p-3 rounded-lg">
-                  <Text className="text-white text-center text-lg" style={{ fontFamily: "Red_Hat" }}>
+                <Pressable
+                  onPress={closeExpenseDetail}
+                  className="bg-blue-500 p-3 rounded-lg"
+                >
+                  <Text
+                    className="text-white text-center text-lg"
+                    style={{ fontFamily: "Red_Hat" }}
+                  >
                     Close
                   </Text>
                 </Pressable>
@@ -271,7 +355,10 @@ export default function ExpensesPage() {
       >
         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
           <View className="bg-gray-800 rounded-lg p-5 w-11/12">
-            <Text className="text-white text-2xl mb-4" style={{ fontFamily: "Red_Hat" }}>
+            <Text
+              className="text-white text-2xl mb-4"
+              style={{ fontFamily: "Red_Hat" }}
+            >
               Name
             </Text>
             <TextInput
@@ -281,17 +368,25 @@ export default function ExpensesPage() {
               className="bg-gray-700 text-white p-2 mb-4 rounded-lg"
               placeholderTextColor="#888"
             />
-            <Text className="text-white text-2xl mb-4" style={{ fontFamily: "Red_Hat" }}>
+            <Text
+              className="text-white text-2xl mb-4"
+              style={{ fontFamily: "Red_Hat" }}
+            >
               Amount
             </Text>
             <TextInput
               placeholder="0"
-              onChangeText={(text) => handleExpenseChange("expenseAmount", Number(text))}
+              onChangeText={(text) =>
+                handleExpenseChange("expenseAmount", Number(text))
+              }
               className="bg-gray-700 text-white p-2 mb-4 rounded-lg"
               placeholderTextColor="#888"
               keyboardType="numeric"
             />
-            <Text className="text-white text-2xl mb-4" style={{ fontFamily: "Red_Hat" }}>
+            <Text
+              className="text-white text-2xl mb-4"
+              style={{ fontFamily: "Red_Hat" }}
+            >
               Select Mode
             </Text>
             <Dropdown
@@ -312,7 +407,10 @@ export default function ExpensesPage() {
               onPress={handleSaveExpense}
               className="bg-blue-500 p-3 rounded-lg mb-2"
             >
-              <Text className="text-white text-center text-lg" style={{ fontFamily: "Red_Hat" }}>
+              <Text
+                className="text-white text-center text-lg"
+                style={{ fontFamily: "Red_Hat" }}
+              >
                 Save Expense
               </Text>
             </Pressable>
@@ -320,7 +418,10 @@ export default function ExpensesPage() {
               onPress={() => setModalVisible(false)}
               className="bg-red-500 p-3 rounded-lg"
             >
-              <Text className="text-white text-center text-lg" style={{ fontFamily: "Red_Hat" }}>
+              <Text
+                className="text-white text-center text-lg"
+                style={{ fontFamily: "Red_Hat" }}
+              >
                 Cancel
               </Text>
             </Pressable>
