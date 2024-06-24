@@ -228,7 +228,8 @@ export default function ExpensesPage() {
             </Picker>
           </View> */}
           <View>
-            <Button title="Show Date Picker" onPress={showDatePicker} />
+
+            <Pressable onPress={showDatePicker} className="bg-cardColor p-4 rounded-xl" ><Text className="text-white">Select Date</Text></Pressable>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
