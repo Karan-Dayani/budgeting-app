@@ -22,7 +22,9 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toDateString().slice(4)
+  );
   const [user, setUser] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [expense, setExpense] = useState({
@@ -48,7 +50,6 @@ export default function ExpensesPage() {
   };
 
   const handleConfirm = (date) => {
-    console.log(new Date(date).toDateString().slice(4));
     setSelectedDate(new Date(date).toDateString().slice(4));
     hideDatePicker();
   };
@@ -82,6 +83,11 @@ export default function ExpensesPage() {
     setLoading(false);
     return () => clearTimeout(timer);
   }, [user, expense]);
+
+  const datedExpenses = userExpenses?.filter(
+    (expense) => expense.expenseDate === selectedDate
+  );
+  console.log(datedExpenses);
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
@@ -195,41 +201,14 @@ export default function ExpensesPage() {
               Monthly Expenses
             </Text>
           </View>
-          {/* <Text className="text-gray-400 mb-2">Select month :</Text>
-          <View className="w-42 h-12  rounded-lg">
-            <Picker
-              selectedValue={selectedDate}
-              onValueChange={(itemValue) => setSelectedDate(itemValue)}
-              style={{
-                height: "100%",
-                width: "100%",
-                color: "white",
-                fontFamily: "Red_Hat",
-              }}
-              itemStyle={{
-                backgroundColor: "#000",
-                color: "#fff",
-                fontFamily: "Red_Hat",
-                fontSize: 16,
-              }}
-            >
-              <Picker.Item label="January 2024" value="January 2024" />
-              <Picker.Item label="February 2024" value="February 2024" />
-              <Picker.Item label="March 2024" value="March 2024" />
-              <Picker.Item label="April 2024" value="April 2024" />
-              <Picker.Item label="May 2024" value="May 2024" />
-              <Picker.Item label="June 2024" value="June 2024" />
-              <Picker.Item label="July 2024" value="July 2024" />
-              <Picker.Item label="August 2024" value="August 2024" />
-              <Picker.Item label="September 2024" value="September 2024" />
-              <Picker.Item label="October 2024" value="October 2024" />
-              <Picker.Item label="November 2024" value="November 2024" />
-              <Picker.Item label="December 2024" value="December 2024" />
-            </Picker>
-          </View> */}
           <View>
-
-            <Pressable onPress={showDatePicker} className="bg-cardColor p-4 rounded-xl" ><Text className="text-white">Select Date</Text></Pressable>
+            <Text className="text-white">{selectedDate}</Text>
+            <Pressable
+              onPress={showDatePicker}
+              className="bg-cardColor p-4 rounded-xl"
+            >
+              <Text className="text-white">Select Date</Text>
+            </Pressable>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
@@ -247,7 +226,7 @@ export default function ExpensesPage() {
         ) : (
           <ScrollView className="mt-5">
             <View className="w-full mb-16">
-              {userExpenses?.map((item, index) => (
+              {datedExpenses?.map((item, index) => (
                 <View key={index}>
                   <TouchableOpacity
                     onLongPress={() => handleExpenseDetail(item)}
