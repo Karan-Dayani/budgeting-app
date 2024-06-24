@@ -24,6 +24,6 @@ export default function LoadingAnimation({ style }) {
     }, [opacity]);
 
     return (
-        <Animated.View style={[style, { backgroundColor: '#31363F', opacity, marginTop: 10 }]} />
+        <Animated.View style={[style, { backgroundColor: '#31363F', opacity, marginTop: 5 }]} />
     );
 }

@@ -4,7 +4,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 const TotalIncome = ({ user }) => {
@@ -18,9 +18,9 @@ const TotalIncome = ({ user }) => {
 
     const expense = numberWithCommas(getTotalExpense());
 
-    const income = numberWithCommas(user[0].income);
+    const income = numberWithCommas(user[0]?.income);
 
-    const savings = numberWithCommas(user[0].income - getTotalExpense());
+    const savings = numberWithCommas(user[0]?.income - getTotalExpense());
 
     const handleExpensesClick = () => {
         router.push("/(tabs)/Expenses");

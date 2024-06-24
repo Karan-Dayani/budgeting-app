@@ -56,7 +56,7 @@ export default function Home() {
 
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [isFocused]);
@@ -71,6 +71,8 @@ export default function Home() {
     const { error } = await supabase.auth.signOut();
     setMenuVisible(!menuVisible);
   };
+
+
 
   return (
     <SafeAreaView className="h-full ">
@@ -133,9 +135,11 @@ export default function Home() {
       >
         {loading ? (
           <>
-            <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
-            <LoadingAnimation style={{ height: 100, borderRadius: 15 }} />
-            {/* <LoadingAnimation style={{ height: 100, borderRadius: 15 }} /> */}
+            <LoadingAnimation style={{ height: 96, borderRadius: 15 }} />
+            <View className="flex-row justify-between ">
+              <LoadingAnimation style={{ height: 96, width: 156, borderRadius: 15 }} />
+              <LoadingAnimation style={{ height: 96, width: 156, borderRadius: 15 }} />
+            </View>
           </>
         ) : (
           <>
@@ -168,7 +172,7 @@ export default function Home() {
                 />
               </View>
               <View className="mx-2 mb-2">
-                {historyExpense.map((itme, index) => (
+                {historyExpense?.map((itme, index) => (
                   <View
                     className="mb-2 py-1 flex-row justify-between"
                     key={index}
