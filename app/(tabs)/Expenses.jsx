@@ -22,9 +22,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toDateString().slice(4)
-  );
+  const [selectedDate, setSelectedDate] = useState("");
   const [user, setUser] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [expense, setExpense] = useState({
@@ -84,9 +82,15 @@ export default function ExpensesPage() {
     return () => clearTimeout(timer);
   }, [user, expense]);
 
-  const datedExpenses = userExpenses?.filter(
-    (expense) => expense.expenseDate === selectedDate
-  );
+  let datedExpenses = [];
+
+  if (selectedDate === "") {
+    datedExpenses = userExpenses;
+  } else {
+    datedExpenses = userExpenses?.filter(
+      (expense) => expense.expenseDate === selectedDate
+    );
+  }
   console.log(datedExpenses);
 
   const handleExpenseChange = (fieldName, value) => {
@@ -202,13 +206,26 @@ export default function ExpensesPage() {
             </Text>
           </View>
           <View>
-            <Text className="text-white">{selectedDate}</Text>
             <Pressable
               onPress={showDatePicker}
-              className="bg-cardColor p-4 rounded-xl"
+              className="bg-cardColor p-3 rounded-xl "
             >
-              <Text className="text-white">Select Date</Text>
+              {selectedDate ? (
+                <Text className="text-white">{selectedDate}</Text>
+              ) : (
+                <Text className="text-white">Select Date</Text>
+              )}
             </Pressable>
+            {selectedDate ? (
+              <Pressable
+                onPress={() => setSelectedDate("")}
+                className="bg-red-500 rounded-r-lg p-3 absolute right-0"
+              >
+                <Text className="text-white">Reset</Text>
+              </Pressable>
+            ) : (
+              <></>
+            )}
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
