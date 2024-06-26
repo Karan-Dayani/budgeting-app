@@ -1,4 +1,14 @@
-import { View, Text, SafeAreaView, Pressable, Modal, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  Pressable,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Link, Stack } from "expo-router";
 import uuid from "react-native-uuid";
@@ -9,12 +19,19 @@ const Goals = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState();
   const [userGoals, setUserGoals] = useState();
+  const [goalDetailModal, setGoalDetailModal] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState();
   const [goal, setGoal] = useState({
     goalId: uuid.v4(),
     goalName: "",
     goalTargetMoney: 0,
     goalSavedMoney: 0,
   });
+
+  const handleGoalDetailOpen = (item) => {
+    setSelectedGoal(item);
+    setGoalDetailModal(true);
+  };
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -46,10 +63,7 @@ const Goals = () => {
       setLoading(true);
       fetchData();
     }
-
   }, [user, goal]);
-
-
 
   const handleAddGoalChange = (fieldName, value) => {
     setGoal((prevData) => ({
@@ -64,7 +78,7 @@ const Goals = () => {
       .select("goals")
       .eq("email", user?.user_metadata?.email);
 
-    console.log(data)
+    console.log(data);
     const prevArray = data[0]?.goals || [];
     const updatedArray = [goal, ...prevArray];
 
@@ -81,6 +95,7 @@ const Goals = () => {
     setModalVisible(false);
   };
 
+  console.log(userGoals);
 
   return (
     <View className="px-5 flex-1">
@@ -97,35 +112,50 @@ const Goals = () => {
         }}
       />
       <SafeAreaView className="h-full">
+        {userGoals?.length > 0 ? (
+          <Pressable
+            onPress={() => setModalVisible(true)}
+            className="bg-blue-500 p-2 rounded-full absolute right-0 bottom-5 z-10"
+          >
+            <Ionicons name="add" size={40} color="white" />
+          </Pressable>
+        ) : (
+          <></>
+        )}
+
         <Text className="text-white text-3xl" style={{ fontFamily: "Nunito" }}>
           Goals
         </Text>
         <View className="mt-4">
-          {userGoals ? (
-            userGoals.map((item, index) => (
-              <Link key={index} className="" href={""}>
-                <View className="rounded-lg bg-gray-900 p-4 my-2 w-96">
-                  <View className="flex-row justify-between mb-2">
-                    <Text
-                      className="text-white text-xl "
-                      style={{ fontFamily: "Red_Hat" }}
-                    >
-                      {item?.goalName}
-                    </Text>
-                    <Text
-                      className="text-white text-lg"
-                      style={{ fontFamily: "Red_Hat" }}
-                    >
-                      ₹{item?.goalTargetMoney}
-                    </Text>
-                  </View>
+          {userGoals?.length > 0 ? (
+            userGoals?.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                onLongPress={() => handleGoalDetailOpen(item)}
+              >
+                <View className="rounded-lg bg-gray-900 p-4 my-2 w-full flex-row justify-between">
+                  <Text
+                    className="text-white text-xl "
+                    style={{ fontFamily: "Red_Hat" }}
+                  >
+                    {item?.goalName}
+                  </Text>
+                  <Text
+                    className="text-white text-lg"
+                    style={{ fontFamily: "Red_Hat" }}
+                  >
+                    ₹{item.goalSavedMoney} / ₹{item?.goalTargetMoney}
+                  </Text>
                 </View>
-              </Link>
+              </TouchableOpacity>
             ))
           ) : (
             // Render when userGoals is undefined or empty
             <View className="bg-[#1F2937] px-6 py-4 rounded-xl mt-5 shadow-lg">
-              <Text className="text-white text-xl mb-3" style={{ fontFamily: "Nunito" }}>
+              <Text
+                className="text-white text-xl mb-3"
+                style={{ fontFamily: "Nunito" }}
+              >
                 Set and track your personal goals here.
               </Text>
 
@@ -133,13 +163,33 @@ const Goals = () => {
                 className="p-2 bg-blue-500 items-center rounded-lg"
                 onPress={() => setModalVisible(true)}
               >
-                <Text className="text-white text-lg font-bold" style={{ fontFamily: "Nunito" }}>
+                <Text
+                  className="text-white text-lg font-bold"
+                  style={{ fontFamily: "Nunito" }}
+                >
                   Add Goal
                 </Text>
               </Pressable>
             </View>
           )}
         </View>
+
+        {selectedGoal && (
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={goalDetailModal}
+            onRequestClose={() => {
+              setGoalDetailModal(!goalDetailModal);
+            }}
+          >
+            <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+              <View className="bg-[#191A19] p-5 rounded-xl w-4/5">
+                <Text className="text-white">{selectedGoal.goalName}</Text>
+              </View>
+            </View>
+          </Modal>
+        )}
 
         <Modal
           animationType="slide"
@@ -151,7 +201,10 @@ const Goals = () => {
         >
           <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
             <View className="bg-[#191A19] p-5 rounded-xl w-4/5">
-              <Text className="text-white text-xl mb-3" style={{ fontFamily: "Nunito" }}>
+              <Text
+                className="text-white text-xl mb-3"
+                style={{ fontFamily: "Nunito" }}
+              >
                 Set a Goal
               </Text>
               <TextInput
@@ -163,7 +216,9 @@ const Goals = () => {
               />
               <TextInput
                 value={goal.goalMoneyTarget}
-                onChangeText={(value) => handleAddGoalChange("goalTargetMoney", value)}
+                onChangeText={(value) =>
+                  handleAddGoalChange("goalTargetMoney", value)
+                }
                 className="rounded-lg mb-4 text-white p-2 bg-[#31363F]"
                 placeholderTextColor="white"
                 placeholder="Target amount"
