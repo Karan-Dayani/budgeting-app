@@ -63,23 +63,26 @@ export default function ExpensesPage() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
     async function fetchData() {
-      const { data, err } = await supabase
+      const { data, error } = await supabase
         .from("User Data")
         .select("expenses, income")
         .eq("email", user?.user_metadata?.email);
 
-      setUserExpenses(data[0]?.expenses || []);
-      setIncome(data[0]?.income || 0);
-    }
-    fetchData();
-    const timer = setTimeout(() => {
+      if (error) {
+        console.error(error);
+        Alert.alert("Error fetching data");
+      } else {
+        setUserExpenses(data[0]?.expenses || []);
+        setIncome(data[0]?.income || 0);
+      }
       setLoading(false);
-    }, 2000);
+    }
 
-    setLoading(false);
-    return () => clearTimeout(timer);
+    if (user) {
+      setLoading(true);
+      fetchData();
+    }
   }, [user, expense]);
 
   let datedExpenses = [];
@@ -91,7 +94,7 @@ export default function ExpensesPage() {
       (expense) => expense.expenseDate === selectedDate
     );
   }
-  console.log(datedExpenses);
+
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
@@ -199,33 +202,45 @@ export default function ExpensesPage() {
         <View className=" w-full">
           <View className="h-12 justify-start">
             <Text
-              className="text-white text-3xl"
-              style={{ fontFamily: "Red_Hat" }}
+              className="text-white text-2xl "
+              style={{ fontFamily: "Nunito" }}
             >
-              Monthly Expenses
+              Expenses
             </Text>
           </View>
           <View>
-            <Pressable
-              onPress={showDatePicker}
-              className="bg-cardColor p-3 rounded-xl "
-            >
+            <View className="flex-row justify-between items-center mb-4">
+              <View>
+                {selectedDate ? (
+                  <Text className="text-white text-xl font-bold ml-1">
+                    {selectedDate}
+                  </Text>
+                ) : (
+                  <Text className="text-white text-xl font-bold ml-1">
+                    {new Date().toLocaleString("default", { month: "long", year: "numeric" })}
+                  </Text>
+                )}
+                <Text className="px-1 text-white">
+                  Total expense: ₹{getTotalExpense()}
+                </Text>
+              </View>
+
               {selectedDate ? (
-                <Text className="text-white">{selectedDate}</Text>
+                <Pressable
+                  onPress={() => setSelectedDate("")}
+                  className="bg-red-500 p-3 rounded-xl justify-center "
+                >
+                  <Text className="text-white">Reset</Text>
+                </Pressable>
               ) : (
-                <Text className="text-white">Select Date</Text>
+                <Pressable
+                  onPress={showDatePicker}
+                  className="bg-cardColor p-3 rounded-xl justify-center "
+                >
+                  <Text className="text-white">Select Date</Text>
+                </Pressable>
               )}
-            </Pressable>
-            {selectedDate ? (
-              <Pressable
-                onPress={() => setSelectedDate("")}
-                className="bg-red-500 rounded-r-lg p-3 absolute right-0"
-              >
-                <Text className="text-white">Reset</Text>
-              </Pressable>
-            ) : (
-              <></>
-            )}
+            </View>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
@@ -241,7 +256,7 @@ export default function ExpensesPage() {
             className=" justify-center h-96"
           />
         ) : (
-          <ScrollView className="mt-5">
+          <ScrollView className="mt-2">
             <View className="w-full mb-16">
               {datedExpenses?.map((item, index) => (
                 <View key={index}>

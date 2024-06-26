@@ -46,8 +46,8 @@ export default function TabLayout() {
           tabBarStyle: {
             height: 60,
             paddingBottom: 2,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
           },
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome name="dollar" size={24} color={color} />

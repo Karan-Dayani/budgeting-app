@@ -171,18 +171,22 @@ export default function Home() {
                   style={{ marginRight: 10 }}
                 />
               </View>
-              <View className="mx-2 mb-2">
+              <View className="mx-1 mb-2">
                 {historyExpense?.map((itme, index) => (
-                  <View
-                    className="mb-2 py-1 flex-row justify-between"
-                    key={index}
-                  >
-                    <Text className="text-white text-lg">
-                      {itme.expenseName}
-                    </Text>
-                    <Text className="text-red-500 text-lg">
-                      - {itme.expenseAmount}
-                    </Text>
+                  <View key={index} className="mb-2 p-3 bg-gray-800  rounded-xl">
+                    <View
+                      className="flex-row justify-between"
+                    >
+                      <Text className="text-white text-lg">
+                        {itme.expenseName}
+                      </Text>
+                      <Text className="text-red-500 text-lg">
+                        - ₹{itme.expenseAmount}
+                      </Text>
+                    </View>
+
+                    <Text className="text-gray-400">{itme.expenseDate}</Text>
+
                   </View>
                 ))}
               </View>
