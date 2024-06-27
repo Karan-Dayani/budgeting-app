@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+
+
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Link, Stack } from "expo-router";
@@ -66,7 +68,7 @@ const Goals = () => {
         Alert.alert("error accessing user");
       }
     });
-  }, [isFocused]);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -151,27 +153,42 @@ const Goals = () => {
         </Text>
         <View className="mt-4">
           {userGoals?.length > 0 ? (
-            userGoals?.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                onLongPress={() => handleGoalDetailOpen(item)}
-              >
-                <View className="rounded-lg bg-gray-900 p-4 my-2 w-full flex-row justify-between">
-                  <Text
-                    className="text-white text-xl "
-                    style={{ fontFamily: "Red_Hat" }}
-                  >
-                    {item?.goalName}
-                  </Text>
-                  <Text
-                    className="text-white text-lg"
-                    style={{ fontFamily: "Red_Hat" }}
-                  >
-                    ₹{item.goalSavedMoney} / ₹{item?.goalTargetMoney}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))
+            userGoals?.map((item, index) => {
+              const progress = Math.min(
+                (item.goalSavedMoney / item.goalTargetMoney) * 100,
+                100
+              );
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onLongPress={() => handleGoalDetailOpen(item)}
+                >
+                  <View className="rounded-lg bg-gray-900 p-4 my-2 w-full ">
+
+
+                    <Text
+                      className="text-white text-xl"
+                      style={{ fontFamily: "Red_Hat" }}
+                    >
+                      {item?.goalName}
+                    </Text>
+
+                    <View className="h-2 bg-gray-400 rounded-full overflow-hidden w-full mt-2">
+                      <View
+                        className="bg-green-500 h-full"
+                        style={{ width: `${progress}%` }}
+                      ></View>
+                    </View>
+                    <Text
+                      className="text-white text-lg mt-2"
+                      style={{ fontFamily: "Red_Hat" }}
+                    >
+                      ₹{item.goalSavedMoney} / ₹{item?.goalTargetMoney}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
           ) : (
             // Render when userGoals is undefined or empty
             <View className="bg-[#1F2937] px-6 py-4 rounded-xl mt-5 shadow-lg">
