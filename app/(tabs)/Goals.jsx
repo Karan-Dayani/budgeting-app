@@ -13,20 +13,44 @@ import React, { useEffect, useState } from "react";
 import { Link, Stack } from "expo-router";
 import uuid from "react-native-uuid";
 import { supabase } from "../../lib/supabase";
+import { useIsFocused } from "@react-navigation/native";
 
 const Goals = () => {
+  const isFocused = useIsFocused()
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState();
   const [userGoals, setUserGoals] = useState();
   const [goalDetailModal, setGoalDetailModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState();
+  const [goalAddInput, setGoalAddInput] = useState(0);
   const [goal, setGoal] = useState({
     goalId: uuid.v4(),
     goalName: "",
     goalTargetMoney: 0,
     goalSavedMoney: 0,
   });
+
+  const handleGoalAmountAdd = async () => {
+    const totalSavedMoney = selectedGoal.goalSavedMoney + goalAddInput;
+    const { data, err } = await supabase
+      .from("User Data")
+      .select("goals")
+      .eq("email", user?.user_metadata?.email);
+
+    const updatedData = data[0].goals.map((goal) => {
+      if (goal.goalId === selectedGoal.goalId) {
+        return { ...goal, goalSavedMoney: totalSavedMoney };
+      }
+    });
+
+    await supabase
+      .from("User Data")
+      .update({ goals: updatedData })
+      .eq("email", user?.user_metadata?.email);
+
+    setGoalDetailModal(false);
+  };
 
   const handleGoalDetailOpen = (item) => {
     setSelectedGoal(item);
@@ -41,7 +65,7 @@ const Goals = () => {
         Alert.alert("error accessing user");
       }
     });
-  }, []);
+  }, [isFocused]);
 
   useEffect(() => {
     async function fetchData() {
@@ -78,7 +102,6 @@ const Goals = () => {
       .select("goals")
       .eq("email", user?.user_metadata?.email);
 
-    console.log(data);
     const prevArray = data[0]?.goals || [];
     const updatedArray = [goal, ...prevArray];
 
@@ -94,8 +117,6 @@ const Goals = () => {
     });
     setModalVisible(false);
   };
-
-  console.log(userGoals);
 
   return (
     <View className="px-5 flex-1">
@@ -184,8 +205,21 @@ const Goals = () => {
             }}
           >
             <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+              <Text className="text-white">{selectedGoal.goalName}</Text>
               <View className="bg-[#191A19] p-5 rounded-xl w-4/5">
-                <Text className="text-white">{selectedGoal.goalName}</Text>
+                <TextInput
+                  placeholder="Add Amount"
+                  className="bg-gray-700 text-white p-2 mb-4 rounded-lg"
+                  placeholderTextColor={"white"}
+                  keyboardType="numeric"
+                  onChangeText={(text) => setGoalAddInput(Number(text))}
+                />
+                <Pressable
+                  className="bg-blue-500 p-3 rounded-lg mb-2"
+                  onPress={handleGoalAmountAdd}
+                >
+                  <Text className="text-white text-center text-lg">Add</Text>
+                </Pressable>
               </View>
             </View>
           </Modal>
