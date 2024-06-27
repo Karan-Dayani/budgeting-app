@@ -14,6 +14,7 @@ import { Link, Stack } from "expo-router";
 import uuid from "react-native-uuid";
 import { supabase } from "../../lib/supabase";
 import { useIsFocused } from "@react-navigation/native";
+import CircularProgress from 'react-native-circular-progress-indicator';
 
 const Goals = () => {
   const isFocused = useIsFocused()
@@ -29,7 +30,7 @@ const Goals = () => {
     goalName: "",
     goalTargetMoney: 0,
     goalSavedMoney: 0,
-  });
+  })
 
   const handleGoalAmountAdd = async () => {
     const totalSavedMoney = selectedGoal.goalSavedMoney + goalAddInput;
@@ -87,6 +88,7 @@ const Goals = () => {
       setLoading(true);
       fetchData();
     }
+
   }, [user, goal]);
 
   const handleAddGoalChange = (fieldName, value) => {
@@ -204,18 +206,23 @@ const Goals = () => {
               setGoalDetailModal(!goalDetailModal);
             }}
           >
-            <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-              <Text className="text-white">{selectedGoal.goalName}</Text>
-              <View className="bg-[#191A19] p-5 rounded-xl w-4/5">
+            <View className="flex-1 justify-center items-center bg-black bg-opacity-50 ">
+              <View className="bg-[#191A19] p-5 rounded-xl w-4/5 items-center ">
+                <Text className="text-white mb-5 text-xl">{selectedGoal.goalName}</Text>
+                <CircularProgress
+                  value={Math.round((selectedGoal?.goalSavedMoney / selectedGoal?.goalTargetMoney) * 100)}
+                  radius={70}
+                  valueSuffix={'%'}
+                />
                 <TextInput
                   placeholder="Add Amount"
-                  className="bg-gray-700 text-white p-2 mb-4 rounded-lg"
+                  className="bg-gray-700 text-white p-2 mb-4 rounded-lg w-full mt-5"
                   placeholderTextColor={"white"}
                   keyboardType="numeric"
                   onChangeText={(text) => setGoalAddInput(Number(text))}
                 />
                 <Pressable
-                  className="bg-blue-500 p-3 rounded-lg mb-2"
+                  className="bg-blue-500 p-2 rounded-lg mb-2 w-full"
                   onPress={handleGoalAmountAdd}
                 >
                   <Text className="text-white text-center text-lg">Add</Text>
