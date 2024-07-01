@@ -15,7 +15,8 @@ import LoadingAnimation from "../../components/LoadingAnimation";
 import { Entypo } from "@expo/vector-icons";
 import { supabase } from "../../lib/supabase";
 import TotalIncome from "../../components/TotalIncome";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, useTheme } from "@react-navigation/native";
+import { Button, Menu, NativeBaseProvider, Skeleton } from "native-base";
 
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -25,8 +26,7 @@ export default function Home() {
   const [userData, setUserData] = useState([]);
 
   const isFocused = useIsFocused();
-
-  const opacity = useRef(new Animated.Value(0.5)).current;
+  const { colors } = useTheme();
 
   const getUserRow = async (user) => {
     const { data, err } = await supabase
@@ -48,20 +48,12 @@ export default function Home() {
       }
     });
 
-    Animated.timing(opacity, {
-      toValue: 1,
-      useNativeDriver: true,
-      duration: 500,
-    }).start();
-
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500);
 
     return () => clearTimeout(timer);
   }, [isFocused]);
-
-  // console.log(user?.user_metadata?.email);
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -72,9 +64,8 @@ export default function Home() {
     setMenuVisible(!menuVisible);
   };
 
-
-
   return (
+
     <SafeAreaView className="h-full ">
       <Stack.Screen
         options={{
@@ -82,63 +73,76 @@ export default function Home() {
           headerTitleStyle: {
             fontSize: 30,
             fontFamily: "Jost",
-            color: "white",
+            color: colors.text,
           },
           headerStyle: {
-            backgroundColor: "#0F0F0F",
+            backgroundColor: colors.header,
           },
           headerRight: () => (
             <View className="right-5">
-              <Pressable onPress={() => toggleMenu()}>
-                {/* <Ionicons
-                  name="person-circle-outline"
-                  size={30}
-                  color="white"
-                /> */}
-                <Entypo name="dots-three-vertical" size={25} color="white" />
-              </Pressable>
-              {menuVisible ? (
-                <Animated.View
-                  className=" bg-gray-600 rounded-md w-40 p-2 absolute right-3 top-9 "
-                  style={{ opacity }}
+              <View className="flex-row">
+                <Ionicons
+                  name="notifications"
+                  size={25}
+                  color={colors.text}
+                />
+                <Menu
+                  w="150"
+                  trigger={(triggerProps) => {
+                    return (
+                      <Pressable
+                        accessibilityLabel="More options menu"
+                        {...triggerProps}
+                        className="ml-3"
+                      >
+                        <Entypo
+                          name="dots-three-vertical"
+                          size={25}
+                          color={colors.text}
+                        />
+                      </Pressable>
+                    );
+                  }}
+                  placement="bottom right"
                 >
-                  <Link
-                    href={"/profile"}
-                    className="text-white my-2 text-lg"
-                    onPress={() => toggleMenu()}
-                  >
+                  <Menu.Item onPress={() => router.push("/")}>
                     Profile
-                  </Link>
-                  <Link
-                    href={"/Expenses"}
-                    className="text-white my-2 text-lg "
-                    onPress={() => toggleMenu()}
-                  >
+                  </Menu.Item>
+                  <Menu.Item onPress={() => router.push("/Expenses")}>
                     Support
-                  </Link>
-                  <Pressable onPress={() => handleLogOut()}>
-                    <Text className="text-red-400 my-2 text-lg">Log out</Text>
-                  </Pressable>
-                </Animated.View>
-              ) : (
-                <></>
-              )}
+                  </Menu.Item>
+                  <Menu.Item onPress={handleLogOut}>
+                    <Text className="text-red-400">Log out</Text>
+                  </Menu.Item>
+                </Menu>
+                <Pressable onPress={() => toggleMenu()}>
+                  {/* Additional Pressable */}
+                </Pressable>
+              </View>
             </View>
           ),
         }}
       />
 
-      <ScrollView
-        className="px-5 py-2
-      \
-      "
-      >
+      <ScrollView className="px-5 py-2">
         {loading ? (
           <>
-            <LoadingAnimation style={{ height: 96, borderRadius: 15 }} />
-            <View className="flex-row justify-between ">
-              <LoadingAnimation style={{ height: 96, width: 156, borderRadius: 15 }} />
-              <LoadingAnimation style={{ height: 96, width: 156, borderRadius: 15 }} />
+            <Skeleton h="100px" mb="1" rounded="lg" startColor="coolGray.100" />
+            <View className="flex-row justify-between">
+              <Skeleton
+                h="100px"
+                w="156px"
+                my="1"
+                rounded="lg"
+                startColor="coolGray.100"
+              />
+              <Skeleton
+                h="100px"
+                w="156px"
+                my="1"
+                rounded="lg"
+                startColor="coolGray.100"
+              />
             </View>
           </>
         ) : (
@@ -149,17 +153,16 @@ export default function Home() {
           </>
         )}
         {/* History */}
-
         {loading ? (
           <>
-            <LoadingAnimation style={{ height: 250, borderRadius: 15 }} />
+            <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.100" />
           </>
         ) : (
           <>
-            <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 ">
-              <View className="items-center justify-between flex-row mb-4 px-2 py-2">
+            <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 ">
+              <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
                 <Text
-                  className="text-white text-2xl "
+                  className="text-white text-2xl"
                   style={{ fontFamily: "Nunito" }}
                 >
                   History
@@ -172,42 +175,29 @@ export default function Home() {
                 />
               </View>
               <View className="mx-1 mb-2">
-                {historyExpense?.map((itme, index) => (
-                  <View key={index} className="mb-2 p-3 bg-gray-800  rounded-xl">
-                    <View
-                      className="flex-row justify-between"
-                    >
+                {historyExpense?.map((item, index) => (
+                  <View key={index} className="mb-2 p-3 bg-gray-800 rounded-xl">
+                    <View className="flex-row justify-between">
                       <Text className="text-white text-lg">
-                        {itme.expenseName}
+                        {item.expenseName}
                       </Text>
                       <Text className="text-red-500 text-lg">
-                        - ₹{itme.expenseAmount}
+                        - ₹{item.expenseAmount}
                       </Text>
                     </View>
-
-                    <Text className="text-gray-400">{itme.expenseDate}</Text>
-
+                    <Text className="text-gray-400">{item.expenseDate}</Text>
                   </View>
                 ))}
               </View>
-            </Animated.View>
+            </View>
           </>
         )}
-
-        <Animated.View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 mb-10">
+        <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 mb-10">
           <View className="items-center justify-between flex-row mb-4 px-2 py-2">
-            <Text
-              className="text-white text-2xl"
-              style={{ fontFamily: "Nunito" }}
-            >
+            <Text className="text-white text-2xl" style={{ fontFamily: "Nunito" }}>
               Goals
             </Text>
-            <AntDesign
-              name="right"
-              size={14}
-              color="white"
-              style={{ marginRight: 10 }}
-            />
+            <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
           </View>
           <View className="mx-2 mb-2">
             <View className="mb-2 py-1 gap-2">
@@ -229,13 +219,12 @@ export default function Home() {
               <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
                 <View className="bg-green-500 h-full w-1/4"></View>
               </View>
-              <Text className="text-white text-sm mt-1">
-                ₹50,000 / ₹2,00,000
-              </Text>
+              <Text className="text-white text-sm mt-1">₹50,000 / ₹2,00,000</Text>
             </View>
           </View>
-        </Animated.View>
+        </View>
       </ScrollView>
     </SafeAreaView>
+
   );
 }

@@ -2,11 +2,13 @@ export const LightCustomTheme = {
     dark: false,
     colors: {
         primary: 'rgb(255, 45, 85)',
-        background: 'rgb(242, 242, 242)',
-        card: 'rgb(255, 255, 255)',
-        text: 'rgb(28, 28, 30)',
+        background: 'white',
+        card: '#3D2C8D',
+        text: 'black',
         border: 'rgb(199, 199, 204)',
         notification: 'rgb(255, 69, 58)',
+        tabBar: '#3D2C8D',
+        header: 'white',
     }
 }
 
@@ -16,8 +18,10 @@ export const DarkCustomTheme = {
         primary: 'rgb(255, 45, 85)',
         background: '#0F0F0F',
         card: '#3D2C8D',
-        text: 'rgb(28, 28, 30)',
+        text: 'white',
         border: '#0F0F0F',
         notification: 'rgb(255, 69, 58)',
+        tabBar: '#3D2C8D',
+        header: '#0F0F0F',
     },
 };

@@ -13,6 +13,8 @@ import {
 import { supabase } from "../../lib/supabase";
 
 import { Redirect, Stack } from "expo-router";
+import { Icon, Input } from "native-base";
+import { MaterialIcons } from "@expo/vector-icons";
 
 AppState.addEventListener("change", (state) => {
   if (state === "active") {
@@ -23,6 +25,7 @@ AppState.addEventListener("change", (state) => {
 });
 
 export default function Auth() {
+  const [show, setShow] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -65,8 +68,8 @@ export default function Auth() {
   return (
     <View className="h-full justify-center px-5 ">
       <Stack.Screen options={{ headerShown: false }} />
-
       <View className=" bg-[#191A19] pb-8 justify-center rounded-xl px-5">
+
         <Text
           className="text-white text-2xl text-center mt-5"
           style={{ fontFamily: "Nunito" }}
@@ -80,12 +83,20 @@ export default function Auth() {
           >
             Email
           </Text>
-          <TextInput
+          <Input
             label="Email"
-            leftIcon={{ type: "font-awesome", name: "envelope" }}
+            InputLeftElement={
+              <Icon
+                as={<MaterialIcons name="person" />}
+                size={5}
+                ml="2"
+                color="muted.400"
+              />
+            }
+            color="muted.50"
             onChangeText={(text) => setEmail(text)}
             value={email}
-            className="placeholder-white border-2 p-2 rounded-lg bg-white text-black"
+            rounded="lg"
             placeholder="email@address.com"
             autoCapitalize={"none"}
           />
@@ -97,13 +108,28 @@ export default function Auth() {
           >
             Password
           </Text>
-          <TextInput
+          <Input
             label="Password"
-            leftIcon={{ type: "font-awesome", name: "lock" }}
+            type={show ? "text" : "password"}
+            InputRightElement={
+              <Pressable onPress={() => setShow(!show)}>
+                <Icon
+                  as={
+                    <MaterialIcons
+                      name={show ? "visibility" : "visibility-off"}
+                    />
+                  }
+                  size={5}
+                  mr="2"
+                  color="muted.400"
+                />
+              </Pressable>
+            }
+            color="muted.50"
+            rounded="lg"
             onChangeText={(text) => setPassword(text)}
             value={password}
-            secureTextEntry={true}
-            className="placeholder-white border-2 p-2 rounded-lg bg-white text-black"
+
             placeholder="Password"
             autoCapitalize={"none"}
           />
