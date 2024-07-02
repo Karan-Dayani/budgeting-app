@@ -3,13 +3,13 @@
     "name": "budgeting-app",
     "slug": "budgeting-app",
     "version": "1.0.0",
-    "backgroundColor": "#0F0F0F",
+    "backgroundColor": "#191A19",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splashScreen.jpg",
+      "image": "./assets/images/splashPiggy.png",
       "resizeMode": "contain",
       "backgroundColor": "#191A19"
     },
@@ -18,8 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#191A19"
+        "foregroundImage": "./assets/images/adaptive-icon.png"
       }
     },
     "web": {

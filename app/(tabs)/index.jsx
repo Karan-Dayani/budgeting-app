@@ -66,7 +66,7 @@ export default function Home() {
 
   return (
 
-    <SafeAreaView className="h-full ">
+    <SafeAreaView className="h-full">
       <Stack.Screen
         options={{
           headerTitle: "CoinTrack",
@@ -127,20 +127,20 @@ export default function Home() {
       <ScrollView className="px-5 py-2">
         {loading ? (
           <>
-            <Skeleton h="100px" mb="1" rounded="lg" startColor="coolGray.100" />
+            <Skeleton h="100px" mb="1" rounded="20px" startColor="coolGray.100" />
             <View className="flex-row justify-between">
               <Skeleton
                 h="100px"
                 w="156px"
                 my="1"
-                rounded="lg"
+                rounded="20px"
                 startColor="coolGray.100"
               />
               <Skeleton
                 h="100px"
                 w="156px"
                 my="1"
-                rounded="lg"
+                rounded="20px"
                 startColor="coolGray.100"
               />
             </View>

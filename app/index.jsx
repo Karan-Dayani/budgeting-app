@@ -2,8 +2,9 @@ import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Redirect, router } from "expo-router";
 import { supabase } from "../lib/supabase";
+import SplashScreenLoad from "../screens/splashScreenLoad";
 
-const index = () => {
+const Index = () => {
 
   const checkUserIncome = async (email) => {
     const { data, error } = await supabase
@@ -12,35 +13,40 @@ const index = () => {
       .eq('email', email);
 
     return data && data[0].income;
-
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        const hasIncome = await checkUserIncome(session.user.email)
-        if (hasIncome) {
-          router.replace("/(tabs)/");
+    const delay = setTimeout(() => {
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
+        if (session) {
+          const hasIncome = await checkUserIncome(session.user.email)
+          if (hasIncome) {
+            router.replace("/(tabs)/");
+          } else {
+            router.replace("/profile/");
+          }
         } else {
-          router.replace("/profile/");
+          router.replace("/(auth)/login");
         }
-      } else {
-        router.replace("/(auth)/login");
-      }
-    });
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session) {
-        const hasIncome = await checkUserIncome(session.user.email)
-        if (hasIncome) {
-          router.replace("/(tabs)/");
+      });
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        if (session) {
+          const hasIncome = await checkUserIncome(session.user.email)
+          if (hasIncome) {
+            router.replace("/(tabs)/");
+          } else {
+            router.replace("/profile/");
+          }
         } else {
-          router.replace("/profile/");
+          router.replace("/(auth)/login");
         }
-      } else {
-        router.replace("/(auth)/login");
-      }
-    });
-  });
+      });
+    }, 1300); // 2000 milliseconds = 2 seconds
+
+    return () => clearTimeout(delay); // Clear timeout on unmount
+  }, []);
+
+  return <SplashScreenLoad />;
 };
 
-export default index;
+export default Index;

@@ -39,12 +39,12 @@ const TotalIncome = ({ user }) => {
                     >
                         Monthly Income
                     </Text>
-                    <AntDesign
+                    {/* <AntDesign
                         name="right"
                         size={14}
                         color="white"
                         style={{ marginRight: 10 }}
-                    />
+                    /> */}
                 </View>
                 {income ? (
                     <Text
@@ -63,7 +63,7 @@ const TotalIncome = ({ user }) => {
                 )}
             </View>
             <View className="flex-row w-full justify-between">
-                <View className="flex-1 rounded-xl bg-green-800 p-2 shadow-2xl mr-2">
+                <View className="flex-1 rounded-3xl bg-green-800 p-3 shadow-2xl mr-2">
                     <View className="items-center justify-between flex-row mb-4">
                         <View className="flex-row items-center gap-2">
                             <Text
@@ -73,12 +73,12 @@ const TotalIncome = ({ user }) => {
                                 Savings
                             </Text>
                         </View>
-                        <AntDesign
+                        {/* <AntDesign
                             name="right"
                             size={14}
                             color="white"
                             style={{ marginRight: 10 }}
-                        />
+                        /> */}
                     </View>
                     <Text
                         className="text-white text-3xl"
@@ -88,7 +88,7 @@ const TotalIncome = ({ user }) => {
                     </Text>
                 </View>
                 <View
-                    className="flex-1 rounded-xl bg-red-700 p-2 shadow-2xl ml-0"
+                    className="flex-1 rounded-3xl bg-red-700 p-3 shadow-2xl ml-0"
                     onStartShouldSetResponder={() => handleExpensesClick()}
                 >
                     <View className="items-center justify-between flex-row mb-4">
@@ -98,12 +98,12 @@ const TotalIncome = ({ user }) => {
                         >
                             Expenses
                         </Text>
-                        <AntDesign
+                        {/* <AntDesign
                             name="right"
                             size={14}
                             color="white"
                             style={{ marginRight: 10 }}
-                        />
+                        /> */}
                     </View>
                     <Text
                         className="text-white text-3xl"

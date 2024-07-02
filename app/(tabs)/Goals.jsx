@@ -19,6 +19,8 @@ import { supabase } from "../../lib/supabase";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import CircularProgress from 'react-native-circular-progress-indicator';
 
+
+
 const Goals = () => {
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(true);
@@ -146,7 +148,6 @@ const Goals = () => {
           }}
         />
         <SafeAreaView className="h-full">
-
           <>
             {userGoals.length > 0 ? (
               <Pressable
@@ -179,20 +180,27 @@ const Goals = () => {
                         key={index}
                         onLongPress={() => handleGoalDetailOpen(item)}
                       >
-                        <View className="rounded-lg bg-gray-900 p-4 my-2 w-full">
-                          <Text
-                            className="text-white text-xl"
-                            style={{ fontFamily: "Red_Hat" }}
-                          >
-                            {item.goalName}
-                          </Text>
-
-                          <View className="h-2 bg-gray-400 rounded-full overflow-hidden w-full mt-2">
-                            <Progress value={progress} />
+                        <View className="rounded-3xl bg-[#191A19] p-4 my-2 w-full flex-row ">
+                          <View className="mr-5">
+                            <CircularProgress
+                              value={Math.round((item.goalSavedMoney / item.goalTargetMoney) * 100)}
+                              radius={35}
+                              valueSuffix={"%"}
+                            />
                           </View>
-                          <Text className="text-white text-lg mt-2">
-                            ₹{item.goalSavedMoney} / ₹{item.goalTargetMoney}
-                          </Text>
+                          <View className="justify-center">
+                            <Text
+                              className="text-white text-xl"
+                              style={{ fontFamily: "Red_Hat" }}
+                            >
+                              {item.goalName}
+                            </Text>
+
+
+                            <Text className="text-gray-400 text-md mt-2">
+                              ₹{item.goalSavedMoney} / ₹{item.goalTargetMoney}
+                            </Text>
+                          </View>
                         </View>
                       </TouchableOpacity>
                     );
@@ -269,34 +277,34 @@ const Goals = () => {
             }}
           >
             <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-              <View className="bg-[#191A19] p-5 rounded-xl w-4/5">
+              <View className="bg-[#191A19] p-5 rounded-3xl w-11/12">
                 <Text className="text-white text-xl mb-3" style={{ fontFamily: "Nunito" }}>
                   Set a Goal
                 </Text>
                 <TextInput
                   value={goal.goalName}
                   onChangeText={(value) => handleAddGoalChange("goalName", value)}
-                  className="rounded-lg mb-4 text-white p-2 bg-[#31363F]"
+                  className="rounded-3xl mb-4 text-white p-4 bg-[#31363F]"
                   placeholderTextColor="white"
                   placeholder="Enter your goal"
                 />
                 <TextInput
                   value={goal.goalTargetMoney}
                   onChangeText={(value) => handleAddGoalChange("goalTargetMoney", value)}
-                  className="rounded-lg mb-4 text-white p-2 bg-[#31363F]"
+                  className="rounded-3xl mb-4 text-white p-4 bg-[#31363F]"
                   placeholderTextColor="white"
                   placeholder="Target amount"
                   keyboardType="numeric"
                 />
                 <View className="flex-row gap-2">
                   <Pressable
-                    className="flex-1 p-2 bg-red-500 items-center rounded-lg"
+                    className="flex-1 p-3 bg-red-500 items-center rounded-3xl"
                     onPress={() => setModalVisible(false)}
                   >
                     <Text className="text-white text-lg">Cancel</Text>
                   </Pressable>
                   <Pressable
-                    className="flex-1 p-2 bg-blue-500 items-center rounded-lg"
+                    className="flex-1 p-3 bg-blue-500 items-center rounded-3xl"
                     onPress={handleAddGoal}
                   >
                     <Text className="text-white text-lg">Save</Text>

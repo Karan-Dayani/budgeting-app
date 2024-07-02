@@ -9,6 +9,8 @@ export const LightCustomTheme = {
         notification: 'rgb(255, 69, 58)',
         tabBar: '#3D2C8D',
         header: 'white',
+        login: "white",
+        loginInput: "#EEEEEE"
     }
 }
 
@@ -23,5 +25,7 @@ export const DarkCustomTheme = {
         notification: 'rgb(255, 69, 58)',
         tabBar: '#3D2C8D',
         header: '#0F0F0F',
+        login: "#191A19",
+        loginInput: "#31363F"
     },
 };

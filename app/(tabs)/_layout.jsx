@@ -6,6 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Text } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -15,23 +16,25 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors.dark.tint,
         tabBarInactiveTintColor: Colors.dark.icon,
+
         headerShown: true,
         headerShadowVisible: false,
+
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          tabBarLabel: ({ focused }) => (focused ? <Text className="text-white text-[12px] mb-2">Home</Text> : null),
           tabBarStyle: {
-            height: 60,
-            paddingBottom: 2,
+            height: 70,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
           },
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
+              style={{ marginTop: focused ? 10 : 0 }}
               color={color}
               size={24}
             />
@@ -42,15 +45,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Expenses"
         options={{
-          title: "Expenses",
+          tabBarLabel: ({ focused }) => (focused ? <Text className="text-white text-[12px] mb-2">Expenses</Text> : null),
           tabBarStyle: {
-            height: 60,
-            paddingBottom: 2,
+            height: 70,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
           },
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="dollar" size={24} color={color} />
+            <FontAwesome name="dollar" size={24} style={{ marginTop: focused ? 10 : 0 }} color={color} />
           ),
         }}
       />
@@ -58,15 +60,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Goals"
         options={{
-          title: "Goals",
+          tabBarLabel: ({ focused }) => (focused ? <Text className="text-white text-[12px] mb-2">Goals</Text> : null),
           tabBarStyle: {
-            height: 60,
+            height: 70,
             paddingBottom: 2,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
           },
           tabBarIcon: ({ color, focused }) => (
-            <MaterialCommunityIcons name="finance" size={24} color={color} />
+            <MaterialCommunityIcons name="finance" style={{ marginTop: focused ? 10 : 0 }} size={24} color={color} />
           ),
         }}
       />
