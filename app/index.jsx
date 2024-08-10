@@ -41,9 +41,9 @@ const Index = () => {
           router.replace("/(auth)/login");
         }
       });
-    }, 2000); // 2000 milliseconds = 2 seconds
+    }, 2000);
 
-    return () => clearTimeout(delay); // Clear timeout on unmount
+    return () => clearTimeout(delay);
   }, []);
 
   return <SplashScreenLoad />;

@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   TouchableOpacity,
-  Text
+  Text,
 } from "react-native";
 import { Stack } from "expo-router";
 import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -18,11 +18,11 @@ import { Dropdown } from "react-native-element-dropdown";
 import uuid from "react-native-uuid";
 import { Button, NativeBaseProvider, Select } from "native-base";
 
-
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useTheme } from "@react-navigation/native";
 import RecurringExpense from "../../components/modals/RecurringExpense";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
+import NoDataLoad from "../../screens/NoDataLoad";
 
 export default function ExpensesPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +42,7 @@ export default function ExpensesPage() {
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
 
-  const { colors } = useTheme()
+  const { colors } = useTheme();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -102,7 +102,6 @@ export default function ExpensesPage() {
     );
   }
 
-
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
       ...prevData,
@@ -145,7 +144,7 @@ export default function ExpensesPage() {
       expenseDate: new Date().toDateString().slice(4),
     });
     setModalVisible(false);
-    setIsOpen(!isOpen)
+    setIsOpen(!isOpen);
     setTimeout(() => {
       setIsOpen(false);
     }, 4000);
@@ -217,12 +216,21 @@ export default function ExpensesPage() {
             <View className="flex-row justify-between items-center mb-4">
               <View>
                 {selectedDate ? (
-                  <Text className={`text-xl font-bold ml-1`} style={{ color: colors.text }}>
+                  <Text
+                    className={`text-xl font-bold ml-1`}
+                    style={{ color: colors.text }}
+                  >
                     {selectedDate}
                   </Text>
                 ) : (
-                  <Text className={` text-xl font-bold ml-1`} style={{ color: colors.text }}>
-                    {new Date().toLocaleString("default", { month: "long", year: "numeric" })}
+                  <Text
+                    className={` text-xl font-bold ml-1`}
+                    style={{ color: colors.text }}
+                  >
+                    {new Date().toLocaleString("default", {
+                      month: "long",
+                      year: "numeric",
+                    })}
                   </Text>
                 )}
                 <Text className={`px-1`} style={{ color: colors.text }}>
@@ -263,45 +271,50 @@ export default function ExpensesPage() {
         ) : (
           <ScrollView className="mt-2">
             <View className="w-full mb-16">
-              {datedExpenses?.map((item, index) => (
-                <View key={index}>
-                  <TouchableOpacity
-                    onLongPress={() => handleExpenseDetail(item)}
-                  >
-                    <View className="rounded-2xl bg-gray-900 px-5 py-4 my-2">
-                      <View className="flex-row justify-between mb-2">
+              {datedExpenses.length > 0 ? (
+                datedExpenses?.map((item, index) => (
+                  <View key={index}>
+                    <TouchableOpacity
+                      onLongPress={() => handleExpenseDetail(item)}
+                    >
+                      <View className="rounded-2xl bg-gray-900 px-5 py-4 my-2">
+                        <View className="flex-row justify-between mb-2">
+                          <Text
+                            className="text-white text-xl"
+                            style={{ fontFamily: "Red_Hat" }}
+                          >
+                            {item?.expenseName}
+                          </Text>
+                          <Text
+                            className="text-white text-lg"
+                            style={{ fontFamily: "Red_Hat" }}
+                          >
+                            ₹{item?.expenseAmount}
+                          </Text>
+                        </View>
                         <Text
-                          className="text-white text-xl"
+                          className="text-gray-400"
                           style={{ fontFamily: "Red_Hat" }}
                         >
-                          {item?.expenseName}
+                          Payment Mode: {item?.paymentMode}
                         </Text>
                         <Text
-                          className="text-white text-lg"
+                          className="text-gray-400"
                           style={{ fontFamily: "Red_Hat" }}
                         >
-                          ₹{item?.expenseAmount}
+                          Date: {item?.expenseDate}
                         </Text>
                       </View>
-                      <Text
-                        className="text-gray-400"
-                        style={{ fontFamily: "Red_Hat" }}
-                      >
-                        Payment Mode: {item?.paymentMode}
-                      </Text>
-                      <Text
-                        className="text-gray-400"
-                        style={{ fontFamily: "Red_Hat" }}
-                      >
-                        Date: {item?.expenseDate}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              ))}
+                    </TouchableOpacity>
+                  </View>
+                ))
+              ) : (
+                <NoDataLoad />
+              )}
             </View>
           </ScrollView>
         )}
+
         {selectedExpense && (
           <Modal
             animationType="fade"
@@ -333,6 +346,5 @@ export default function ExpensesPage() {
         />
       </Modal>
     </View>
-
   );
 }

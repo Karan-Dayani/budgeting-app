@@ -2,20 +2,18 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import LottieView from "lottie-react-native";
 
-const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => {} }) => {
+const NoDataLoad = () => {
   return (
     <View style={styles.animationContainer}>
       <LottieView
         autoPlay
-        loop={false}
+        loop
         style={{
-          width: 298,
-          height: 298,
-          backgroundColor: "#191A19",
-          marginBottom: 85,
+          width: 278,
+          height: 400,
+          backgroundColor: "#0F0F0F",
         }}
-        source={require("../assets/animations/Animation - 1719931728055.json")}
-        onAnimationFinish={onAnimationFinish}
+        source={require("../assets/animations/Animation - 1719999846178 (1).json")}
       />
     </View>
   );
@@ -23,11 +21,11 @@ const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => {} }) => {
 
 const styles = StyleSheet.create({
   animationContainer: {
-    backgroundColor: "#191A19",
+    backgroundColor: "#0F0F0F",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
 });
 
-export default SplashScreenLoad;
+export default NoDataLoad;

@@ -8,6 +8,9 @@ export const LightCustomTheme = {
         border: 'rgb(199, 199, 204)',
         notification: 'rgb(255, 69, 58)',
         tabBar: '#3D2C8D',
+        tabBarBgColor: "#161616",
+        tabBarBtActive: "white",
+        tabBarBtInActive: "gray",
         header: 'white',
         login: "white",
         loginInput: "#EEEEEE"
@@ -24,6 +27,9 @@ export const DarkCustomTheme = {
         border: '#0F0F0F',
         notification: 'rgb(255, 69, 58)',
         tabBar: '#3D2C8D',
+        tabBarBgColor: "#31363F",
+        tabBarBtActive: "white",
+        tabBarBtInActive: "gray",
         header: '#0F0F0F',
         login: "#191A19",
         loginInput: "#31363F"
