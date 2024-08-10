@@ -108,10 +108,10 @@ export default function Home() {
         {/* Content sections */}
         {loading ? (
           <>
-            <Skeleton h="100px" mb="1" rounded="20px" startColor="coolGray.100" />
+            <Skeleton h="100px" mb="1" rounded="20px" startColor="coolGray.300" />
             <View className="flex-row justify-between">
-              <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.100" />
-              <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.100" />
+              <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
+              <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
             </View>
           </>
         ) : (
@@ -124,7 +124,7 @@ export default function Home() {
 
         {/* History */}
         {loading ? (
-          <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.100" />
+          <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.300" />
         ) : (
           <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
@@ -152,38 +152,43 @@ export default function Home() {
         )}
 
         {/* Goals */}
-        <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 mb-32">
-          <View className="items-center justify-between flex-row mb-4 px-2 py-2">
-            <Text className="text-white text-2xl" style={{ fontFamily: "Nunito" }}>
-              Goals
-            </Text>
-            <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
+        {loading ? (
+          <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.300" />
+        ) : (
+          <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 mb-32">
+            <View className="items-center justify-between flex-row mb-4 px-2 py-2">
+              <Text className="text-white text-2xl" style={{ fontFamily: "Nunito" }}>
+                Goals
+              </Text>
+              <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
+            </View>
+            <View className="mx-2 mb-2">
+              <View className="mb-2 py-1 gap-2">
+                <Text className="text-white text-lg">Debt Repayment</Text>
+                <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
+                  <View className="bg-green-500 h-full w-3/4"></View>
+                </View>
+                <Text className="text-white text-sm mt-1">₹30,000 / ₹40,000</Text>
+              </View>
+              <View className="mb-2 py-1 gap-2">
+                <Text className="text-white text-lg">Vacation</Text>
+                <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
+                  <View className="bg-green-500 h-full w-1/2"></View>
+                </View>
+                <Text className="text-white text-sm mt-1">₹25,000 / ₹50,000</Text>
+              </View>
+              <View className="mb-2 py-1 gap-2">
+                <Text className="text-white text-lg">New Car</Text>
+                <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
+                  <View className="bg-green-500 h-full w-1/4"></View>
+                </View>
+                <Text className="text-white text-sm mt-1">₹50,000 / ₹2,00,000</Text>
+              </View>
+            </View>
           </View>
-          <View className="mx-2 mb-2">
-            <View className="mb-2 py-1 gap-2">
-              <Text className="text-white text-lg">Debt Repayment</Text>
-              <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                <View className="bg-green-500 h-full w-3/4"></View>
-              </View>
-              <Text className="text-white text-sm mt-1">₹30,000 / ₹40,000</Text>
-            </View>
-            <View className="mb-2 py-1 gap-2">
-              <Text className="text-white text-lg">Vacation</Text>
-              <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                <View className="bg-green-500 h-full w-1/2"></View>
-              </View>
-              <Text className="text-white text-sm mt-1">₹25,000 / ₹50,000</Text>
-            </View>
-            <View className="mb-2 py-1 gap-2">
-              <Text className="text-white text-lg">New Car</Text>
-              <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                <View className="bg-green-500 h-full w-1/4"></View>
-              </View>
-              <Text className="text-white text-sm mt-1">₹50,000 / ₹2,00,000</Text>
-            </View>
-          </View>
-        </View>
+        )}
       </ScrollView>
+
     </View>
   );
 }

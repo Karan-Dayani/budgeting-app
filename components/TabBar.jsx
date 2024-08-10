@@ -63,13 +63,14 @@ const styles = StyleSheet.create({
 
     tabbar: {
         position: 'absolute',
-        bottom: 2,
+        bottom: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginHorizontal: 15,
+        marginHorizontal: 5,
         paddingVertical: 15,
-        borderRadius: 40,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         borderCurve: 'continuous',
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 10 },

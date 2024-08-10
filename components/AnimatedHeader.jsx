@@ -12,7 +12,7 @@ const AnimatedHeader = ({ toggleMenu, handleLogOut }) => {
         <SafeAreaView >
             <View className="py-2 flex-row justify-between">
                 <View>
-                    <Text className="text-white text-3xl " style={{ fontFamily: "Jost" }}>CoinTrack</Text>
+                    <Text className=" text-3xl " style={{ fontFamily: "Jost", color: colors.text }}>CoinTrack</Text>
                 </View>
                 <View>
                     <View className="">

@@ -152,7 +152,7 @@ const Goals = () => {
             {userGoals.length > 0 ? (
               <Pressable
                 onPress={() => setModalVisible(true)}
-                className="bg-blue-500 p-2 rounded-full absolute right-0 bottom-5 z-10"
+                className="bg-blue-500 p-4 rounded-full absolute right-0 bottom-24 z-10"
               >
                 <Ionicons name="add" size={40} color="white" />
               </Pressable>
@@ -180,7 +180,7 @@ const Goals = () => {
                         key={index}
                         onLongPress={() => handleGoalDetailOpen(item)}
                       >
-                        <View className="rounded-3xl bg-[#191A19] p-4 my-2 w-full flex-row ">
+                        <View className="rounded-3xl  p-4 my-2 w-full flex-row " style={{ backgroundColor: colors.goalBg }}>
                           <View className="mr-5">
                             <CircularProgress
                               value={Math.round((item.goalSavedMoney / item.goalTargetMoney) * 100)}
@@ -190,14 +190,14 @@ const Goals = () => {
                           </View>
                           <View className="justify-center">
                             <Text
-                              className="text-white text-xl"
-                              style={{ fontFamily: "Red_Hat" }}
+                              className=" text-xl"
+                              style={{ fontFamily: "Red_Hat", color: colors.text }}
                             >
                               {item.goalName}
                             </Text>
 
 
-                            <Text className="text-gray-400 text-md mt-2">
+                            <Text className="text-md mt-2" style={{ color: colors.secondary }}>
                               ₹{item.goalSavedMoney} / ₹{item.goalTargetMoney}
                             </Text>
                           </View>
@@ -234,17 +234,19 @@ const Goals = () => {
                 setGoalDetailModal(!goalDetailModal);
               }}
             >
-              <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-                <View className="bg-[#191A19] p-5 rounded-xl w-4/5 items-center">
-                  <Text className="text-white mb-5 text-xl">{selectedGoal.goalName}</Text>
+              <View className="flex-1 justify-center items-center  bg-opacity-50" style={{ backgroundColor: colors.background }}>
+                <View className=" p-5 rounded-xl w-4/5 items-center" style={{ backgroundColor: colors.goalBg }}>
+                  <Text className=" mb-5 text-xl" style={{ color: colors.text }}>{selectedGoal.goalName}</Text>
                   <CircularProgress
                     value={Math.round((selectedGoal.goalSavedMoney / selectedGoal.goalTargetMoney) * 100)}
                     radius={70}
                     valueSuffix={"%"}
+                    titleColor={"#DDDDDD"}
+                    progressValueColor={'#346751'}
                   />
                   <TextInput
                     placeholder="Add Amount"
-                    className="bg-gray-700 text-white p-2 mb-4 rounded-lg w-full mt-5"
+                    className="bg-gray-700 text-white p-3 mb-4 rounded-lg w-full mt-5"
                     placeholderTextColor={"white"}
                     keyboardType="numeric"
                     onChangeText={(text) => setGoalAddInput(Number(text))}

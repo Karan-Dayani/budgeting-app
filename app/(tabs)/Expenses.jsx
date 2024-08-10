@@ -199,7 +199,7 @@ export default function ExpensesPage() {
       <SafeAreaView className="h-full">
         <Pressable
           onPress={handleAddExpense}
-          className="bg-blue-500 p-2 rounded-full absolute right-0 bottom-5 z-10"
+          className="bg-blue-500 p-4 rounded-full absolute right-0 bottom-24 z-10"
         >
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
@@ -277,30 +277,30 @@ export default function ExpensesPage() {
                     <TouchableOpacity
                       onLongPress={() => handleExpenseDetail(item)}
                     >
-                      <View className="rounded-2xl bg-gray-900 px-5 py-4 my-2">
+                      <View className="rounded-2xl px-5 py-4 my-2" style={{ backgroundColor: colors.expenseBg }}>
                         <View className="flex-row justify-between mb-2">
                           <Text
-                            className="text-white text-xl"
-                            style={{ fontFamily: "Red_Hat" }}
+                            className=" text-xl"
+                            style={{ fontFamily: "Red_Hat", color: colors.text }}
                           >
                             {item?.expenseName}
                           </Text>
                           <Text
-                            className="text-white text-lg"
-                            style={{ fontFamily: "Red_Hat" }}
+                            className=" text-lg"
+                            style={{ fontFamily: "Red_Hat", color: colors.text }}
                           >
                             ₹{item?.expenseAmount}
                           </Text>
                         </View>
                         <Text
-                          className="text-gray-400"
-                          style={{ fontFamily: "Red_Hat" }}
+
+                          style={{ fontFamily: "Red_Hat", color: colors.secondary }}
                         >
                           Payment Mode: {item?.paymentMode}
                         </Text>
                         <Text
-                          className="text-gray-400"
-                          style={{ fontFamily: "Red_Hat" }}
+
+                          style={{ fontFamily: "Red_Hat", color: colors.secondary }}
                         >
                           Date: {item?.expenseDate}
                         </Text>
