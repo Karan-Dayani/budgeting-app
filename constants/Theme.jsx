@@ -15,7 +15,7 @@ export const LightCustomTheme = {
         header: 'white',
         login: "white",
         loginInput: "#EEEEEE",
-        goalBg: "#DDDDDD",
+        inputBg: "#DDDDDD",
         expenseBg: "#DDDDDD"
     }
 }
@@ -37,7 +37,7 @@ export const DarkCustomTheme = {
         header: '#0F0F0F',
         login: "#191A19",
         loginInput: "#31363F",
-        goalBg: "#191A19",
+        inputBg: "#191A19",
         expenseBg: "#111827"
     },
 };

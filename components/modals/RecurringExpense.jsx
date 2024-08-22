@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { Select } from "native-base";
+import { useTheme } from "@react-navigation/native";
 
 const RecurringExpense = ({
     expense,
@@ -15,11 +16,13 @@ const RecurringExpense = ({
         { label: "Card", value: "Card" },
     ];
 
+    const { colors } = useTheme()
+
     return (
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <View className="bg-gray-800 rounded-3xl p-5 w-11/12 justify-between">
+        <View className="flex-1 justify-center items-center bg-opacity-50" style={{ backgroundColor: colors.background }}>
+            <View className=" rounded-3xl p-5 w-11/12 justify-between" style={{ backgroundColor: colors.inputBg }}>
                 <View>
-                    <Text className="text-white text-2xl mb-4 font-Red_Hat">Amount</Text>
+                    <Text className=" text-2xl mb-4 font-Red_Hat" style={{ color: colors.text }}>Amount</Text>
                     <TextInput
                         placeholder="0"
                         onChangeText={(text) =>
@@ -29,7 +32,7 @@ const RecurringExpense = ({
                         placeholderTextColor="#888"
                         keyboardType="numeric"
                     />
-                    <Text className="text-white text-2xl mb-4 font-Red_Hat">Name</Text>
+                    <Text className=" text-2xl mb-4 font-Red_Hat" style={{ color: colors.text }}>Name</Text>
                     <TextInput
                         placeholder="Expense Name"
                         value={expense.expenseName}
@@ -37,7 +40,7 @@ const RecurringExpense = ({
                         className="bg-gray-700 text-white p-4 mb-4 rounded-3xl "
                         placeholderTextColor="#888"
                     />
-                    <Text className="text-white text-2xl mb-4 font-Red_Hat">
+                    <Text className=" text-2xl mb-4 font-Red_Hat" style={{ color: colors.text }}>
                         Select Mode
                     </Text>
                     <Select

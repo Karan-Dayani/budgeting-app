@@ -11,7 +11,5 @@ import {
 export const icons = {
   index: (props) => <Entypo name="home" size={24} {...props} />,
   Expenses: (props) => <FontAwesome name="dollar" size={26} {...props} />,
-  Goals: (props) => (
-    <MaterialCommunityIcons name="finance" size={24} {...props} />
-  ),
+  Goals: (props) => <AntDesign name="checkcircleo" size={24} {...props} />,
 };

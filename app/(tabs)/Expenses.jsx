@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
+import { Button } from "native-base";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  ScrollView,
-  SafeAreaView,
-  Pressable,
-  Modal,
-  TextInput,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
+  Modal,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
   Text,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { Stack } from "expo-router";
-import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { supabase } from "../../lib/supabase";
-import { Dropdown } from "react-native-element-dropdown";
 import uuid from "react-native-uuid";
-import { Button, NativeBaseProvider, Select } from "native-base";
+import { supabase } from "../../lib/supabase";
 
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useTheme } from "@react-navigation/native";
-import RecurringExpense from "../../components/modals/RecurringExpense";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
+import RecurringExpense from "../../components/modals/RecurringExpense";
 import NoDataLoad from "../../screens/NoDataLoad";
 
 export default function ExpensesPage() {
@@ -143,6 +141,7 @@ export default function ExpensesPage() {
       paymentMode: "",
       expenseDate: new Date().toDateString().slice(4),
     });
+    Alert.alert("Success", "Expense added successfully!")
     setModalVisible(false);
     setIsOpen(!isOpen);
     setTimeout(() => {
@@ -157,6 +156,7 @@ export default function ExpensesPage() {
       .eq("email", user?.user_metadata?.email);
 
     const prevArray = data[0]?.expenses || [];
+
     const updatedArray = prevArray.filter(
       (exp) => exp.expenseId !== selectedExpense.expenseId
     );
@@ -167,11 +167,10 @@ export default function ExpensesPage() {
       .from("User Data")
       .update({ expenses: updatedArray })
       .eq("email", user?.user_metadata?.email);
-
     setUserExpenses(updatedArray);
-
     setExpenseDetail(false);
     setSelectedExpense(null);
+    Alert.alert("Success", "Expense deleted successfully!")
   };
 
   const getTotalExpense = () => {
@@ -203,15 +202,8 @@ export default function ExpensesPage() {
         >
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
-        <View className=" w-full">
-          <View className="h-12 justify-start">
-            <Text
-              className={`text-2xl`}
-              style={{ fontFamily: "Nunito", color: colors.text }}
-            >
-              Expenses
-            </Text>
-          </View>
+        <View className=" w-full mt-4">
+
           <View>
             <View className="flex-row justify-between items-center mb-4">
               <View>
@@ -227,10 +219,7 @@ export default function ExpensesPage() {
                     className={` text-xl font-bold ml-1`}
                     style={{ color: colors.text }}
                   >
-                    {new Date().toLocaleString("default", {
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    All Expense
                   </Text>
                 )}
                 <Text className={`px-1`} style={{ color: colors.text }}>
