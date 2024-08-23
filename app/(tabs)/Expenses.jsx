@@ -11,7 +11,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import uuid from "react-native-uuid";
 import { supabase } from "../../lib/supabase";
@@ -19,7 +19,7 @@ import { supabase } from "../../lib/supabase";
 import { useTheme } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
-import NonRecurringExpense from "../../components/modals/NonRecurringExpense"
+import AddExpenseModal from "../../components/modals/AddExpenseModal";
 import NoDataLoad from "../../screens/NoDataLoad";
 
 export default function ExpensesPage() {
@@ -27,14 +27,14 @@ export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState("");
   const [user, setUser] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
-  const [nonRecurringModal, setNonRecurringModal] = useState(false);
+  const [addExpenseModal, setAddExpenseModal] = useState(false);
   const [expense, setExpense] = useState({
     expenseId: uuid.v4(),
     expenseName: "",
     expenseAmount: 0,
     paymentMode: "",
     expenseDate: new Date().toDateString().slice(4),
+    expenseCategory: "",
   });
   const [userExpenses, setUserExpenses] = useState([]);
   const [income, setIncome] = useState(0);
@@ -109,7 +109,7 @@ export default function ExpensesPage() {
   };
 
   const handleAddExpense = () => {
-    setModalVisible(true);
+    setAddExpenseModal(true);
   };
 
   const handleExpenseDetail = (item) => {
@@ -142,8 +142,8 @@ export default function ExpensesPage() {
       paymentMode: "",
       expenseDate: new Date().toDateString().slice(4),
     });
-    Alert.alert("Success", "Expense added successfully!")
-    setModalVisible(false);
+    Alert.alert("Success", "Expense added successfully!");
+    setAddExpenseModal(false);
     setIsOpen(!isOpen);
     setTimeout(() => {
       setIsOpen(false);
@@ -169,7 +169,7 @@ export default function ExpensesPage() {
     setUserExpenses(updatedArray);
     setExpenseDetail(false);
     setSelectedExpense(null);
-    Alert.alert("Success", "Expense deleted successfully!")
+    Alert.alert("Success", "Expense deleted successfully!");
   };
 
   const getTotalExpense = () => {
@@ -202,7 +202,6 @@ export default function ExpensesPage() {
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
         <View className=" w-full mt-4">
-
           <View>
             <View className="flex-row justify-between items-center mb-4">
               <View>
@@ -265,30 +264,43 @@ export default function ExpensesPage() {
                     <TouchableOpacity
                       onLongPress={() => handleExpenseDetail(item)}
                     >
-                      <View className="rounded-2xl px-5 py-4 my-2" style={{ backgroundColor: colors.expenseBg }}>
+                      <View
+                        className="rounded-2xl px-5 py-4 my-2"
+                        style={{ backgroundColor: colors.expenseBg }}
+                      >
                         <View className="flex-row justify-between mb-2">
                           <Text
                             className=" text-xl"
-                            style={{ fontFamily: "Red_Hat", color: colors.text }}
+                            style={{
+                              fontFamily: "Red_Hat",
+                              color: colors.text,
+                            }}
                           >
                             {item?.expenseName}
                           </Text>
                           <Text
                             className=" text-lg"
-                            style={{ fontFamily: "Red_Hat", color: colors.text }}
+                            style={{
+                              fontFamily: "Red_Hat",
+                              color: colors.text,
+                            }}
                           >
                             ₹{item?.expenseAmount}
                           </Text>
                         </View>
                         <Text
-
-                          style={{ fontFamily: "Red_Hat", color: colors.secondary }}
+                          style={{
+                            fontFamily: "Red_Hat",
+                            color: colors.secondary,
+                          }}
                         >
                           Payment Mode: {item?.paymentMode}
                         </Text>
                         <Text
-
-                          style={{ fontFamily: "Red_Hat", color: colors.secondary }}
+                          style={{
+                            fontFamily: "Red_Hat",
+                            color: colors.secondary,
+                          }}
                         >
                           Date: {item?.expenseDate}
                         </Text>
@@ -318,70 +330,20 @@ export default function ExpensesPage() {
           </Modal>
         )}
       </SafeAreaView>
+
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
+        visible={addExpenseModal}
         onRequestClose={() => {
-          setModalVisible(!modalVisible);
+          setAddExpenseModal(!addExpenseModal);
         }}
       >
-
-        <View className="flex-1 justify-center items-center bg-opacity-50" style={{ backgroundColor: colors.background }}>
-          <View className=" rounded-2xl p-5 w-11/12 justify-between" style={{ backgroundColor: colors.inputBg }}>
-            <View className="gap-y-4">
-              <Pressable
-                className="bg-gray-500 p-5 rounded-xl justify-center"
-
-              >
-                <Text className="text-white">
-                  Recurring
-                </Text>
-              </Pressable>
-
-              <Pressable
-                className="bg-gray-500 p-5 rounded-xl justify-center"
-                onPress={() => {
-                  setNonRecurringModal(true)
-                  setModalVisible(false)
-                }}
-              >
-                <Text className="text-white">
-                  Non - Recurring
-                </Text>
-              </Pressable>
-
-            </View>
-            <View className=" mt-4">
-              <Pressable
-                onPress={() =>
-                  setModalVisible(!modalVisible)}
-                className="bg-red-500 p-5 rounded-xl items-center"
-              >
-                <Text className="text-white">
-                  Cancel
-                </Text>
-
-              </Pressable>
-            </View>
-          </View>
-        </View>
-
-      </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={nonRecurringModal}
-        onRequestClose={() => {
-          setNonRecurringModal(!nonRecurringModal);
-        }}
-      >
-        <NonRecurringExpense
+        <AddExpenseModal
           expense={expense}
           handleExpenseChange={handleExpenseChange}
           handleSaveExpense={handleSaveExpense}
-          setModalVisible={setModalVisible}
-          setNonRecurringModal={setNonRecurringModal}
+          setAddExpenseModal={setAddExpenseModal}
         />
       </Modal>
     </View>
