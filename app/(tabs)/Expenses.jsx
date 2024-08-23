@@ -19,7 +19,7 @@ import { supabase } from "../../lib/supabase";
 import { useTheme } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
-import RecurringExpense from "../../components/modals/RecurringExpense";
+import NonRecurringExpense from "../../components/modals/NonRecurringExpense"
 import NoDataLoad from "../../screens/NoDataLoad";
 
 export default function ExpensesPage() {
@@ -28,7 +28,7 @@ export default function ExpensesPage() {
   const [selectedDate, setSelectedDate] = useState("");
   const [user, setUser] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-  const [recurringModal, setRecurringModal] = useState(false);
+  const [nonRecurringModal, setNonRecurringModal] = useState(false);
   const [expense, setExpense] = useState({
     expenseId: uuid.v4(),
     expenseName: "",
@@ -332,10 +332,7 @@ export default function ExpensesPage() {
             <View className="gap-y-4">
               <Pressable
                 className="bg-gray-500 p-5 rounded-xl justify-center"
-                onPress={() => {
-                  setRecurringModal(true)
-                  setModalVisible(false)
-                }}
+
               >
                 <Text className="text-white">
                   Recurring
@@ -344,6 +341,10 @@ export default function ExpensesPage() {
 
               <Pressable
                 className="bg-gray-500 p-5 rounded-xl justify-center"
+                onPress={() => {
+                  setNonRecurringModal(true)
+                  setModalVisible(false)
+                }}
               >
                 <Text className="text-white">
                   Non - Recurring
@@ -370,17 +371,17 @@ export default function ExpensesPage() {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={recurringModal}
+        visible={nonRecurringModal}
         onRequestClose={() => {
-          setRecurringModal(!recurringModal);
+          setNonRecurringModal(!nonRecurringModal);
         }}
       >
-        <RecurringExpense
+        <NonRecurringExpense
           expense={expense}
           handleExpenseChange={handleExpenseChange}
           handleSaveExpense={handleSaveExpense}
           setModalVisible={setModalVisible}
-          setRecurringModal={setRecurringModal}
+          setNonRecurringModal={setNonRecurringModal}
         />
       </Modal>
     </View>

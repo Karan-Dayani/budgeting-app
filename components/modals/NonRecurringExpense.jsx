@@ -4,12 +4,12 @@ import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { Select } from "native-base";
 import { useTheme } from "@react-navigation/native";
 
-const RecurringExpense = ({
+const NonRecurringExpense = ({
     expense,
     handleExpenseChange,
     handleSaveExpense,
     setModalVisible,
-    setRecurringModal
+    setNonRecurringModal
 }) => {
     const data = [
         { label: "Cash", value: "Cash" },
@@ -73,7 +73,7 @@ const RecurringExpense = ({
                 </View>
                 <View className="flex-row justify-between">
                     <Pressable
-                        onPress={() => setRecurringModal(false)}
+                        onPress={() => setNonRecurringModal(false)}
                         className="bg-red-500 p-5 rounded-full justify-center"
                     >
                         <Entypo name="cross" size={25} color="white" />
@@ -90,4 +90,4 @@ const RecurringExpense = ({
     );
 };
 
-export default RecurringExpense;
+export default NonRecurringExpense;
