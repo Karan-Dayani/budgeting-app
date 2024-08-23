@@ -187,8 +187,6 @@ const Goals = () => {
     Alert.alert("Success", "Goal removed successfully!")
   }
 
-  console.log(goalComplete)
-
   return (
     <NativeBaseProvider>
       <View className="px-5 flex-1">

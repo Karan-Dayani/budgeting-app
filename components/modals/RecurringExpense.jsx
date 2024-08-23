@@ -9,6 +9,7 @@ const RecurringExpense = ({
     handleExpenseChange,
     handleSaveExpense,
     setModalVisible,
+    setRecurringModal
 }) => {
     const data = [
         { label: "Cash", value: "Cash" },
@@ -20,15 +21,15 @@ const RecurringExpense = ({
 
     return (
         <View className="flex-1 justify-center items-center bg-opacity-50" style={{ backgroundColor: colors.background }}>
-            <View className=" rounded-3xl p-5 w-11/12 justify-between" style={{ backgroundColor: colors.inputBg }}>
+            <View className=" rounded-2xl p-5 w-11/12 justify-between" style={{ backgroundColor: colors.inputBg }}>
                 <View>
-                    <Text className=" text-2xl mb-4 font-Red_Hat" style={{ color: colors.text }}>Amount</Text>
+                    <Text className="text-2xl mb-4 font-Red_Hat" style={{ color: colors.text }}>Amount</Text>
                     <TextInput
                         placeholder="0"
                         onChangeText={(text) =>
                             handleExpenseChange("expenseAmount", Number(text))
                         }
-                        className="bg-gray-700 text-white p-4 mb-3 rounded-3xl "
+                        className="bg-gray-700 text-white p-4 mb-3 rounded-xl border-[1px] border-white"
                         placeholderTextColor="#888"
                         keyboardType="numeric"
                     />
@@ -37,7 +38,7 @@ const RecurringExpense = ({
                         placeholder="Expense Name"
                         value={expense.expenseName}
                         onChangeText={(text) => handleExpenseChange("expenseName", text)}
-                        className="bg-gray-700 text-white p-4 mb-4 rounded-3xl "
+                        className="bg-gray-700 text-white p-4 mb-4 rounded-xl border-[1px] border-white "
                         placeholderTextColor="#888"
                     />
                     <Text className=" text-2xl mb-4 font-Red_Hat" style={{ color: colors.text }}>
@@ -46,7 +47,7 @@ const RecurringExpense = ({
                     <Select
                         accessibilityLabel="Payment mode"
                         backgroundColor="coolGray.700"
-                        borderWidth="0"
+                        borderWidth="2"
                         rounded="20px"
                         selectedValue={expense.paymentMode}
                         placeholder="Payment Mode"
@@ -72,7 +73,7 @@ const RecurringExpense = ({
                 </View>
                 <View className="flex-row justify-between">
                     <Pressable
-                        onPress={() => setModalVisible(false)}
+                        onPress={() => setRecurringModal(false)}
                         className="bg-red-500 p-5 rounded-full justify-center"
                     >
                         <Entypo name="cross" size={25} color="white" />

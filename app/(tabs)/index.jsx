@@ -34,6 +34,7 @@ export default function Home() {
   };
 
   const historyExpense = userData[0]?.expenses?.slice(0, 4);
+  const historyGoal = userData[0]?.goals?.slice(0, 4);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -163,27 +164,24 @@ export default function Home() {
               <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
             </View>
             <View className="mx-2 mb-2">
-              <View className="mb-2 py-1 gap-2">
-                <Text className="text-white text-lg">Debt Repayment</Text>
-                <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                  <View className="bg-green-500 h-full w-3/4"></View>
-                </View>
-                <Text className="text-white text-sm mt-1">₹30,000 / ₹40,000</Text>
-              </View>
-              <View className="mb-2 py-1 gap-2">
-                <Text className="text-white text-lg">Vacation</Text>
-                <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                  <View className="bg-green-500 h-full w-1/2"></View>
-                </View>
-                <Text className="text-white text-sm mt-1">₹25,000 / ₹50,000</Text>
-              </View>
-              <View className="mb-2 py-1 gap-2">
-                <Text className="text-white text-lg">New Car</Text>
-                <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                  <View className="bg-green-500 h-full w-1/4"></View>
-                </View>
-                <Text className="text-white text-sm mt-1">₹50,000 / ₹2,00,000</Text>
-              </View>
+              {historyGoal?.map((item, i) => {
+                const percentage = (item.goalSavedMoney / item.goalTargetMoney) * 100;
+                return (
+                  <View className="mb-2 py-1 gap-2" key={i}>
+                    <Text className="text-white text-lg">{item?.goalName}</Text>
+                    <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
+                      <View
+                        className="bg-green-500 h-full"
+                        style={{ width: `${percentage > 100 ? 100 : percentage}%` }}
+                      ></View>
+                    </View>
+                    <Text className="text-white text-sm mt-1">
+                      ₹{item?.goalSavedMoney} / ₹{item?.goalTargetMoney}
+                    </Text>
+                  </View>
+                );
+              })}
+
             </View>
           </View>
         )}

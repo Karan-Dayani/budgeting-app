@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import { Button } from "native-base";
 import React, { useEffect, useState } from "react";
@@ -28,6 +28,7 @@ export default function ExpensesPage() {
   const [selectedDate, setSelectedDate] = useState("");
   const [user, setUser] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [recurringModal, setRecurringModal] = useState(false);
   const [expense, setExpense] = useState({
     expenseId: uuid.v4(),
     expenseName: "",
@@ -160,8 +161,6 @@ export default function ExpensesPage() {
     const updatedArray = prevArray.filter(
       (exp) => exp.expenseId !== selectedExpense.expenseId
     );
-
-    console.log(updatedArray);
 
     await supabase
       .from("User Data")
@@ -327,11 +326,61 @@ export default function ExpensesPage() {
           setModalVisible(!modalVisible);
         }}
       >
+
+        <View className="flex-1 justify-center items-center bg-opacity-50" style={{ backgroundColor: colors.background }}>
+          <View className=" rounded-2xl p-5 w-11/12 justify-between" style={{ backgroundColor: colors.inputBg }}>
+            <View className="gap-y-4">
+              <Pressable
+                className="bg-gray-500 p-5 rounded-xl justify-center"
+                onPress={() => {
+                  setRecurringModal(true)
+                  setModalVisible(false)
+                }}
+              >
+                <Text className="text-white">
+                  Recurring
+                </Text>
+              </Pressable>
+
+              <Pressable
+                className="bg-gray-500 p-5 rounded-xl justify-center"
+              >
+                <Text className="text-white">
+                  Non - Recurring
+                </Text>
+              </Pressable>
+
+            </View>
+            <View className=" mt-4">
+              <Pressable
+                onPress={() =>
+                  setModalVisible(!modalVisible)}
+                className="bg-red-500 p-5 rounded-xl items-center"
+              >
+                <Text className="text-white">
+                  Cancel
+                </Text>
+
+              </Pressable>
+            </View>
+          </View>
+        </View>
+
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={recurringModal}
+        onRequestClose={() => {
+          setRecurringModal(!recurringModal);
+        }}
+      >
         <RecurringExpense
           expense={expense}
           handleExpenseChange={handleExpenseChange}
           handleSaveExpense={handleSaveExpense}
           setModalVisible={setModalVisible}
+          setRecurringModal={setRecurringModal}
         />
       </Modal>
     </View>
