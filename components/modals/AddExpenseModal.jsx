@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { Select } from "native-base";
+import { Radio, Select } from "native-base";
 import { useTheme } from "@react-navigation/native";
 
 const AddExpenseModal = ({
@@ -38,7 +38,21 @@ const AddExpenseModal = ({
         style={{ backgroundColor: colors.inputBg }}
       >
         <View>
-
+          <View className="items-center">
+            <Radio.Group
+              className="flex-row gap-x-3"
+              onChange={(value) => {
+                handleExpenseChange("expenseType", value);
+              }}
+            >
+              <Radio value="Reccuring">
+                <Text className="text-white text-center">Reccuring</Text>
+              </Radio>
+              <Radio value="Non-Reccuring">
+                <Text className="text-white text-center">Non-Reccuring</Text>
+              </Radio>
+            </Radio.Group>
+          </View>
           <Text
             className=" text-2xl mb-4 font-Red_Hat"
             style={{ color: colors.text }}

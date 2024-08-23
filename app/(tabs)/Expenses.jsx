@@ -35,6 +35,7 @@ export default function ExpensesPage() {
     paymentMode: "",
     expenseDate: new Date().toDateString().slice(4),
     expenseCategory: "",
+    expenseType: "",
   });
   const [userExpenses, setUserExpenses] = useState([]);
   const [income, setIncome] = useState(0);
