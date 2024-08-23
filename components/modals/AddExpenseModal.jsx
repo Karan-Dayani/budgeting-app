@@ -38,40 +38,20 @@ const AddExpenseModal = ({
         style={{ backgroundColor: colors.inputBg }}
       >
         <View>
+
           <Text
-            className="text-2xl mb-4 font-Red_Hat"
+            className=" text-2xl mb-4 font-Red_Hat"
             style={{ color: colors.text }}
           >
-            Category
+            Name
           </Text>
-          <Select
-            accessibilityLabel="category"
-            backgroundColor="coolGray.700"
-            borderWidth="2"
-            rounded="20px"
-            selectedValue={expense.expenseCategory}
-            placeholder="Category"
+          <TextInput
+            placeholder="Expense Name"
+            value={expense.expenseName}
+            onChangeText={(text) => handleExpenseChange("expenseName", text)}
+            className="bg-gray-700 text-white p-4 mb-4 rounded-xl border-[1px] border-white "
             placeholderTextColor="#888"
-            onValueChange={(value) =>
-              handleExpenseChange("expenseCategory", value)
-            }
-            _selectedItem={{
-              bg: "gray.300",
-              color: "white",
-            }}
-            color="white"
-            fontSize="18"
-            h="60px"
-            marginBottom="8"
-          >
-            {CategoryData.map((item) => (
-              <Select.Item
-                key={item.value}
-                label={item.label}
-                value={item.value}
-              />
-            ))}
-          </Select>
+          />
           <Text
             className="text-2xl mb-4 font-Red_Hat"
             style={{ color: colors.text }}
@@ -88,18 +68,39 @@ const AddExpenseModal = ({
             keyboardType="numeric"
           />
           <Text
-            className=" text-2xl mb-4 font-Red_Hat"
+            className="text-2xl mb-4 font-Red_Hat"
             style={{ color: colors.text }}
           >
-            Name
+            Category
           </Text>
-          <TextInput
-            placeholder="Expense Name"
-            value={expense.expenseName}
-            onChangeText={(text) => handleExpenseChange("expenseName", text)}
-            className="bg-gray-700 text-white p-4 mb-4 rounded-xl border-[1px] border-white "
+          <Select
+            accessibilityLabel="category"
+            backgroundColor="coolGray.700"
+            borderWidth="2"
+            rounded="12px"
+            selectedValue={expense.expenseCategory}
+            placeholder="Category"
             placeholderTextColor="#888"
-          />
+            onValueChange={(value) =>
+              handleExpenseChange("expenseCategory", value)
+            }
+            _selectedItem={{
+              bg: "gray.300",
+              color: "white",
+            }}
+            color="white"
+            fontSize="18"
+            h="60px"
+            marginBottom="4"
+          >
+            {CategoryData.map((item) => (
+              <Select.Item
+                key={item.value}
+                label={item.label}
+                value={item.value}
+              />
+            ))}
+          </Select>
           <Text
             className=" text-2xl mb-4 font-Red_Hat"
             style={{ color: colors.text }}
@@ -110,7 +111,7 @@ const AddExpenseModal = ({
             accessibilityLabel="Payment mode"
             backgroundColor="coolGray.700"
             borderWidth="2"
-            rounded="20px"
+            rounded="12px"
             selectedValue={expense.paymentMode}
             placeholder="Payment Mode"
             placeholderTextColor="#888"
