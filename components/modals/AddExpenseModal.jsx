@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Pressable } from "react-native";
+import React from "react";
+import { View, TextInput, Pressable } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { Radio, Select } from "native-base";
+import { Select } from "native-base";
 import { useTheme } from "@react-navigation/native";
+import CustomText from "../CustomText";
 
 const AddExpenseModal = ({
   expense,
@@ -30,134 +31,106 @@ const AddExpenseModal = ({
 
   return (
     <View
-      className="flex-1 justify-center items-center bg-opacity-50"
+      className="flex-1 justify-center items-center bg-opacity-90"
       style={{ backgroundColor: colors.background }}
     >
       <View
-        className=" rounded-2xl p-5 w-11/12 justify-between"
-        style={{ backgroundColor: colors.inputBg }}
+        className="rounded-xl p-8 w-11/12  shadow-2xl"
+        style={{ elevation: 5, backgroundColor: colors.expenseForm }}
       >
-        <View>
-          <View className="items-center">
-            <Radio.Group
-              className="flex-row gap-x-3"
-              onChange={(value) => {
-                handleExpenseChange("expenseType", value);
-              }}
-            >
-              <Radio value="Reccuring">
-                <Text className="text-white text-center">Reccuring</Text>
-              </Radio>
-              <Radio value="Non-Reccuring">
-                <Text className="text-white text-center">Non-Reccuring</Text>
-              </Radio>
-            </Radio.Group>
-          </View>
-          <Text
-            className=" text-2xl mb-4 font-Red_Hat"
-            style={{ color: colors.text }}
-          >
-            Name
-          </Text>
-          <TextInput
-            placeholder="Expense Name"
-            value={expense.expenseName}
-            onChangeText={(text) => handleExpenseChange("expenseName", text)}
-            className="bg-gray-700 text-white p-4 mb-4 rounded-xl border-[1px] border-white "
-            placeholderTextColor="#888"
-          />
-          <Text
-            className="text-2xl mb-4 font-Red_Hat"
-            style={{ color: colors.text }}
-          >
-            Amount
-          </Text>
-          <TextInput
-            placeholder="0"
-            onChangeText={(text) =>
-              handleExpenseChange("expenseAmount", Number(text))
-            }
-            className="bg-gray-700 text-white p-4 mb-3 rounded-xl border-[1px] border-white"
-            placeholderTextColor="#888"
-            keyboardType="numeric"
-          />
-          <Text
-            className="text-2xl mb-4 font-Red_Hat"
-            style={{ color: colors.text }}
-          >
-            Category
-          </Text>
-          <Select
-            accessibilityLabel="category"
-            backgroundColor="coolGray.700"
-            borderWidth="2"
-            rounded="12px"
-            selectedValue={expense.expenseCategory}
-            placeholder="Category"
-            placeholderTextColor="#888"
-            onValueChange={(value) =>
-              handleExpenseChange("expenseCategory", value)
-            }
-            _selectedItem={{
-              bg: "gray.300",
-              color: "white",
-            }}
-            color="white"
-            fontSize="18"
-            h="60px"
-            marginBottom="4"
-          >
-            {CategoryData.map((item) => (
-              <Select.Item
-                key={item.value}
-                label={item.label}
-                value={item.value}
-              />
-            ))}
-          </Select>
-          <Text
-            className=" text-2xl mb-4 font-Red_Hat"
-            style={{ color: colors.text }}
-          >
-            Select Mode
-          </Text>
-          <Select
-            accessibilityLabel="Payment mode"
-            backgroundColor="coolGray.700"
-            borderWidth="2"
-            rounded="12px"
-            selectedValue={expense.paymentMode}
-            placeholder="Payment Mode"
-            placeholderTextColor="#888"
-            onValueChange={(value) => handleExpenseChange("paymentMode", value)}
-            _selectedItem={{
-              bg: "gray.300",
-              color: "white",
-            }}
-            color="white"
-            fontSize="18"
-            h="60px"
-            marginBottom="8"
-          >
-            {PaymentModedata.map((item) => (
-              <Select.Item
-                key={item.value}
-                label={item.label}
-                value={item.value}
-              />
-            ))}
-          </Select>
-        </View>
-        <View className="flex-row justify-between">
+        <CustomText className="text-3xl font-semibold mb-5 text-center" style={{ color: colors.primary }}>
+          Add Expense
+        </CustomText>
+
+        {/* Expense Name */}
+        <CustomText className="text-lg mb-1" style={{ color: colors.text }}>
+          Expense Name
+        </CustomText>
+        <TextInput
+          placeholder="Enter expense name"
+          value={expense.expenseName}
+          onChangeText={(text) => handleExpenseChange("expenseName", text)}
+          className="  p-3 mb-4 rounded-md border border-gray-300 shadow-sm"
+          style={{ backgroundColor: colors.expenseInput, color: colors.text }}
+          placeholderTextColor="#A0AEC0"
+        />
+
+        {/* Amount */}
+        <CustomText className="text-lg mb-1" style={{ color: colors.text }}>
+          Amount
+        </CustomText>
+        <TextInput
+          placeholder="0"
+          onChangeText={(text) =>
+            handleExpenseChange("expenseAmount", Number(text))
+          }
+          className=" p-3 mb-4 rounded-md border border-gray-300 shadow-sm"
+          style={{ backgroundColor: colors.expenseInput, color: colors.text }}
+          placeholderTextColor="#A0AEC0"
+          keyboardType="numeric"
+        />
+
+        {/* Category */}
+        <CustomText className="text-lg mb-1" style={{ color: colors.text }}>
+          Category
+        </CustomText>
+        <Select
+          selectedValue={expense.expenseCategory}
+          placeholder="Select Category"
+          onValueChange={(value) =>
+            handleExpenseChange("expenseCategory", value)
+          }
+          backgroundColor={colors.expenseInput}
+
+          _selectedItem={{
+            bg: "blue.500",
+            color: "white",
+          }}
+          color={colors.text}
+          fontSize="16"
+          h="55px"
+          marginBottom="15px"
+          placeholderTextColor="#A0AEC0"
+        >
+          {CategoryData.map((item) => (
+            <Select.Item key={item.value} label={item.label} value={item.value} />
+          ))}
+        </Select>
+
+        {/* Payment Mode */}
+        <CustomText className="text-lg mb-1" style={{ color: colors.text }}>
+          Payment Mode
+        </CustomText>
+        <Select
+          selectedValue={expense.paymentMode}
+          placeholder="Select Payment Mode"
+          onValueChange={(value) => handleExpenseChange("paymentMode", value)}
+          backgroundColor={colors.expenseInput}
+          _selectedItem={{
+            bg: "blue.500",
+            color: "white",
+          }}
+          color={colors.text}
+          fontSize="16"
+          h="55px"
+          placeholderTextColor="#A0AEC0"
+        >
+          {PaymentModedata.map((item) => (
+            <Select.Item key={item.value} label={item.label} value={item.value} />
+          ))}
+        </Select>
+
+        {/* Buttons */}
+        <View className="flex-row justify-between mt-5">
           <Pressable
             onPress={() => setAddExpenseModal(false)}
-            className="bg-red-500 p-5 rounded-full justify-center"
+            className="bg-red-500 p-4 rounded-full justify-center shadow-lg"
           >
             <Entypo name="cross" size={25} color="white" />
           </Pressable>
           <Pressable
             onPress={handleSaveExpense}
-            className="bg-blue-500 p-5 rounded-full justify-center"
+            className="bg-green-500 p-4 rounded-full justify-center shadow-lg"
           >
             <MaterialIcons name="check" size={25} color="white" />
           </Pressable>

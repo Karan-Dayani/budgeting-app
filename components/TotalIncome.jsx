@@ -31,7 +31,7 @@ const TotalIncome = ({ user }) => {
             className=""
 
         >
-            <View className="rounded-3xl bg-cardColor justify-center px-5 py-3 mb-2 flex-2" >
+            <View className="rounded-3xl bg-[#41B3A2] justify-center px-5 py-3 mb-2 flex-2" >
                 <View className="items-center justify-between flex-row mb-4">
                     <Text
                         className="text-white text-xl"

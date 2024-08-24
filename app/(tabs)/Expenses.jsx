@@ -9,18 +9,17 @@ import {
   Pressable,
   SafeAreaView,
   ScrollView,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import uuid from "react-native-uuid";
 import { supabase } from "../../lib/supabase";
-
 import { useTheme } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import AddExpenseModal from "../../components/modals/AddExpenseModal";
 import NoDataLoad from "../../screens/NoDataLoad";
+import CustomText from "../../components/CustomText"; // Import your custom text component
 
 export default function ExpensesPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,7 +63,7 @@ export default function ExpensesPage() {
       if (user) {
         setUser(user);
       } else {
-        Alert.alert("error accessing user");
+        Alert.alert("Error accessing user");
       }
     });
   }, []);
@@ -186,10 +185,10 @@ export default function ExpensesPage() {
       <Stack.Screen
         options={{
           headerShown: true,
+          headerShadowVisible: false,
           headerTitle: "",
           headerTitleStyle: {
             color: colors.text,
-            fontFamily: "Nunito",
             fontSize: 25,
           },
           headerStyle: { backgroundColor: colors.header, height: 50 },
@@ -198,32 +197,32 @@ export default function ExpensesPage() {
       <SafeAreaView className="h-full">
         <Pressable
           onPress={handleAddExpense}
-          className="bg-blue-500 p-4 rounded-full absolute right-0 bottom-24 z-10"
+          className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-28 z-10"
         >
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
-        <View className=" w-full mt-4">
+        <View className="w-full mt-4">
           <View>
             <View className="flex-row justify-between items-center mb-4">
               <View>
                 {selectedDate ? (
-                  <Text
-                    className={`text-xl font-bold ml-1`}
+                  <CustomText
+                    className={`text-xl  ml-1`}
                     style={{ color: colors.text }}
                   >
                     {selectedDate}
-                  </Text>
+                  </CustomText>
                 ) : (
-                  <Text
-                    className={` text-xl font-bold ml-1`}
+                  <CustomText
+                    className={`text-xl ml-1`}
                     style={{ color: colors.text }}
                   >
-                    All Expense
-                  </Text>
+                    All Expenses
+                  </CustomText>
                 )}
-                <Text className={`px-1`} style={{ color: colors.text }}>
-                  Total expense: ₹{getTotalExpense()}
-                </Text>
+                <CustomText className={`px-1`} style={{ color: colors.text }}>
+                  Total Expense: ₹{getTotalExpense()}
+                </CustomText>
               </View>
 
               {selectedDate ? (
@@ -231,14 +230,14 @@ export default function ExpensesPage() {
                   onPress={() => setSelectedDate("")}
                   className="bg-red-500 p-3 rounded-xl justify-center "
                 >
-                  <Text className="text-white">Reset</Text>
+                  <CustomText className="text-white">Reset</CustomText>
                 </Pressable>
               ) : (
                 <Button
                   onPress={showDatePicker}
-                  className="rounded-xl bg-cardColor"
+                  className="rounded-xl bg-[#41B3A2]"
                 >
-                  <Text className="text-white">Select Date</Text>
+                  <CustomText className="text-white">Select Date</CustomText>
                 </Button>
               )}
             </View>
@@ -253,11 +252,11 @@ export default function ExpensesPage() {
         {loading ? (
           <ActivityIndicator
             size="large"
-            color="white"
-            className=" justify-center h-96"
+            color={colors.text}
+            className="justify-center h-96"
           />
         ) : (
-          <ScrollView className="mt-2">
+          <ScrollView className="mt-2" showsVerticalScrollIndicator={false}>
             <View className="w-full mb-16">
               {datedExpenses.length > 0 ? (
                 datedExpenses?.map((item, index) => (
@@ -267,50 +266,48 @@ export default function ExpensesPage() {
                     >
                       <View
                         className="rounded-2xl px-5 py-4 my-2"
-                        style={{ backgroundColor: colors.expenseBg }}
+                        style={{ backgroundColor: colors.inputBg }}
                       >
                         <View className="flex-row justify-between mb-2">
-                          <Text
-                            className=" text-xl"
+                          <CustomText
+                            className="text-xl"
                             style={{
-                              fontFamily: "Red_Hat",
                               color: colors.text,
                             }}
                           >
                             {item?.expenseName}
-                          </Text>
-                          <Text
-                            className=" text-lg"
+                          </CustomText>
+                          <CustomText
+                            className="text-lg"
                             style={{
-                              fontFamily: "Red_Hat",
                               color: colors.text,
                             }}
                           >
                             ₹{item?.expenseAmount}
-                          </Text>
+                          </CustomText>
                         </View>
-                        <Text
+                        <CustomText
                           style={{
-                            fontFamily: "Red_Hat",
                             color: colors.secondary,
                           }}
                         >
                           Payment Mode: {item?.paymentMode}
-                        </Text>
-                        <Text
+                        </CustomText>
+                        <CustomText
                           style={{
-                            fontFamily: "Red_Hat",
                             color: colors.secondary,
                           }}
                         >
                           Date: {item?.expenseDate}
-                        </Text>
+                        </CustomText>
                       </View>
                     </TouchableOpacity>
                   </View>
                 ))
               ) : (
-                <NoDataLoad />
+                <NoDataLoad
+                  selectedDate={selectedDate}
+                />
               )}
             </View>
           </ScrollView>

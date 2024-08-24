@@ -67,7 +67,7 @@ export default function Auth() {
   }
 
   return (
-    <View className="h-full pt-14 " style={{ backgroundColor: colors.login }}>
+    <View className="h-full pt-14 px-5 pb-10 " style={{ backgroundColor: colors.login }}>
       <Stack.Screen options={{ headerShown: false }} />
       <View className="  pb-8 justify-between  rounded-xl px-5 h-full">
         <View>

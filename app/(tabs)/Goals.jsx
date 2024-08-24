@@ -207,7 +207,7 @@ const Goals = () => {
             {userGoals.length > 0 ? (
               <Pressable
                 onPress={() => setModalVisible(true)}
-                className="bg-blue-500 p-4 rounded-full absolute right-0 bottom-24 z-10"
+                className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-28 z-10"
               >
                 <Ionicons name="add" size={40} color="white" />
               </Pressable>
@@ -233,7 +233,7 @@ const Goals = () => {
                     })
                     .map((item, index) => {
                       return (
-                        <View className="rounded-3xl  p-4 my-2 w-full flex-row justify-between" style={{ backgroundColor: colors.inputBg }} key={index}>
+                        <View className="rounded-3xl  p-4 my-2 w-full flex-row justify-between" style={{ backgroundColor: colors.itemBg }} key={index}>
                           <View className="flex-row">
                             <View className="mr-5">
                               <CircularProgress
@@ -244,12 +244,12 @@ const Goals = () => {
                             </View>
                             <View className="justify-center">
                               <Text
-                                className=" text-xl w-40"
-                                style={{ fontFamily: "Red_Hat", color: colors.text }}
+                                className=" text-xl w-40 text-white"
+                                style={{ fontFamily: "Red_Hat" }}
                               >
                                 {item.goalName}
                               </Text>
-                              <Text className="text-md mt-2" style={{ color: colors.secondary }}>
+                              <Text className="text-md mt-2 text-gray-300" >
                                 ₹{item.goalSavedMoney} / ₹{item.goalTargetMoney}
                               </Text>
                             </View>
@@ -261,7 +261,7 @@ const Goals = () => {
                                 <Feather name="check" size={24} color="white" />
                               </TouchableOpacity>
                               :
-                              <TouchableOpacity className="bg-blue-500 rounded-3xl p-3" onPress={() => handleGoalDetailOpen(item)}>
+                              <TouchableOpacity className="bg-[#41B3A2] rounded-3xl p-3" onPress={() => handleGoalDetailOpen(item)}>
                                 <AntDesign name="right" size={24} color="white" />
                               </TouchableOpacity>
                             }

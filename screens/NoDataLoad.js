@@ -2,8 +2,9 @@ import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import LottieView from "lottie-react-native";
 import { useTheme } from "@react-navigation/native";
+import CustomText from "../components/CustomText";
 
-const NoDataLoad = () => {
+const NoDataLoad = ({ selectedDate }) => {
   const { colors } = useTheme();
   return (
     <View style={styles.animationContainer}>
@@ -20,13 +21,17 @@ const NoDataLoad = () => {
         style={{
           backgroundColor: colors.background,
           position: "absolute",
-          bottom: 65,
-          paddingHorizontal: 100,
+          bottom: 55,
+          alignItems: "center",
+          width: "100%",
         }}
       >
-        <Text style={{ color: colors.text, fontSize: 30, fontFamily: "Jost" }}>
+        <CustomText style={{ color: colors.text, fontSize: 20 }}>
           No data
-        </Text>
+        </CustomText>
+        <CustomText style={{ color: colors.text, fontSize: 20 }}>
+          {selectedDate}
+        </CustomText>
       </View>
     </View>
   );

@@ -7,19 +7,18 @@ import {
   Alert,
   SafeAreaView,
   ScrollView,
-  Text,
   View,
   Animated
 } from "react-native";
 import AnimatedHeader from "../../components/AnimatedHeader";
 import TotalIncome from "../../components/TotalIncome";
 import { supabase } from "../../lib/supabase";
+import CustomText from "../../components/CustomText"; // Import the custom text component
 
 export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [userIncome, setUserIncome] = useState(null);
   const [userData, setUserData] = useState([]);
 
   const isFocused = useIsFocused();
@@ -129,23 +128,23 @@ export default function Home() {
         ) : (
           <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
-              <Text className="text-white text-2xl" style={{ fontFamily: "Nunito" }}>
+              <CustomText className="text-white text-2xl">
                 History
-              </Text>
+              </CustomText>
               <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
             </View>
             <View className="mx-1 mb-2">
               {historyExpense?.map((item, index) => (
                 <View key={index} className="mb-2 p-3 bg-gray-800 rounded-xl">
                   <View className="flex-row justify-between">
-                    <Text className="text-white text-lg">
+                    <CustomText className="text-white text-lg">
                       {item.expenseName}
-                    </Text>
-                    <Text className="text-red-500 text-lg">
+                    </CustomText>
+                    <CustomText className="text-red-500 text-lg">
                       - ₹{item.expenseAmount}
-                    </Text>
+                    </CustomText>
                   </View>
-                  <Text className="text-gray-400">{item.expenseDate}</Text>
+                  <CustomText className="text-gray-400">{item.expenseDate}</CustomText>
                 </View>
               ))}
             </View>
@@ -158,35 +157,38 @@ export default function Home() {
         ) : (
           <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 mb-32">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2">
-              <Text className="text-white text-2xl" style={{ fontFamily: "Nunito" }}>
+              <CustomText className="text-white text-2xl">
                 Goals
-              </Text>
+              </CustomText>
               <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
             </View>
             <View className="mx-2 mb-2">
-              {historyGoal?.map((item, i) => {
-                const percentage = (item.goalSavedMoney / item.goalTargetMoney) * 100;
-                return (
-                  <View className="mb-2 py-1 gap-2" key={i}>
-                    <Text className="text-white text-lg">{item?.goalName}</Text>
-                    <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                      <View
-                        className="bg-green-500 h-full"
-                        style={{ width: `${percentage > 100 ? 100 : percentage}%` }}
-                      ></View>
+              {historyGoal.length > 0
+                ?
+                historyGoal?.map((item, i) => {
+                  const percentage = (item.goalSavedMoney / item.goalTargetMoney) * 100;
+                  return (
+                    <View className="mb-2 py-1 gap-2" key={i}>
+                      <CustomText className="text-white text-lg">{item?.goalName}</CustomText>
+                      <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
+                        <View
+                          className="bg-green-500 h-full"
+                          style={{ width: `${percentage > 100 ? 100 : percentage}%` }}
+                        ></View>
+                      </View>
+                      <CustomText className="text-white text-sm mt-1">
+                        ₹{item?.goalSavedMoney} / ₹{item?.goalTargetMoney}
+                      </CustomText>
                     </View>
-                    <Text className="text-white text-sm mt-1">
-                      ₹{item?.goalSavedMoney} / ₹{item?.goalTargetMoney}
-                    </Text>
-                  </View>
-                );
-              })}
-
+                  );
+                })
+                :
+                <CustomText className="text-white text-xl">No Goals added till yet</CustomText>
+              }
             </View>
           </View>
         )}
       </ScrollView>
-
     </View>
   );
 }

@@ -1,5 +1,7 @@
 import { View, Text, Pressable } from 'react-native'
 import React from 'react'
+import { useTheme } from '@react-navigation/native'
+import CustomText from '../CustomText'
 
 const ExpenseDetail = ({
     selectedExpense,
@@ -7,54 +9,56 @@ const ExpenseDetail = ({
     closeExpenseDetail
 }) => {
 
+    const { colors } = useTheme()
+
     return (
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-70">
-            <View className="bg-gray-900 rounded-lg p-6 w-11/12">
-                <Text
-                    className="text-white text-3xl mb-4"
-                    style={{ fontFamily: "Red_Hat" }}
+        <View className="flex-1 justify-center items-center bg-opacity-70" style={{ backgroundColor: colors.background }}>
+            <View className=" rounded-2xl p-6 w-11/12" style={{ backgroundColor: "#31363F" }}>
+                <CustomText
+                    className="text-white text-3xl mb-2"
+
                 >
                     {selectedExpense?.expenseName}
-                </Text>
-                <Text
-                    className="text-yellow-400 text-2xl mb-4"
-                    style={{ fontFamily: "Red_Hat" }}
+                </CustomText>
+                <CustomText
+                    className="text-yellow-400 text-2xl mb-2"
+
                 >
                     ₹{selectedExpense?.expenseAmount}
-                </Text>
-                <Text
-                    className="text-gray-400 text-xl mb-4"
-                    style={{ fontFamily: "Red_Hat" }}
+                </CustomText>
+                <CustomText
+                    className="text-gray-400 text-xl mb-2"
+
                 >
                     Date: {selectedExpense?.expenseDate}
-                </Text>
-                <Text
+                </CustomText>
+                <CustomText
                     className="text-gray-400 text-xl mb-4"
-                    style={{ fontFamily: "Red_Hat" }}
+
                 >
                     Payment Mode: {selectedExpense?.paymentMode}
-                </Text>
+                </CustomText>
                 <Pressable
                     className="bg-red-500 p-3 rounded-lg mb-2"
                     onPress={() => handleDeleteExpense()}
                 >
-                    <Text
+                    <CustomText
                         className="text-white text-center text-lg"
-                        style={{ fontFamily: "Red_Hat" }}
+
                     >
                         Delete
-                    </Text>
+                    </CustomText>
                 </Pressable>
                 <Pressable
                     onPress={closeExpenseDetail}
                     className="bg-blue-500 p-3 rounded-lg"
                 >
-                    <Text
+                    <CustomText
                         className="text-white text-center text-lg"
-                        style={{ fontFamily: "Red_Hat" }}
+
                     >
                         Close
-                    </Text>
+                    </CustomText>
                 </Pressable>
             </View>
         </View>

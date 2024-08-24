@@ -28,6 +28,8 @@ export default function RootLayout() {
     Cabin: require("../assets/fonts/Cabin/static/Cabin-SemiBold.ttf"),
     Josefin: require("../assets/fonts/Josefin_Sans/static/JosefinSans-Medium.ttf"),
     Red_Hat: require("../assets/fonts/Red_Hat_Display/static/RedHatDisplay-Medium.ttf"),
+    Montserrat: require("../assets/fonts/Montserrat/static/Montserrat-Medium.ttf"),
+    Nunito_Sans: require("../assets/fonts/Nunito_Sans/static/NunitoSans_7pt-Medium.ttf"),
   });
   useEffect(() => {
     if (loaded) {
