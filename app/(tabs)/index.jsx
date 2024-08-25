@@ -126,7 +126,7 @@ export default function Home() {
         {loading ? (
           <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3">
+          <View className="rounded-xl bg-[#222831] justify-center p-2 mt-3">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
               <CustomText className="text-white text-2xl">
                 History
@@ -135,7 +135,7 @@ export default function Home() {
             </View>
             <View className="mx-1 mb-2">
               {historyExpense?.map((item, index) => (
-                <View key={index} className="mb-2 p-3 bg-gray-800 rounded-xl">
+                <View key={index} className="mb-2 p-3 bg-gray-700 rounded-xl">
                   <View className="flex-row justify-between">
                     <CustomText className="text-white text-lg">
                       {item.expenseName}
@@ -155,7 +155,7 @@ export default function Home() {
         {loading ? (
           <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-xl bg-[#1C1C1C] justify-center p-2 mt-3 mb-32">
+          <View className="rounded-xl bg-[#222831] justify-center p-2 mt-3 mb-32">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2">
               <CustomText className="text-white text-2xl">
                 Goals

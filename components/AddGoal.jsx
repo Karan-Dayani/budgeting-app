@@ -1,15 +1,16 @@
 import { View, Text, TextInput, Pressable, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { useTheme } from '@react-navigation/native'
+import CustomText from './CustomText'
 
 const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, loading }) => {
     const { colors } = useTheme()
     return (
         <View className="flex-1 justify-center items-center bg-opacity-50" style={{ backgroundColor: colors.background }}>
             <View className=" p-5 rounded-3xl w-11/12" style={{ backgroundColor: colors.inputBg }}>
-                <Text className=" text-xl mb-3" style={{ fontFamily: "Nunito", color: colors.text }}>
+                <CustomText className=" text-xl mb-3" style={{ color: colors.text }}>
                     Set a Goal
-                </Text>
+                </CustomText>
                 <TextInput
                     value={goal.goalName}
                     onChangeText={(value) => handleAddGoalChange("goalName", value)}
@@ -34,13 +35,13 @@ const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, lo
                             className="flex-1 p-3 bg-red-500 items-center rounded-3xl"
                             onPress={() => setModalVisible(false)}
                         >
-                            <Text className="text-white text-lg">Cancel</Text>
+                            <CustomText className="text-white text-lg">Cancel</CustomText>
                         </Pressable>
                         <Pressable
                             className="flex-1 p-3 bg-blue-500 items-center rounded-3xl"
                             onPress={handleAddGoal}
                         >
-                            <Text className="text-white text-lg">Save</Text>
+                            <CustomText className="text-white text-lg">Save</CustomText>
                         </Pressable>
                     </View>
                 }

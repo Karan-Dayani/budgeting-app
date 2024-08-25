@@ -1,6 +1,7 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { Button } from "native-base";
+import { Box, Button, HStack, Slide } from "native-base";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,17 +13,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import uuid from "react-native-uuid";
-import { supabase } from "../../lib/supabase";
-import { useTheme } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import ExpenseDetail from "../../components/modals/ExpenseDetail";
-import AddExpenseModal from "../../components/modals/AddExpenseModal";
-import NoDataLoad from "../../screens/NoDataLoad";
+import uuid from "react-native-uuid";
 import CustomText from "../../components/CustomText"; // Import your custom text component
+import AddExpenseModal from "../../components/modals/AddExpenseModal";
+import ExpenseDetail from "../../components/modals/ExpenseDetail";
+import { supabase } from "../../lib/supabase";
+import NoDataLoad from "../../screens/NoDataLoad";
 
 export default function ExpensesPage() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState("");
   const [user, setUser] = useState("");
@@ -40,6 +41,8 @@ export default function ExpensesPage() {
   const [income, setIncome] = useState(0);
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [activeTab, setActiveTab] = useState("Non-Recurring")
+  const [formType, setFormType] = useState("")
 
   const { colors } = useTheme();
 
@@ -142,12 +145,11 @@ export default function ExpensesPage() {
       paymentMode: "",
       expenseDate: new Date().toDateString().slice(4),
     });
-    Alert.alert("Success", "Expense added successfully!");
     setAddExpenseModal(false);
-    setIsOpen(!isOpen);
+    setIsSaved(!isSaved);
     setTimeout(() => {
-      setIsOpen(false);
-    }, 4000);
+      setIsSaved(false);
+    }, 2500);
   };
 
   const handleDeleteExpense = async () => {
@@ -169,7 +171,11 @@ export default function ExpensesPage() {
     setUserExpenses(updatedArray);
     setExpenseDetail(false);
     setSelectedExpense(null);
-    Alert.alert("Success", "Expense deleted successfully!");
+
+    setIsDeleted(!isDeleted);
+    setTimeout(() => {
+      setIsDeleted(false);
+    }, 2500);
   };
 
   const getTotalExpense = () => {
@@ -178,6 +184,7 @@ export default function ExpensesPage() {
       (total, item) => total + item?.expenseAmount,
       0
     );
+
   };
 
   return (
@@ -249,6 +256,33 @@ export default function ExpensesPage() {
             />
           </View>
         </View>
+        <View className="flex-row my-4 gap-x-4">
+          <Pressable
+            className="flex-1 p-2 rounded-md"
+            onPress={() => setActiveTab("Non-Recurring")}
+            style={{ backgroundColor: activeTab === "Non-Recurring" ? "#57A6A1" : colors.inputBg }}
+          >
+            <CustomText
+              style={{ color: colors.text }}
+              className="text-lg text-center"
+            >
+              Non-Recurring
+            </CustomText>
+          </Pressable>
+
+          <Pressable
+            className="flex-1 p-2 rounded-md"
+            onPress={() => setActiveTab("Recurring")}
+            style={{ backgroundColor: activeTab === "Recurring" ? "#57A6A1" : colors.inputBg }}
+          >
+            <CustomText
+              style={{ color: colors.text }}
+              className="text-lg text-center"
+            >
+              Recurring
+            </CustomText>
+          </Pressable>
+        </View>
         {loading ? (
           <ActivityIndicator
             size="large"
@@ -257,7 +291,7 @@ export default function ExpensesPage() {
           />
         ) : (
           <ScrollView className="mt-2" showsVerticalScrollIndicator={false}>
-            <View className="w-full mb-16">
+            <View className="w-full mb-40">
               {datedExpenses.length > 0 ? (
                 datedExpenses?.map((item, index) => (
                   <View key={index}>
@@ -339,11 +373,35 @@ export default function ExpensesPage() {
       >
         <AddExpenseModal
           expense={expense}
+          formType={formType}
+          setFormType={setFormType}
           handleExpenseChange={handleExpenseChange}
           handleSaveExpense={handleSaveExpense}
           setAddExpenseModal={setAddExpenseModal}
         />
       </Modal>
+      <Slide in={isSaved} placement="top">
+        <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="emerald.500" alignItems="center" justifyContent="center" _dark={{
+          bg: "emerald.200"
+        }} safeArea>
+          <HStack space={2}>
+            <CustomText className=" text-white text-lg">
+              Expense saved successfully!
+            </CustomText>
+          </HStack>
+        </Box>
+      </Slide>
+
+      <Slide in={isDeleted} placement="top">
+        <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="error.500" alignItems="center" justifyContent="center" safeArea>
+          <HStack space={2}>
+            <CustomText className="text-white text-lg">
+              Expense deleted successfully!
+            </CustomText>
+          </HStack>
+        </Box>
+      </Slide>
+
     </View>
   );
 }

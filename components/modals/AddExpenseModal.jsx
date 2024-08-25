@@ -1,7 +1,7 @@
 import React from "react";
 import { View, TextInput, Pressable } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { Select } from "native-base";
+import { Select, Radio } from "native-base";
 import { useTheme } from "@react-navigation/native";
 import CustomText from "../CustomText";
 
@@ -10,6 +10,8 @@ const AddExpenseModal = ({
   handleExpenseChange,
   handleSaveExpense,
   setAddExpenseModal,
+  formType,
+  setFormType
 }) => {
   const PaymentModedata = [
     { label: "Cash", value: "Cash" },
@@ -42,6 +44,56 @@ const AddExpenseModal = ({
           Add Expense
         </CustomText>
 
+        {/* <View className="items-center">
+          <Radio.Group
+            className="flex-row gap-x-3"
+            onChange={(value) => {
+              handleExpenseChange("expenseType", value);
+            }}
+          >
+            <Radio value="Reccuring">
+              <CustomText className=" text-center" style={{ color: colors.text }}>Reccuring</CustomText>
+            </Radio>
+            <Radio value="Non-Reccuring">
+              <CustomText className=" text-center" style={{ color: colors.text }}>Non-Reccuring</CustomText>
+            </Radio>
+          </Radio.Group>
+        </View> */}
+
+        <View className="flex-row mb-5 gap-x-4">
+          <Pressable
+            className="flex-1 p-2 rounded-md"
+            onPress={() => {
+              setFormType("Non-Recurring")
+              handleExpenseChange("expenseType", formType)
+            }}
+            style={{ backgroundColor: formType === "Non-Recurring" ? "#57A6A1" : colors.inputBg }}
+          >
+            <CustomText
+              style={{ color: colors.text }}
+              className="text-lg text-center"
+            >
+              Non-Recurring
+            </CustomText>
+          </Pressable>
+
+          <Pressable
+            className="flex-1 p-2 rounded-md"
+            onPress={() => {
+              setFormType("Recurring")
+              handleExpenseChange("expenseType", formType)
+            }}
+            style={{ backgroundColor: formType === "Recurring" ? "#57A6A1" : colors.inputBg }}
+          >
+            <CustomText
+              style={{ color: colors.text }}
+              className="text-lg text-center"
+            >
+              Recurring
+            </CustomText>
+          </Pressable>
+        </View>
+
         {/* Expense Name */}
         <CustomText className="text-lg mb-1" style={{ color: colors.text }}>
           Expense Name
@@ -50,7 +102,7 @@ const AddExpenseModal = ({
           placeholder="Enter expense name"
           value={expense.expenseName}
           onChangeText={(text) => handleExpenseChange("expenseName", text)}
-          className="  p-3 mb-4 rounded-md border border-gray-300 shadow-sm"
+          className=" p-3 mb-4 rounded-md border border-gray-300 shadow-sm"
           style={{ backgroundColor: colors.expenseInput, color: colors.text }}
           placeholderTextColor="#A0AEC0"
         />

@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { NativeBaseProvider, Spinner } from "native-base";
+import { Box, HStack, NativeBaseProvider, Slide, Spinner } from "native-base";
 import { AntDesign, Entypo, Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
@@ -19,8 +19,11 @@ import uuid from "react-native-uuid";
 import AddGoal from "../../components/AddGoal";
 import { supabase } from "../../lib/supabase";
 import GoalComplete from "../../screens/GoalComplete";
+import CustomText from "../../components/CustomText";
 
 const Goals = () => {
+  const [isSaved, setIsSaved] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false)
@@ -99,6 +102,10 @@ const Goals = () => {
     setModalVisible(false);
     await fetchData();
     setLoading(false);
+    setIsSaved(!isSaved);
+    setTimeout(() => {
+      setIsSaved(false);
+    }, 2500);
   };
 
 
@@ -184,7 +191,10 @@ const Goals = () => {
 
     setConfirmModal(false);
     setSelectedGoal(null);
-    Alert.alert("Success", "Goal removed successfully!")
+    setIsDeleted(!isDeleted);
+    setTimeout(() => {
+      setIsDeleted(false);
+    }, 2500);
   }
 
   return (
@@ -194,9 +204,9 @@ const Goals = () => {
           options={{
             headerShown: true,
             headerTitle: "",
+            headerShadowVisible: false,
             headerTitleStyle: {
               color: colors.text,
-              fontFamily: "Nunito",
               fontSize: 25,
             },
             headerStyle: { backgroundColor: colors.header, height: 50 },
@@ -215,9 +225,9 @@ const Goals = () => {
               <></>
             )}
 
-            <Text className={` text-2xl`} style={{ fontFamily: "Nunito", color: colors.text }}>
+            <CustomText className={` text-2xl`} style={{ color: colors.text }}>
               Goals
-            </Text>
+            </CustomText>
             {loading ? (
               <View className="flex-1 justify-center items-center">
                 <Spinner size="lg" color={colors.text} />
@@ -243,15 +253,14 @@ const Goals = () => {
                               />
                             </View>
                             <View className="justify-center">
-                              <Text
+                              <CustomText
                                 className=" text-xl w-40 text-white"
-                                style={{ fontFamily: "Red_Hat" }}
                               >
                                 {item.goalName}
-                              </Text>
-                              <Text className="text-md mt-2 text-gray-300" >
+                              </CustomText>
+                              <CustomText className="text-md mt-2 text-gray-300" >
                                 ₹{item.goalSavedMoney} / ₹{item.goalTargetMoney}
-                              </Text>
+                              </CustomText>
                             </View>
                           </View>
                           <View className="justify-center mr-2 ">
@@ -273,17 +282,17 @@ const Goals = () => {
                     })
                 ) : (
                   <View className="bg-[#1F2937] px-6 py-4 rounded-xl mt-5 shadow-lg">
-                    <Text className="text-white text-xl mb-3" style={{ fontFamily: "Nunito" }}>
+                    <CustomText className="text-white text-xl mb-3" >
                       Set and track your personal goals here.
-                    </Text>
+                    </CustomText>
 
                     <Pressable
                       className="p-2 bg-blue-500 items-center rounded-lg"
                       onPress={() => setModalVisible(true)}
                     >
-                      <Text className="text-white text-lg font-bold" style={{ fontFamily: "Nunito" }}>
+                      <CustomText className="text-white text-lg font-bold" >
                         Add Goal
-                      </Text>
+                      </CustomText>
                     </Pressable>
                   </View>
                 )}
@@ -303,7 +312,7 @@ const Goals = () => {
               <View className="flex-1 justify-center items-center  bg-opacity-50" style={{ backgroundColor: colors.background }}>
                 <View className=" p-5 rounded-xl w-4/5" style={{ backgroundColor: colors.inputBg }}>
                   <View className="flex-row justify-between mb-4">
-                    <Text className="py-2 text-xl w-40" style={{ color: colors.text, fontFamily: "Cabin" }} numberOfLines={1}>{selectedGoal.goalName}</Text>
+                    <CustomText className="py-2 text-xl w-40" style={{ color: colors.text }} numberOfLines={1}>{selectedGoal.goalName}</CustomText>
                     <Pressable className="bg-red-500 rounded-xl justify-center p-2" onPress={() => setConfirmModal(true)}>
                       <MaterialIcons name="delete" size={24} color="white" />
                     </Pressable>
@@ -314,7 +323,7 @@ const Goals = () => {
                       radius={70}
                       valueSuffix={"%"}
                     />
-                    <Text className="text-xl mt-4 mb-2" style={{ color: colors.text, fontFamily: "Cabin" }}>₹{selectedGoal.goalSavedMoney} / ₹{selectedGoal.goalTargetMoney}</Text>
+                    <CustomText className="text-xl mt-4 mb-2" style={{ color: colors.text }}>₹{selectedGoal.goalSavedMoney} / ₹{selectedGoal.goalTargetMoney}</CustomText>
                   </View>
                   <TextInput
                     placeholder="Add Amount"
@@ -328,13 +337,13 @@ const Goals = () => {
                       className="flex-1 p-2 bg-red-500 items-center rounded-lg"
                       onPress={() => setGoalDetailModal(false)}
                     >
-                      <Text className="text-white text-lg">Cancel</Text>
+                      <CustomText className="text-white text-lg">Cancel</CustomText>
                     </Pressable>
                     <Pressable
                       className="flex-1 p-2 bg-blue-500 items-center rounded-lg"
                       onPress={handleGoalAmountAdd}
                     >
-                      <Text className="text-white text-lg">Add</Text>
+                      <CustomText className="text-white text-lg">Add</CustomText>
                     </Pressable>
                   </View>
                 </View>
@@ -368,19 +377,19 @@ const Goals = () => {
           >
             <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
               <View className=" p-5 rounded-xl w-4/5" style={{ backgroundColor: colors.inputBg }}>
-                <Text className="text-xl mb-4" style={{ color: colors.text }}>Are you sure?</Text>
+                <CustomText className="text-xl mb-4" style={{ color: colors.text }}>Are you sure?</CustomText>
                 <View className="flex-row gap-2">
                   <Pressable
                     className="flex-1 p-3 bg-red-500 items-center rounded-3xl"
                     onPress={() => setConfirmModal(false)}
                   >
-                    <Text className="text-white text-lg">No</Text>
+                    <CustomText className="text-white text-lg">No</CustomText>
                   </Pressable>
                   <Pressable
                     className="flex-1 p-3 bg-blue-500 items-center rounded-3xl"
                     onPress={() => handleGoalDelete()}
                   >
-                    <Text className="text-white text-lg">Yes</Text>
+                    <CustomText className="text-white text-lg">Yes</CustomText>
                   </Pressable>
                 </View>
               </View>
@@ -400,6 +409,27 @@ const Goals = () => {
             </Modal>
           )}
         </SafeAreaView>
+        <Slide in={isSaved} placement="top">
+          <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="emerald.500" alignItems="center" justifyContent="center" _dark={{
+            bg: "emerald.200"
+          }} safeArea>
+            <HStack space={2}>
+              <CustomText className=" text-white text-lg">
+                Goal saved successfully!
+              </CustomText>
+            </HStack>
+          </Box>
+        </Slide>
+
+        <Slide in={isDeleted} placement="top">
+          <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="error.500" alignItems="center" justifyContent="center" safeArea>
+            <HStack space={2}>
+              <CustomText className="text-white text-lg">
+                Goal removed successfully!
+              </CustomText>
+            </HStack>
+          </Box>
+        </Slide>
       </View>
     </NativeBaseProvider>
   );
