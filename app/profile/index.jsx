@@ -47,9 +47,7 @@ const Profile = () => {
     <View className="h-full justify-center px-5">
       <Stack.Screen
         options={{
-          headerTitle: "Profile",
-          headerStyle: { backgroundColor: "#0F0F0F" },
-          headerTitleStyle: { color: "white" },
+          headerShown: false
         }}
       />
       <View className="bg-[#191A19] pb-8 justify-center rounded-xl px-5 ">
@@ -85,7 +83,7 @@ const Profile = () => {
           )}
         </View>
         <Pressable
-          className="p-3 bg-cardColor items-center rounded-lg mt-5"
+          className="p-3 bg-[#41B3A2] items-center rounded-lg mt-5"
           onPress={() => handleSubmit()}
         >
           {loading ? (
