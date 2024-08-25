@@ -41,8 +41,7 @@ export default function ExpensesPage() {
   const [income, setIncome] = useState(0);
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
-  const [activeTab, setActiveTab] = useState("Non-Recurring")
-  const [formType, setFormType] = useState("")
+  const [activeTab, setActiveTab] = useState("Non-Recurring");
 
   const { colors } = useTheme();
 
@@ -104,6 +103,18 @@ export default function ExpensesPage() {
     );
   }
 
+  let activeExpenses = [];
+
+  if (activeTab === "Non-Recurring") {
+    activeExpenses = datedExpenses?.filter(
+      (expense) => expense.expenseType === "Non-Recurring"
+    );
+  } else if (activeTab === "Recurring") {
+    activeExpenses = datedExpenses?.filter(
+      (expense) => expense.expenseType === "Recurring"
+    );
+  }
+
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
       ...prevData,
@@ -140,10 +151,13 @@ export default function ExpensesPage() {
       .eq("email", user?.user_metadata?.email);
 
     setExpense({
+      expenseId: uuid.v4(),
       expenseName: "",
       expenseAmount: 0,
       paymentMode: "",
       expenseDate: new Date().toDateString().slice(4),
+      expenseCategory: "",
+      expenseType: "",
     });
     setAddExpenseModal(false);
     setIsSaved(!isSaved);
@@ -184,7 +198,6 @@ export default function ExpensesPage() {
       (total, item) => total + item?.expenseAmount,
       0
     );
-
   };
 
   return (
@@ -260,7 +273,10 @@ export default function ExpensesPage() {
           <Pressable
             className="flex-1 p-2 rounded-md"
             onPress={() => setActiveTab("Non-Recurring")}
-            style={{ backgroundColor: activeTab === "Non-Recurring" ? "#57A6A1" : colors.inputBg }}
+            style={{
+              backgroundColor:
+                activeTab === "Non-Recurring" ? "#57A6A1" : colors.inputBg,
+            }}
           >
             <CustomText
               style={{ color: colors.text }}
@@ -273,7 +289,10 @@ export default function ExpensesPage() {
           <Pressable
             className="flex-1 p-2 rounded-md"
             onPress={() => setActiveTab("Recurring")}
-            style={{ backgroundColor: activeTab === "Recurring" ? "#57A6A1" : colors.inputBg }}
+            style={{
+              backgroundColor:
+                activeTab === "Recurring" ? "#57A6A1" : colors.inputBg,
+            }}
           >
             <CustomText
               style={{ color: colors.text }}
@@ -292,8 +311,8 @@ export default function ExpensesPage() {
         ) : (
           <ScrollView className="mt-2" showsVerticalScrollIndicator={false}>
             <View className="w-full mb-40">
-              {datedExpenses.length > 0 ? (
-                datedExpenses?.map((item, index) => (
+              {activeExpenses.length > 0 ? (
+                activeExpenses?.map((item, index) => (
                   <View key={index}>
                     <TouchableOpacity
                       onLongPress={() => handleExpenseDetail(item)}
@@ -339,9 +358,7 @@ export default function ExpensesPage() {
                   </View>
                 ))
               ) : (
-                <NoDataLoad
-                  selectedDate={selectedDate}
-                />
+                <NoDataLoad selectedDate={selectedDate} />
               )}
             </View>
           </ScrollView>
@@ -373,17 +390,27 @@ export default function ExpensesPage() {
       >
         <AddExpenseModal
           expense={expense}
-          formType={formType}
-          setFormType={setFormType}
+          // formType={formType}
+          // setFormType={setFormType}
           handleExpenseChange={handleExpenseChange}
           handleSaveExpense={handleSaveExpense}
           setAddExpenseModal={setAddExpenseModal}
         />
       </Modal>
       <Slide in={isSaved} placement="top">
-        <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="emerald.500" alignItems="center" justifyContent="center" _dark={{
-          bg: "emerald.200"
-        }} safeArea>
+        <Box
+          w="100%"
+          position="absolute"
+          p="2"
+          borderRadius="xs"
+          bg="emerald.500"
+          alignItems="center"
+          justifyContent="center"
+          _dark={{
+            bg: "emerald.200",
+          }}
+          safeArea
+        >
           <HStack space={2}>
             <CustomText className=" text-white text-lg">
               Expense saved successfully!
@@ -393,7 +420,16 @@ export default function ExpensesPage() {
       </Slide>
 
       <Slide in={isDeleted} placement="top">
-        <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="error.500" alignItems="center" justifyContent="center" safeArea>
+        <Box
+          w="100%"
+          position="absolute"
+          p="2"
+          borderRadius="xs"
+          bg="error.500"
+          alignItems="center"
+          justifyContent="center"
+          safeArea
+        >
           <HStack space={2}>
             <CustomText className="text-white text-lg">
               Expense deleted successfully!
@@ -401,7 +437,6 @@ export default function ExpensesPage() {
           </HStack>
         </Box>
       </Slide>
-
     </View>
   );
 }
