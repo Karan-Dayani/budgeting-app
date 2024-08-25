@@ -19,30 +19,35 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors.dark.icon,
         headerShown: false,
       }}
-      tabBar={props => <TabBar {...props} />}
+      tabBar={(props) => <TabBar {...props} />}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-
         }}
       />
 
       <Tabs.Screen
         name="Expenses"
         options={{
-          title: "Expenses"
+          title: "Expenses",
         }}
       />
 
       <Tabs.Screen
         name="Goals"
         options={{
-          title: "Goals"
+          title: "Goals",
         }}
       />
 
+      <Tabs.Screen
+        name="Profile"
+        options={{
+          title: "Profile",
+        }}
+      />
     </Tabs>
   );
 }
