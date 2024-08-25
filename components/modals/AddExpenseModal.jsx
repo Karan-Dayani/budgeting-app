@@ -36,7 +36,7 @@ const AddExpenseModal = ({
       style={{ backgroundColor: colors.background }}
     >
       <View
-        className="rounded-xl p-8 w-11/12  shadow-2xl"
+        className="rounded-xl p-6 w-11/12  shadow-2xl"
         style={{ elevation: 5, backgroundColor: colors.expenseForm }}
       >
         <CustomText

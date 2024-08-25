@@ -7,21 +7,21 @@ const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, lo
     const { colors } = useTheme()
     return (
         <View className="flex-1 justify-center items-center bg-opacity-50" style={{ backgroundColor: colors.background }}>
-            <View className=" p-5 rounded-3xl w-11/12" style={{ backgroundColor: colors.inputBg }}>
+            <View className=" p-5 rounded-xl w-11/12" style={{ backgroundColor: colors.inputBg }}>
                 <CustomText className=" text-xl mb-3" style={{ color: colors.text }}>
                     Set a Goal
                 </CustomText>
                 <TextInput
                     value={goal.goalName}
                     onChangeText={(value) => handleAddGoalChange("goalName", value)}
-                    className="rounded-3xl mb-4 text-white p-4 bg-[#31363F]"
+                    className="rounded-xl mb-4 text-white p-4 bg-[#212121]"
                     placeholderTextColor="white"
                     placeholder="Enter your goal"
                 />
                 <TextInput
                     value={goal.goalTargetMoney}
                     onChangeText={(value) => handleAddGoalChange("goalTargetMoney", value)}
-                    className="rounded-3xl mb-4 text-white p-4 bg-[#31363F]"
+                    className="rounded-xl mb-4 text-white p-4 bg-[#212121]"
                     placeholderTextColor="white"
                     placeholder="Target amount"
                     keyboardType="numeric"
@@ -32,13 +32,13 @@ const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, lo
                     :
                     <View className="flex-row gap-2">
                         <Pressable
-                            className="flex-1 p-3 bg-red-500 items-center rounded-3xl"
+                            className="flex-1 p-3 bg-red-500 items-center rounded-xl"
                             onPress={() => setModalVisible(false)}
                         >
                             <CustomText className="text-white text-lg">Cancel</CustomText>
                         </Pressable>
                         <Pressable
-                            className="flex-1 p-3 bg-blue-500 items-center rounded-3xl"
+                            className="flex-1 p-3 bg-blue-500 items-center rounded-xl"
                             onPress={handleAddGoal}
                         >
                             <CustomText className="text-white text-lg">Save</CustomText>
