@@ -16,7 +16,7 @@ import { Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import CircularProgress from 'react-native-circular-progress-indicator';
 import uuid from "react-native-uuid";
-import AddGoal from "../../components/AddGoal";
+import AddGoal from "../../components/modals/AddGoal";
 import { supabase } from "../../lib/supabase";
 import GoalComplete from "../../screens/GoalComplete";
 import CustomText from "../../components/CustomText";
@@ -309,7 +309,7 @@ const Goals = () => {
                 setGoalDetailModal(!goalDetailModal);
               }}
             >
-              <View className="flex-1 justify-center items-center  bg-opacity-50" style={{ backgroundColor: colors.background }}>
+              <View className="flex-1 justify-center items-center  bg-opacity-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
                 <View className=" p-5 rounded-xl w-4/5" style={{ backgroundColor: colors.inputBg }}>
                   <View className="flex-row justify-between mb-4">
                     <CustomText className="py-2 text-xl w-40" style={{ color: colors.text }} numberOfLines={1}>{selectedGoal.goalName}</CustomText>
@@ -375,7 +375,7 @@ const Goals = () => {
               setConfirmModal(!confirmModal);
             }}
           >
-            <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+            <View className="flex-1 justify-center items-center  bg-opacity-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
               <View className=" p-5 rounded-xl w-4/5" style={{ backgroundColor: colors.inputBg }}>
                 <CustomText className="text-xl mb-4" style={{ color: colors.text }}>Are you sure?</CustomText>
                 <View className="flex-row gap-2">

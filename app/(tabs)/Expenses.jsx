@@ -55,6 +55,28 @@ export default function ExpensesPage() {
     setDatePickerVisibility(false);
   };
 
+  let datedExpenses = [];
+
+  if (selectedDate === "") {
+    datedExpenses = userExpenses;
+  } else {
+    datedExpenses = userExpenses?.filter(
+      (expense) => expense.expenseDate === selectedDate
+    );
+  }
+
+  let activeExpenses = [];
+
+  if (activeTab === "Non-Recurring") {
+    activeExpenses = datedExpenses?.filter(
+      (expense) => expense.expenseType === "Non-Recurring"
+    );
+  } else if (activeTab === "Recurring") {
+    activeExpenses = datedExpenses?.filter(
+      (expense) => expense.expenseType === "Recurring"
+    );
+  }
+
   const handleConfirm = (date) => {
     setSelectedDate(new Date(date).toDateString().slice(4));
     hideDatePicker();
@@ -93,28 +115,6 @@ export default function ExpensesPage() {
     }
   }, [user, expense]);
 
-  let datedExpenses = [];
-
-  if (selectedDate === "") {
-    datedExpenses = userExpenses;
-  } else {
-    datedExpenses = userExpenses?.filter(
-      (expense) => expense.expenseDate === selectedDate
-    );
-  }
-
-  let activeExpenses = [];
-
-  if (activeTab === "Non-Recurring") {
-    activeExpenses = datedExpenses?.filter(
-      (expense) => expense.expenseType === "Non-Recurring"
-    );
-  } else if (activeTab === "Recurring") {
-    activeExpenses = datedExpenses?.filter(
-      (expense) => expense.expenseType === "Recurring"
-    );
-  }
-
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
       ...prevData,
@@ -137,6 +137,18 @@ export default function ExpensesPage() {
   };
 
   const handleSaveExpense = async () => {
+
+    if (
+      !expense.expenseName.trim() ||
+      !expense.expenseAmount ||
+      !expense.paymentMode.trim() ||
+      !expense.expenseCategory.trim() ||
+      !expense.expenseType.trim()
+    ) {
+      Alert.alert("Please fill in all the fields before saving.");
+      return;
+    }
+
     const { data, err } = await supabase
       .from("User Data")
       .select("expenses")
@@ -164,6 +176,7 @@ export default function ExpensesPage() {
     setTimeout(() => {
       setIsSaved(false);
     }, 2500);
+
   };
 
   const handleDeleteExpense = async () => {
@@ -390,13 +403,12 @@ export default function ExpensesPage() {
       >
         <AddExpenseModal
           expense={expense}
-          // formType={formType}
-          // setFormType={setFormType}
           handleExpenseChange={handleExpenseChange}
           handleSaveExpense={handleSaveExpense}
           setAddExpenseModal={setAddExpenseModal}
         />
       </Modal>
+
       <Slide in={isSaved} placement="top">
         <Box
           w="100%"

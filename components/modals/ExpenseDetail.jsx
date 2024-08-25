@@ -12,8 +12,8 @@ const ExpenseDetail = ({
     const { colors } = useTheme()
 
     return (
-        <View className="flex-1 justify-center items-center bg-opacity-70" style={{ backgroundColor: colors.background }}>
-            <View className=" rounded-2xl p-6 w-11/12" style={{ backgroundColor: "#31363F" }}>
+        <View className="flex-1 justify-center items-center bg-opacity-80" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+            <View className="rounded-3xl p-8 w-10/12 shadow-lg" style={{ backgroundColor: "#31363F" }}>
                 <CustomText
                     className="text-white text-3xl mb-2"
 
@@ -39,7 +39,7 @@ const ExpenseDetail = ({
                     Payment Mode: {selectedExpense?.paymentMode}
                 </CustomText>
                 <Pressable
-                    className="bg-red-500 p-3 rounded-lg mb-2"
+                    className="bg-red-500 p-3 rounded-xl mb-4"
                     onPress={() => handleDeleteExpense()}
                 >
                     <CustomText
@@ -51,7 +51,7 @@ const ExpenseDetail = ({
                 </Pressable>
                 <Pressable
                     onPress={closeExpenseDetail}
-                    className="bg-blue-500 p-3 rounded-lg"
+                    className="bg-blue-500 p-3 rounded-xl"
                 >
                     <CustomText
                         className="text-white text-center text-lg"

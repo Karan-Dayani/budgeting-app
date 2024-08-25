@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TextInput, Pressable } from "react-native";
+import { View, TextInput, Pressable, Alert } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { Select, Radio } from "native-base";
 import { useTheme } from "@react-navigation/native";
@@ -62,6 +62,10 @@ const AddExpenseModal = ({
           </Radio.Group>
         </View> */}
 
+        <CustomText className="mb-2 text-lg" style={{ color: colors.text }}>
+          Expense Type
+        </CustomText>
+
         <View className="flex-row mb-5 gap-x-4">
           <Pressable
             className="flex-1 p-2 rounded-md"
@@ -110,7 +114,7 @@ const AddExpenseModal = ({
           placeholder="Enter expense name"
           value={expense.expenseName}
           onChangeText={(text) => handleExpenseChange("expenseName", text)}
-          className=" p-3 mb-4 rounded-md border border-gray-300 shadow-sm"
+          className=" p-3 mb-4 rounded-md  shadow-sm"
           style={{ backgroundColor: colors.expenseInput, color: colors.text }}
           placeholderTextColor="#A0AEC0"
         />
@@ -124,7 +128,7 @@ const AddExpenseModal = ({
           onChangeText={(text) =>
             handleExpenseChange("expenseAmount", Number(text))
           }
-          className=" p-3 mb-4 rounded-md border border-gray-300 shadow-sm"
+          className=" p-3 mb-4 rounded-md  shadow-sm"
           style={{ backgroundColor: colors.expenseInput, color: colors.text }}
           placeholderTextColor="#A0AEC0"
           keyboardType="numeric"
@@ -150,6 +154,8 @@ const AddExpenseModal = ({
           h="55px"
           marginBottom="15px"
           placeholderTextColor="#A0AEC0"
+          rounded="7"
+          borderWidth="0"
         >
           {CategoryData.map((item) => (
             <Select.Item
@@ -176,7 +182,9 @@ const AddExpenseModal = ({
           color={colors.text}
           fontSize="16"
           h="55px"
+          rounded="7"
           placeholderTextColor="#A0AEC0"
+          borderWidth="0"
         >
           {PaymentModedata.map((item) => (
             <Select.Item
@@ -196,7 +204,13 @@ const AddExpenseModal = ({
             <Entypo name="cross" size={25} color="white" />
           </Pressable>
           <Pressable
-            onPress={handleSaveExpense}
+            onPress={() => {
+              if (formType === "") {
+                Alert.alert("Error", "Select expense type")
+              } else {
+                handleSaveExpense()
+              }
+            }}
             className="bg-green-500 p-4 rounded-full justify-center shadow-lg"
           >
             <MaterialIcons name="check" size={25} color="white" />
