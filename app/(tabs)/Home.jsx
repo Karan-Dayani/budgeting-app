@@ -2,7 +2,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { Skeleton } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   SafeAreaView,
@@ -21,6 +21,7 @@ export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState([]);
+
 
   const isFocused = useIsFocused();
   const { colors } = useTheme();

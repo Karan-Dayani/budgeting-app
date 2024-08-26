@@ -5,6 +5,7 @@ import { Select, Radio } from "native-base";
 import { useTheme } from "@react-navigation/native";
 import CustomText from "../CustomText";
 
+
 const AddExpenseModal = ({
   expense,
   handleExpenseChange,
@@ -29,6 +30,7 @@ const AddExpenseModal = ({
 
   const { colors } = useTheme();
   const [formType, setFormType] = useState("");
+
 
   return (
     <View

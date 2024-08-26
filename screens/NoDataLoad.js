@@ -15,7 +15,7 @@ const NoDataLoad = ({ selectedDate }) => {
           width: 278,
           height: 400,
         }}
-        source={require("../assets/animations/Animation - 1719999846178 (1).json")}
+        source={require("../assets/animations/NoData.json")}
       />
       <View
         style={{

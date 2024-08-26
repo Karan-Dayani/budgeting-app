@@ -38,7 +38,8 @@ const GoalComplete = () => {
               backgroundColor: colors.background,
               position: "absolute",
               bottom: 10,
-              paddingHorizontal: 30,
+              alignItems: "center",
+              width: "100%",
             }}
           >
             <Text

@@ -20,6 +20,9 @@ import AddGoal from "../../components/modals/AddGoal";
 import { supabase } from "../../lib/supabase";
 import GoalComplete from "../../screens/GoalComplete";
 import CustomText from "../../components/CustomText";
+import { useUser } from "../../components/globalState/UserContext"
+import { numberWithCommas } from "../utils"
+
 
 const Goals = () => {
   const [isSaved, setIsSaved] = useState(false);
@@ -27,7 +30,7 @@ const Goals = () => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false)
-  const [user, setUser] = useState();
+  const { user } = useUser()
   const [userGoals, setUserGoals] = useState([]);
   const [goalDetailModal, setGoalDetailModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState();
@@ -41,16 +44,6 @@ const Goals = () => {
   const [goalComplete, setGoalComplete] = useState(false)
 
   const { colors } = useTheme();
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setUser(user);
-      } else {
-        Alert.alert("Error accessing user");
-      }
-    });
-  }, []);
 
   const fetchData = async () => {
     const { data, error } = await supabase
@@ -259,7 +252,7 @@ const Goals = () => {
                                 {item.goalName}
                               </CustomText>
                               <CustomText className="text-md mt-2 text-gray-300" >
-                                ₹{item.goalSavedMoney} / ₹{item.goalTargetMoney}
+                                ₹{numberWithCommas(Number(item.goalSavedMoney))} / ₹{numberWithCommas(Number(item.goalTargetMoney))}
                               </CustomText>
                             </View>
                           </View>
@@ -323,7 +316,9 @@ const Goals = () => {
                       radius={70}
                       valueSuffix={"%"}
                     />
-                    <CustomText className="text-xl mt-4 mb-2" style={{ color: colors.text }}>₹{selectedGoal.goalSavedMoney} / ₹{selectedGoal.goalTargetMoney}</CustomText>
+                    <CustomText className="text-xl mt-4 mb-2" style={{ color: colors.text }}>
+                      ₹ {numberWithCommas(Number(selectedGoal.goalSavedMoney))} / {numberWithCommas(Number(selectedGoal.goalTargetMoney))}
+                    </CustomText>
                   </View>
                   <TextInput
                     placeholder="Add Amount"
@@ -409,30 +404,45 @@ const Goals = () => {
             </Modal>
           )}
         </SafeAreaView>
-        <Slide in={isSaved} placement="top">
-          <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="emerald.500" alignItems="center" justifyContent="center" _dark={{
-            bg: "emerald.200"
-          }} safeArea>
-            <HStack space={2}>
-              <CustomText className=" text-white text-lg">
-                Goal saved successfully!
-              </CustomText>
-            </HStack>
-          </Box>
-        </Slide>
-
-        <Slide in={isDeleted} placement="top">
-          <Box w="100%" position="absolute" p="2" borderRadius="xs" bg="error.500" alignItems="center" justifyContent="center" safeArea>
-            <HStack space={2}>
-              <CustomText className="text-white text-lg">
-                Goal removed successfully!
-              </CustomText>
-            </HStack>
-          </Box>
-        </Slide>
+        <Notification
+          isVisible={isSaved}
+          text="Goal saved!"
+          bgColor="green.500"
+        />
+        <Notification
+          isVisible={isDeleted}
+          text="Goal removed!"
+          bgColor="green.500"
+        />
       </View>
     </NativeBaseProvider>
   );
 };
 
 export default Goals;
+
+
+function Notification({ isVisible, text, bgColor }) {
+  return (
+    <Slide in={isVisible} placement="top">
+      <Box
+        w="100%"
+        position="absolute"
+        p="2"
+        borderRadius="xs"
+        bg="emerald.500"
+        alignItems="center"
+        justifyContent="center"
+
+        safeArea
+        _dark={{ bg: bgColor }}
+        _light={{ bg: bgColor }}
+      >
+        <HStack space={2}>
+          <Ionicons name="checkmark" size={24} color="white" />
+          <CustomText className="text-white">{text}</CustomText>
+        </HStack>
+      </Box>
+    </Slide>
+  );
+}

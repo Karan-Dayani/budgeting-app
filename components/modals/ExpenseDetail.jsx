@@ -2,6 +2,7 @@ import { View, Text, Pressable } from 'react-native'
 import React from 'react'
 import { useTheme } from '@react-navigation/native'
 import CustomText from '../CustomText'
+import { numberWithCommas } from "../../app/utils";
 
 const ExpenseDetail = ({
     selectedExpense,
@@ -24,7 +25,7 @@ const ExpenseDetail = ({
                     className="text-yellow-400 text-2xl mb-2"
 
                 >
-                    ₹{selectedExpense?.expenseAmount}
+                    ₹{numberWithCommas(selectedExpense?.expenseAmount)}
                 </CustomText>
                 <CustomText
                     className="text-gray-400 text-xl mb-2"

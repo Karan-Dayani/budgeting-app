@@ -2,10 +2,8 @@ import React from "react";
 import { View, Text } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { numberWithCommas } from "../app/utils";
 
-function numberWithCommas(x) {
-  return x?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
 
 const TotalIncome = ({ user }) => {
   const getTotalExpense = () => {

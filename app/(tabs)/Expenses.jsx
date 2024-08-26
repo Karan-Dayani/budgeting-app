@@ -15,18 +15,20 @@ import {
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import uuid from "react-native-uuid";
-import CustomText from "../../components/CustomText"; // Import your custom text component
+import CustomText from "../../components/CustomText";
 import AddExpenseModal from "../../components/modals/AddExpenseModal";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import { supabase } from "../../lib/supabase";
 import NoDataLoad from "../../screens/NoDataLoad";
+import { useUser } from "../../components/globalState/UserContext"
+import { numberWithCommas } from "../utils";
 
 export default function ExpensesPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState("");
-  const [user, setUser] = useState("");
+  const { user } = useUser()
   const [addExpenseModal, setAddExpenseModal] = useState(false);
   const [expense, setExpense] = useState({
     expenseId: uuid.v4(),
@@ -42,55 +44,14 @@ export default function ExpensesPage() {
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [activeTab, setActiveTab] = useState("Non-Recurring");
-
   const { colors } = useTheme();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  let datedExpenses = [];
-
-  if (selectedDate === "") {
-    datedExpenses = userExpenses;
-  } else {
-    datedExpenses = userExpenses?.filter(
-      (expense) => expense.expenseDate === selectedDate
-    );
-  }
-
-  let activeExpenses = [];
-
-  if (activeTab === "Non-Recurring") {
-    activeExpenses = datedExpenses?.filter(
-      (expense) => expense.expenseType === "Non-Recurring"
-    );
-  } else if (activeTab === "Recurring") {
-    activeExpenses = datedExpenses?.filter(
-      (expense) => expense.expenseType === "Recurring"
-    );
-  }
 
   const handleConfirm = (date) => {
     setSelectedDate(new Date(date).toDateString().slice(4));
     hideDatePicker();
   };
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setUser(user);
-      } else {
-        Alert.alert("Error accessing user");
-      }
-    });
-  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -171,6 +132,7 @@ export default function ExpensesPage() {
       expenseCategory: "",
       expenseType: "",
     });
+
     setAddExpenseModal(false);
     setIsSaved(!isSaved);
     setTimeout(() => {
@@ -212,6 +174,12 @@ export default function ExpensesPage() {
       0
     );
   };
+
+  const filteredExpenses = userExpenses.filter(
+    (expense) =>
+      (selectedDate === "" || expense.expenseDate === selectedDate) &&
+      expense.expenseType === activeTab
+  );
 
   return (
     <View className="px-5 flex-1 ">
@@ -260,25 +228,28 @@ export default function ExpensesPage() {
 
               {selectedDate ? (
                 <Pressable
-                  onPress={() => setSelectedDate("")}
+                  onPress={() => {
+                    setSelectedDate("")
+                    setDatePickerVisibility(false)
+                  }}
                   className="bg-red-500 p-3 rounded-xl justify-center "
                 >
                   <CustomText className="text-white">Reset</CustomText>
                 </Pressable>
               ) : (
-                <Button
-                  onPress={showDatePicker}
-                  className="rounded-xl bg-[#41B3A2]"
+                <Pressable
+                  onPress={() => setDatePickerVisibility(true)}
+                  className="rounded-xl bg-[#41B3A2] p-3"
                 >
                   <CustomText className="text-white">Select Date</CustomText>
-                </Button>
+                </Pressable>
               )}
             </View>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
               onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
+              onCancel={() => setDatePickerVisibility(false)}
             />
           </View>
         </View>
@@ -324,8 +295,8 @@ export default function ExpensesPage() {
         ) : (
           <ScrollView className="mt-2" showsVerticalScrollIndicator={false}>
             <View className="w-full mb-40">
-              {activeExpenses.length > 0 ? (
-                activeExpenses?.map((item, index) => (
+              {filteredExpenses.length > 0 ? (
+                filteredExpenses?.map((item, index) => (
                   <View key={index}>
                     <TouchableOpacity
                       onLongPress={() => handleExpenseDetail(item)}
@@ -349,7 +320,7 @@ export default function ExpensesPage() {
                               color: colors.text,
                             }}
                           >
-                            ₹{item?.expenseAmount}
+                            ₹{numberWithCommas(Number(item?.expenseAmount))}
                           </CustomText>
                         </View>
                         <CustomText
@@ -409,46 +380,39 @@ export default function ExpensesPage() {
         />
       </Modal>
 
-      <Slide in={isSaved} placement="top">
-        <Box
-          w="100%"
-          position="absolute"
-          p="2"
-          borderRadius="xs"
-          bg="emerald.500"
-          alignItems="center"
-          justifyContent="center"
-          _dark={{
-            bg: "emerald.200",
-          }}
-          safeArea
-        >
-          <HStack space={2}>
-            <CustomText className=" text-white text-lg">
-              Expense saved successfully!
-            </CustomText>
-          </HStack>
-        </Box>
-      </Slide>
-
-      <Slide in={isDeleted} placement="top">
-        <Box
-          w="100%"
-          position="absolute"
-          p="2"
-          borderRadius="xs"
-          bg="error.500"
-          alignItems="center"
-          justifyContent="center"
-          safeArea
-        >
-          <HStack space={2}>
-            <CustomText className="text-white text-lg">
-              Expense deleted successfully!
-            </CustomText>
-          </HStack>
-        </Box>
-      </Slide>
+      <Notification
+        isVisible={isSaved}
+        text="Expense saved!"
+        bgColor="green.500"
+      />
+      <Notification
+        isVisible={isDeleted}
+        text="Expense deleted!"
+        bgColor="green.500"
+      />
     </View>
+  );
+}
+
+function Notification({ isVisible, text, bgColor }) {
+  return (
+    <Slide in={isVisible} placement="top">
+      <Box
+        w="100%"
+        position="absolute"
+        p="2"
+        borderRadius="xs"
+        alignItems="center"
+        justifyContent="center"
+        safeArea
+        _dark={{ bg: bgColor }}
+        _light={{ bg: bgColor }}
+      >
+        <HStack space={2}>
+          <Ionicons name="checkmark" size={24} color="white" />
+          <CustomText className="text-white">{text}</CustomText>
+        </HStack>
+      </Box>
+    </Slide>
   );
 }

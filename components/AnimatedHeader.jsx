@@ -41,7 +41,7 @@ const AnimatedHeader = ({ toggleMenu, handleLogOut }) => {
                                 }}
                                 placement="bottom right"
                             >
-                                <Menu.Item onPress={() => router.push("/")}>
+                                <Menu.Item onPress={() => router.push("/(tabs)/Profile")}>
                                     Profile
                                 </Menu.Item>
                                 <Menu.Item onPress={() => router.push("/Expenses")}>
