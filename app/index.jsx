@@ -21,7 +21,7 @@ const Index = () => {
         if (session) {
           const hasIncome = await checkUserIncome(session.user.email)
           if (hasIncome) {
-            router.replace("/(tabs)/");
+            router.replace("/(tabs)/Home");
           } else {
             router.replace("/profile/");
           }
@@ -33,7 +33,7 @@ const Index = () => {
         if (session) {
           const hasIncome = await checkUserIncome(session.user.email)
           if (hasIncome) {
-            router.replace("/(tabs)/");
+            router.replace("/(tabs)/Home");
           } else {
             router.replace("/profile/");
           }

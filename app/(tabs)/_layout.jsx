@@ -22,7 +22,7 @@ export default function TabLayout() {
       tabBar={(props) => <TabBar {...props} />}
     >
       <Tabs.Screen
-        name="index"
+        name="Home"
         options={{
           title: "Home",
         }}

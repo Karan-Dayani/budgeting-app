@@ -16,6 +16,8 @@ import { Colors } from "@/constants/Colors";
 
 import { DarkCustomTheme, LightCustomTheme } from "../constants/Theme";
 
+import { UserProvider } from "../components/globalState/UserContext";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -31,6 +33,7 @@ export default function RootLayout() {
     Montserrat: require("../assets/fonts/Montserrat/static/Montserrat-Medium.ttf"),
     Nunito_Sans: require("../assets/fonts/Nunito_Sans/static/NunitoSans_7pt-Medium.ttf"),
   });
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -43,18 +46,20 @@ export default function RootLayout() {
 
   return (
     <NativeBaseProvider>
-      <ThemeProvider
-        value={colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme}
-      >
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-            }}
-          />
-        </Stack>
-      </ThemeProvider>
+      <UserProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme}
+        >
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </UserProvider>
     </NativeBaseProvider>
   );
 }

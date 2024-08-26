@@ -13,18 +13,19 @@ import {
 import AnimatedHeader from "../../components/AnimatedHeader";
 import TotalIncome from "../../components/TotalIncome";
 import { supabase } from "../../lib/supabase";
-import CustomText from "../../components/CustomText"; // Import the custom text component
+import CustomText from "../../components/CustomText";
+import { useUser } from "../../components/globalState/UserContext";
 
 export default function Home() {
+  const { user } = useUser();
   const [menuVisible, setMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const [userData, setUserData] = useState([]);
 
   const isFocused = useIsFocused();
   const { colors } = useTheme();
 
-  const getUserRow = async (user) => {
+  const getUserRow = async () => {
     const { data, error } = await supabase
       .from("User Data")
       .select("*")
@@ -32,25 +33,20 @@ export default function Home() {
     setUserData(data);
   };
 
-  const historyExpense = userData[0]?.expenses?.slice(0, 4);
-  const historyGoal = userData[0]?.goals?.slice(0, 4);
-
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setUser(user);
-        getUserRow(user);
-      } else {
-        Alert.alert("Error accessing user");
-      }
-    });
+    getUserRow();
 
     const timer = setTimeout(() => {
-      setLoading(false);
+      setLoading(false)
     }, 1500);
 
     return () => clearTimeout(timer);
   }, [isFocused]);
+
+
+
+  const historyExpense = userData[0]?.expenses?.slice(0, 4);
+  const historyGoal = userData[0]?.goals?.slice(0, 4);
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -163,7 +159,7 @@ export default function Home() {
               <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
             </View>
             <View className="mx-2 mb-2">
-              {historyGoal.length > 0
+              {historyGoal?.length > 0
                 ?
                 historyGoal?.map((item, i) => {
                   const percentage = (item.goalSavedMoney / item.goalTargetMoney) * 100;
