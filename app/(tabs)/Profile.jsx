@@ -12,7 +12,7 @@ import CustomText from "../../components/CustomText";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { supabase } from "../../lib/supabase";
 import { Skeleton } from "native-base";
-import { ActivityIndicator } from "react-native-web";
+import { ActivityIndicator } from "react-native";
 
 const ProfilePage = () => {
   const { colors } = useTheme();
@@ -85,9 +85,12 @@ const ProfilePage = () => {
 
       <View className="px-6 ">
         {loading ? (
+          // <View className="items-center mt-8">
+          //   <Skeleton h="3" w="120" rounded="full" marginY="5" />
+          //   <Skeleton h="3" rounded="full" />
+          // </View>
           <View className="items-center mt-8">
-            <Skeleton h="3" w="120" rounded="full" marginY="5" />
-            <Skeleton h="3" rounded="full" />
+            <ActivityIndicator size={20} color={colors.text} />
           </View>
         ) : (
           <View className="items-center mt-8">

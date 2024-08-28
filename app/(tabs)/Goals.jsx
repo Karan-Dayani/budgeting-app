@@ -236,22 +236,26 @@ const Goals = () => {
                     })
                     .map((item, index) => {
                       return (
-                        <View className="rounded-3xl  p-4 my-2 w-full flex-row justify-between" style={{ backgroundColor: colors.itemBg }} key={index}>
+                        <View className="rounded-3xl  p-4 my-2 w-full flex-row justify-between" style={{ backgroundColor: colors.inputBg }} key={index}>
                           <View className="flex-row">
                             <View className="mr-5">
                               <CircularProgress
                                 value={Math.round((item.goalSavedMoney / item.goalTargetMoney) * 100)}
                                 radius={35}
                                 valueSuffix={"%"}
+                                activeStrokeColor={colors.progressCircleColor}
+                                inActiveStrokeColor={colors.progressInActive}
+                                progressValueColor={colors.progressCircleColor}
                               />
                             </View>
                             <View className="justify-center">
                               <CustomText
-                                className=" text-xl w-40 text-white"
+                                className=" text-xl w-40 "
+                                style={{ color: colors.text }}
                               >
                                 {item.goalName}
                               </CustomText>
-                              <CustomText className="text-md mt-2 text-gray-300" >
+                              <CustomText className="text-md mt-2 " style={{ color: colors.text }}>
                                 ₹{numberWithCommas(Number(item.goalSavedMoney))} / ₹{numberWithCommas(Number(item.goalTargetMoney))}
                               </CustomText>
                             </View>
@@ -302,48 +306,63 @@ const Goals = () => {
                 setGoalDetailModal(!goalDetailModal);
               }}
             >
-              <View className="flex-1 justify-center items-center  bg-opacity-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-                <View className=" p-5 rounded-xl w-4/5" style={{ backgroundColor: colors.inputBg }}>
-                  <View className="flex-row justify-between mb-4">
-                    <CustomText className="py-2 text-xl w-40" style={{ color: colors.text }} numberOfLines={1}>{selectedGoal.goalName}</CustomText>
-                    <Pressable className="bg-red-500 rounded-xl justify-center p-2" onPress={() => setConfirmModal(true)}>
-                      <MaterialIcons name="delete" size={24} color="white" />
+              <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+                <View className="p-6 rounded-lg w-4/5" style={{ backgroundColor: colors.inputBg, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}>
+                  <View className="flex-row justify-between items-center mb-4">
+                    <CustomText className="text-lg font-semibold flex-1 pr-2" style={{ color: colors.text }} numberOfLines={1}>
+                      {selectedGoal.goalName}
+                    </CustomText>
+                    <Pressable className="bg-red-600 rounded-full p-4" onPress={() => setConfirmModal(true)}>
+                      <MaterialIcons name="delete" size={18} color="white" />
                     </Pressable>
                   </View>
-                  <View className="items-center">
+
+                  <View className="items-center mb-4">
                     <CircularProgress
                       value={Math.round((selectedGoal.goalSavedMoney / selectedGoal.goalTargetMoney) * 100)}
-                      radius={70}
+                      radius={60}
                       valueSuffix={"%"}
+                      activeStrokeColor={colors.progressCircleColor}
+                      progressValueColor={colors.text}
+                      maxValue={100}
+                      inActiveStrokeOpacity={0.3}
                     />
-                    <CustomText className="text-xl mt-4 mb-2" style={{ color: colors.text }}>
-                      ₹ {numberWithCommas(Number(selectedGoal.goalSavedMoney))} / {numberWithCommas(Number(selectedGoal.goalTargetMoney))}
+                    <CustomText className="text-xl font-medium mt-3" style={{ color: colors.text }}>
+                      ₹{numberWithCommas(Number(selectedGoal.goalSavedMoney))}
+                    </CustomText>
+                    <CustomText className="text-base mt-1 text-gray-600" >
+                      of ₹{numberWithCommas(Number(selectedGoal.goalTargetMoney))}
                     </CustomText>
                   </View>
+
                   <TextInput
-                    placeholder="Add Amount"
-                    className="bg-gray-700 text-white p-3 mb-4 rounded-lg w-full mt-5"
-                    placeholderTextColor={"white"}
+                    placeholder="Enter Amount"
+                    className="bg-gray-800 text-white p-4 mb-5 rounded-lg w-full"
+                    placeholderTextColor={"#A0AEC0"}
                     keyboardType="numeric"
                     onChangeText={(text) => setGoalAddInput(Number(text))}
+                    style={{ borderWidth: 1, borderColor: colors.border }}
                   />
+
                   <View className="flex-row gap-2">
                     <Pressable
-                      className="flex-1 p-2 bg-red-500 items-center rounded-lg"
+                      className="flex-1 p-3 items-center rounded-lg bg-gray-500"
                       onPress={() => setGoalDetailModal(false)}
                     >
-                      <CustomText className="text-white text-lg">Cancel</CustomText>
+                      <CustomText className="text-white text-base font-semibold">Cancel</CustomText>
                     </Pressable>
                     <Pressable
-                      className="flex-1 p-2 bg-blue-500 items-center rounded-lg"
+                      className="flex-1 p-3 items-center rounded-lg bg-[#41B3A2]"
                       onPress={handleGoalAmountAdd}
                     >
-                      <CustomText className="text-white text-lg">Add</CustomText>
+                      <CustomText className="text-white text-base font-semibold">Add</CustomText>
                     </Pressable>
                   </View>
                 </View>
               </View>
             </Modal>
+
+
           )}
 
           <Modal

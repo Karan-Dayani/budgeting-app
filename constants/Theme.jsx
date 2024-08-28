@@ -16,7 +16,9 @@ export const LightCustomTheme = {
         expenseForm: "white",
         expenseInput: "#f3f4f6",
         inputBg: "#DDDDDD", // Input background color
-        itemBg: "#1E201E" // Expense background color
+        itemBg: "#1E201E", // Expense background color
+        progressCircleColor: "#059212",
+        progressInActive: "#EEEEEE"
     }
 };
 
@@ -39,6 +41,8 @@ export const DarkCustomTheme = {
         expenseForm: "#1C1C1C",
         expenseInput: "#31363F",
         inputBg: '#31363F', // Dark Charcoal
-        itemBg: '#212121' // Slightly Lighter Black
+        itemBg: '#212121', // Slightly Lighter Black
+        progressCircleColor: "#90D26D",
+        progressInActive: "#686D76"
     }
 };

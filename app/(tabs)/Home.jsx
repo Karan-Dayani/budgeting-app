@@ -8,7 +8,8 @@ import {
   SafeAreaView,
   ScrollView,
   View,
-  Animated
+  Animated,
+  StatusBar
 } from "react-native";
 import AnimatedHeader from "../../components/AnimatedHeader";
 import TotalIncome from "../../components/TotalIncome";
@@ -21,7 +22,6 @@ export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState([]);
-
 
   const isFocused = useIsFocused();
   const { colors } = useTheme();
@@ -38,13 +38,11 @@ export default function Home() {
     getUserRow();
 
     const timer = setTimeout(() => {
-      setLoading(false)
+      setLoading(false);
     }, 1500);
 
     return () => clearTimeout(timer);
   }, [isFocused]);
-
-
 
   const historyExpense = userData[0]?.expenses?.slice(0, 4);
   const historyGoal = userData[0]?.goals?.slice(0, 4);
@@ -58,11 +56,12 @@ export default function Home() {
     setMenuVisible(!menuVisible);
   };
 
-  const scrollY = new Animated.Value(0);
-  const diffClamp = Animated.diffClamp(scrollY, 0, 65);
-  const translateY = diffClamp.interpolate({
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const blackBarOpacity = scrollY.interpolate({
     inputRange: [0, 65],
-    outputRange: [0, -65]
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
   });
 
   return (
@@ -79,22 +78,32 @@ export default function Home() {
           headerStyle: {
             backgroundColor: colors.header,
             height: 90,
-            transform: [{ translateY: translateY }]
           },
         }}
       />
+
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: StatusBar.currentHeight,
+          backgroundColor: colors.background,
+          opacity: blackBarOpacity,
+          zIndex: 10,
+        }}
+      />
+
       <ScrollView
-        className="px-5 py-2 "
+        className="px-5 py-2"
         onScroll={(e) => {
           scrollY.setValue(e.nativeEvent.contentOffset.y);
         }}
+        scrollEventThrottle={16}
       >
-
         {/* Animated Header */}
         <Animated.View
-          style={{
-            transform: [{ translateY: translateY }]
-          }}
         >
           <AnimatedHeader
             toggleMenu={toggleMenu}
