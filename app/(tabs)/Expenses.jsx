@@ -21,7 +21,9 @@ import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import { supabase } from "../../lib/supabase";
 import NoDataLoad from "../../screens/NoDataLoad";
 import { useUser } from "../../components/globalState/UserContext"
-import { numberWithCommas } from "../utils";
+import { numberWithCommas, incomePercent, getTotalExpense, getGoalSavings } from "../utils";
+import CustomAlert from "../../components/modals/CustomAlert";
+import AlertScreen from "../../screens/AlertScreen";
 
 export default function ExpensesPage() {
   const [isSaved, setIsSaved] = useState(false);
@@ -44,6 +46,10 @@ export default function ExpensesPage() {
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [activeTab, setActiveTab] = useState("Non-Recurring");
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
+
+
   const { colors } = useTheme();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -53,7 +59,18 @@ export default function ExpensesPage() {
     hideDatePicker();
   };
 
+  // let savings = Number(userData[0]?.income - (getTotalExpense(userData) + getGoalSavings(userData)))
+
+  // useEffect(() => {
+  //   if (savings <= Number(incomePercent(Number(userData[0]?.income)))) {
+  //     setAlertVisible(true);
+  //     setHasShownSavingsAlert(true)
+  //   }
+  // }, []);
+
+
   useEffect(() => {
+
     async function fetchData() {
       const { data, error } = await supabase
         .from("User Data")
@@ -67,6 +84,7 @@ export default function ExpensesPage() {
         setUserExpenses(data[0]?.expenses || []);
         setIncome(data[0]?.income || 0);
       }
+
       setLoading(false);
     }
 
@@ -81,10 +99,6 @@ export default function ExpensesPage() {
       ...prevData,
       [fieldName]: value,
     }));
-  };
-
-  const handleAddExpense = () => {
-    setAddExpenseModal(true);
   };
 
   const handleExpenseDetail = (item) => {
@@ -122,6 +136,7 @@ export default function ExpensesPage() {
       .from("User Data")
       .update({ expenses: updatedArray })
       .eq("email", user?.user_metadata?.email);
+
 
     setExpense({
       expenseId: uuid.v4(),
@@ -167,14 +182,6 @@ export default function ExpensesPage() {
     }, 2500);
   };
 
-  const getTotalExpense = () => {
-    if (userExpenses?.length === 0) return 0;
-    return userExpenses?.reduce(
-      (total, item) => total + item?.expenseAmount,
-      0
-    );
-  };
-
   const filteredExpenses = userExpenses.filter(
     (expense) =>
       (selectedDate === "" || expense.expenseDate === selectedDate) &&
@@ -197,7 +204,7 @@ export default function ExpensesPage() {
       />
       <SafeAreaView className="h-full">
         <Pressable
-          onPress={handleAddExpense}
+          onPress={() => setAddExpenseModal(true)}
           className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-28 z-10"
         >
           <Ionicons name="add" size={40} color="white" />
@@ -222,7 +229,7 @@ export default function ExpensesPage() {
                   </CustomText>
                 )}
                 <CustomText className={`px-1`} style={{ color: colors.text }}>
-                  Total Expense: ₹{getTotalExpense()}
+                  Total Expense:
                 </CustomText>
               </View>
 
@@ -380,6 +387,15 @@ export default function ExpensesPage() {
         />
       </Modal>
 
+      <View className="flex-1">
+        <CustomAlert
+          visible={alertVisible}
+          mainMessage="Low Savings"
+          message="Your savings are running low!, It's time to cut back on expenses."
+          onClose={() => setAlertVisible(false)}
+        />
+      </View>
+
       <Notification
         isVisible={isSaved}
         text="Expense saved!"
@@ -390,6 +406,7 @@ export default function ExpensesPage() {
         text="Expense deleted!"
         bgColor="green.500"
       />
+
     </View>
   );
 }

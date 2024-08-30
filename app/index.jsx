@@ -41,7 +41,7 @@ const Index = () => {
           router.replace("/(auth)/login");
         }
       });
-    }, 2000);
+    }, 1500);
 
     return () => clearTimeout(delay);
   }, []);

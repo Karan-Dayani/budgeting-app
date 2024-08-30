@@ -23,7 +23,7 @@ const Profile = () => {
 
   const addDetails = async () => {
     setLoading(true)
-    if (isNaN(income) || income.trim() === "") {
+    if (isNaN(income) || income.trim() === "" || income === "0") {
       setError("Please enter a valid number for income.");
       return;
     }

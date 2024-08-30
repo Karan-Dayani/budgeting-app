@@ -26,16 +26,17 @@ export default function Home() {
   const isFocused = useIsFocused();
   const { colors } = useTheme();
 
+
   const getUserRow = async () => {
     const { data, error } = await supabase
       .from("User Data")
       .select("*")
       .eq("email", user?.user_metadata?.email);
-    setUserData(data);
+    setUserData(data)
   };
 
   useEffect(() => {
-    getUserRow();
+    getUserRow()
 
     const timer = setTimeout(() => {
       setLoading(false);

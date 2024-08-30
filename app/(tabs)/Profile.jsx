@@ -6,6 +6,7 @@ import {
   Modal,
   TextInput,
   Pressable,
+  Alert,
 } from "react-native";
 import { Stack } from "expo-router";
 import CustomText from "../../components/CustomText";
@@ -13,6 +14,7 @@ import { useIsFocused, useTheme } from "@react-navigation/native";
 import { supabase } from "../../lib/supabase";
 import { Skeleton } from "native-base";
 import { ActivityIndicator } from "react-native";
+import CustomSuccessAlert from "../../components/modals/CustomSuccessAlert";
 
 const ProfilePage = () => {
   const { colors } = useTheme();
@@ -23,14 +25,32 @@ const ProfilePage = () => {
   const [userName, setUserName] = useState("");
   const [income, setIncome] = useState(0);
   const [logOutModal, setLogOutModal] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
 
   const handleChangeSubmit = async () => {
-    const { data, error } = await supabase
-      .from("User Data")
-      .update({ username: userName, income: income })
-      .eq("email", user?.user_metadata?.email)
-      .select();
+    const incomeNumber = Number(income);
+
+
+    if (isNaN(incomeNumber) || income.trim() === "" || incomeNumber <= 0) {
+      Alert.alert("Please enter a valid number for income.");
+      return;
+    } else {
+      const { data, error: updateError } = await supabase
+        .from("User Data")
+        .update({ username: userName, income: incomeNumber })
+        .eq("email", user?.user_metadata?.email)
+        .select();
+      if (updateError) {
+        Alert.alert("Error updating profile", updateError.message);
+      } else {
+        setAlertVisible(true)
+      }
+      setProfileModal(false)
+      setLoading(true);
+    }
+    setLoading(false);
   };
+
 
   const handleLogOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -182,7 +202,6 @@ const ProfilePage = () => {
               className="p-4 bg-[#41B3A2] items-center rounded-full mt-6 shadow-md"
               onPress={() => {
                 handleChangeSubmit();
-                setProfileModal(!profileModal);
               }}
             >
               {loading ? (
@@ -240,6 +259,14 @@ const ProfilePage = () => {
           </View>
         </View>
       </Modal>
+      <View className="flex-1">
+        <CustomSuccessAlert
+          visible={alertVisible}
+          mainMessage="Profile Updated"
+          message="Your profile updated successfully!"
+          onClose={() => setAlertVisible(false)}
+        />
+      </View>
     </View>
   );
 };
