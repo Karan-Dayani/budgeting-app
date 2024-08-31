@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { Box, Button, HStack, Slide } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -47,7 +47,7 @@ export default function ExpensesPage() {
     expenseType: "",
   });
   const [userExpenses, setUserExpenses] = useState([]);
-  // const [income, setIncome] = useState(0);
+  const [income, setIncome] = useState(0);
   const [savings, setSavings] = useState(0);
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
@@ -64,20 +64,11 @@ export default function ExpensesPage() {
     hideDatePicker();
   };
 
-  // let savings = Number(userData[0]?.income - (getTotalExpense(userData) + getGoalSavings(userData)))
-
-  // useEffect(() => {
-  //   if (savings <= Number(incomePercent(Number(userData[0]?.income)))) {
-  //     setAlertVisible(true);
-  //     setHasShownSavingsAlert(true)
-  //   }
-  // }, []);
-
   useEffect(() => {
     async function fetchData() {
       const { data, error } = await supabase
         .from("User Data")
-        .select("expenses, savings")
+        .select("expenses, savings, income")
         .eq("email", user?.user_metadata?.email);
 
       if (error) {
@@ -86,7 +77,7 @@ export default function ExpensesPage() {
       } else {
         setUserExpenses(data[0]?.expenses || []);
         setSavings(data[0]?.savings || 0);
-        // setIncome(data[0]?.income || 0);
+        setIncome(data[0]?.income || 0);
       }
 
       setLoading(false);
@@ -97,6 +88,19 @@ export default function ExpensesPage() {
       fetchData();
     }
   }, [user, expense]);
+
+  const firstRenderRef = useRef(true);
+  useEffect(() => {
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+    } else {
+      console.log(income);
+      if (savings <= incomePercent(income) && !hasShownSavingsAlert) {
+        setAlertVisible(true);
+        setHasShownSavingsAlert(true);
+      }
+    }
+  }, [savings, income]);
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({
@@ -116,6 +120,11 @@ export default function ExpensesPage() {
   };
 
   const handleSaveExpense = async () => {
+    if (savings <= Number(incomePercent(income)) && !hasShownSavingsAlert) {
+      setAlertVisible(true);
+      setHasShownSavingsAlert(true);
+    }
+
     if (
       !expense.expenseName.trim() ||
       !expense.expenseAmount ||
