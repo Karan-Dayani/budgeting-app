@@ -20,8 +20,13 @@ import AddExpenseModal from "../../components/modals/AddExpenseModal";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import { supabase } from "../../lib/supabase";
 import NoDataLoad from "../../screens/NoDataLoad";
-import { useUser } from "../../components/globalState/UserContext"
-import { numberWithCommas, incomePercent, getTotalExpense, getGoalSavings } from "../utils";
+import { useUser } from "../../components/globalState/UserContext";
+import {
+  numberWithCommas,
+  incomePercent,
+  getTotalExpense,
+  getGoalSavings,
+} from "../utils";
 import CustomAlert from "../../components/modals/CustomAlert";
 import AlertScreen from "../../screens/AlertScreen";
 
@@ -30,7 +35,7 @@ export default function ExpensesPage() {
   const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState("");
-  const { user } = useUser()
+  const { user } = useUser();
   const [addExpenseModal, setAddExpenseModal] = useState(false);
   const [expense, setExpense] = useState({
     expenseId: uuid.v4(),
@@ -42,13 +47,13 @@ export default function ExpensesPage() {
     expenseType: "",
   });
   const [userExpenses, setUserExpenses] = useState([]);
-  const [income, setIncome] = useState(0);
+  // const [income, setIncome] = useState(0);
+  const [savings, setSavings] = useState(0);
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [activeTab, setActiveTab] = useState("Non-Recurring");
   const [alertVisible, setAlertVisible] = useState(false);
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
-
 
   const { colors } = useTheme();
 
@@ -68,13 +73,11 @@ export default function ExpensesPage() {
   //   }
   // }, []);
 
-
   useEffect(() => {
-
     async function fetchData() {
       const { data, error } = await supabase
         .from("User Data")
-        .select("expenses, income")
+        .select("expenses, savings")
         .eq("email", user?.user_metadata?.email);
 
       if (error) {
@@ -82,7 +85,8 @@ export default function ExpensesPage() {
         Alert.alert("Error fetching data");
       } else {
         setUserExpenses(data[0]?.expenses || []);
-        setIncome(data[0]?.income || 0);
+        setSavings(data[0]?.savings || 0);
+        // setIncome(data[0]?.income || 0);
       }
 
       setLoading(false);
@@ -112,7 +116,6 @@ export default function ExpensesPage() {
   };
 
   const handleSaveExpense = async () => {
-
     if (
       !expense.expenseName.trim() ||
       !expense.expenseAmount ||
@@ -131,12 +134,12 @@ export default function ExpensesPage() {
 
     const prevArray = data[0]?.expenses || [];
     const updatedArray = [expense, ...prevArray];
+    const updatedSavings = savings - expense.expenseAmount;
 
     await supabase
       .from("User Data")
-      .update({ expenses: updatedArray })
+      .update({ expenses: updatedArray, savings: updatedSavings })
       .eq("email", user?.user_metadata?.email);
-
 
     setExpense({
       expenseId: uuid.v4(),
@@ -153,7 +156,6 @@ export default function ExpensesPage() {
     setTimeout(() => {
       setIsSaved(false);
     }, 2500);
-
   };
 
   const handleDeleteExpense = async () => {
@@ -167,10 +169,11 @@ export default function ExpensesPage() {
     const updatedArray = prevArray.filter(
       (exp) => exp.expenseId !== selectedExpense.expenseId
     );
+    const updatedSavings = savings + selectedExpense.expenseAmount;
 
     await supabase
       .from("User Data")
-      .update({ expenses: updatedArray })
+      .update({ expenses: updatedArray, savings: updatedSavings })
       .eq("email", user?.user_metadata?.email);
     setUserExpenses(updatedArray);
     setExpenseDetail(false);
@@ -236,8 +239,8 @@ export default function ExpensesPage() {
               {selectedDate ? (
                 <Pressable
                   onPress={() => {
-                    setSelectedDate("")
-                    setDatePickerVisibility(false)
+                    setSelectedDate("");
+                    setDatePickerVisibility(false);
                   }}
                   className="bg-red-500 p-3 rounded-xl justify-center "
                 >
@@ -406,7 +409,6 @@ export default function ExpensesPage() {
         text="Expense deleted!"
         bgColor="green.500"
       />
-
     </View>
   );
 }

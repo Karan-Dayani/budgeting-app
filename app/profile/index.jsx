@@ -7,7 +7,7 @@ import { supabase } from "../../lib/supabase";
 const Profile = () => {
   const [name, setName] = useState("");
   const [income, setIncome] = useState(0);
-  const [user, setUser] = useState()
+  const [user, setUser] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -19,35 +19,34 @@ const Profile = () => {
         Alert.alert("error accessing user");
       }
     });
-  }, [])
+  }, []);
 
   const addDetails = async () => {
-    setLoading(true)
+    setLoading(true);
     if (isNaN(income) || income.trim() === "" || income === "0") {
       setError("Please enter a valid number for income.");
       return;
     }
     const { data, err } = await supabase
       .from("User Data")
-      .update({ income: income, username: name })
-      .eq("email", user?.user_metadata?.email)
+      .update({ income: income, username: name, savings: income })
+      .eq("email", user?.user_metadata?.email);
     if (err) {
       setError("Failed to update details. Please try again.");
     }
-    setLoading(false)
+    setLoading(false);
   };
 
-
   const handleSubmit = () => {
-    addDetails()
-    router.replace("/(tabs)/")
+    addDetails();
+    router.replace("/(tabs)/");
   };
 
   return (
     <View className="h-full justify-center px-5">
       <Stack.Screen
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
       <View className="bg-[#191A19] pb-8 justify-center rounded-xl px-5 ">
@@ -78,7 +77,8 @@ const Profile = () => {
             <Text className="text-red-500 mt-2">{error}</Text>
           ) : (
             <Text className="text-gray-400 mt-2">
-              Please enter your monthly income. This helps us tailor your budget and savings goals.
+              Please enter your monthly income. This helps us tailor your budget
+              and savings goals.
             </Text>
           )}
         </View>

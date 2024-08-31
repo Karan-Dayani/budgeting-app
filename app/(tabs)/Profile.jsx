@@ -30,8 +30,7 @@ const ProfilePage = () => {
   const handleChangeSubmit = async () => {
     const incomeNumber = Number(income);
 
-
-    if (isNaN(incomeNumber) || income.trim() === "" || incomeNumber <= 0) {
+    if (isNaN(incomeNumber) || incomeNumber <= 0) {
       Alert.alert("Please enter a valid number for income.");
       return;
     } else {
@@ -43,14 +42,13 @@ const ProfilePage = () => {
       if (updateError) {
         Alert.alert("Error updating profile", updateError.message);
       } else {
-        setAlertVisible(true)
+        setAlertVisible(true);
       }
-      setProfileModal(false)
+      setProfileModal(false);
       setLoading(true);
     }
     setLoading(false);
   };
-
 
   const handleLogOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -153,9 +151,7 @@ const ProfilePage = () => {
             className="p-4 rounded-full flex-row justify-between items-center mt-4 bg-red-500 shadow-md"
             onPress={() => setLogOutModal(true)}
           >
-            <CustomText className="text-lg text-white " >
-              Log Out
-            </CustomText>
+            <CustomText className="text-lg text-white ">Log Out</CustomText>
           </TouchableOpacity>
         </View>
       </View>
@@ -196,7 +192,8 @@ const ProfilePage = () => {
               />
             </View>
             <CustomText className="text-gray-400 text-sm mt-4 text-center">
-              Update your details by removing the old information and entering the new data.
+              Update your details by removing the old information and entering
+              the new data.
             </CustomText>
             <Pressable
               className="p-4 bg-[#41B3A2] items-center rounded-full mt-6 shadow-md"

@@ -2,18 +2,14 @@ import React from "react";
 import { View, Text } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { getGoalSavings, getTotalExpense, numberWithCommas } from "../app/utils";
-
+import { getTotalExpense, numberWithCommas } from "../app/utils";
 
 const TotalIncome = ({ user }) => {
-
   const expense = numberWithCommas(getTotalExpense(user));
 
   const income = numberWithCommas(user[0]?.income);
 
-  const savings = numberWithCommas(
-    user[0]?.income - (getTotalExpense(user) + getGoalSavings(user))
-  );
+  const savings = numberWithCommas(user[0]?.savings);
 
   const handleExpensesClick = () => {
     router.push("/(tabs)/Expenses");
