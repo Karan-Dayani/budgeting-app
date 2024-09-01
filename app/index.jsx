@@ -5,12 +5,11 @@ import { supabase } from "../lib/supabase";
 import SplashScreenLoad from "../screens/splashScreenLoad";
 
 const Index = () => {
-
   const checkUserIncome = async (email) => {
     const { data, error } = await supabase
-      .from('User Data')
-      .select('income')
-      .eq('email', email);
+      .from("User Data")
+      .select("income")
+      .eq("email", email);
 
     return data && data[0].income;
   };
@@ -19,11 +18,11 @@ const Index = () => {
     const delay = setTimeout(() => {
       supabase.auth.getSession().then(async ({ data: { session } }) => {
         if (session) {
-          const hasIncome = await checkUserIncome(session.user.email)
+          const hasIncome = await checkUserIncome(session.user.email);
           if (hasIncome) {
             router.replace("/(tabs)/Home");
           } else {
-            router.replace("/profile/");
+            router.replace("/UserDetails/");
           }
         } else {
           router.replace("/(auth)/login");
@@ -31,11 +30,11 @@ const Index = () => {
       });
       supabase.auth.onAuthStateChange(async (_event, session) => {
         if (session) {
-          const hasIncome = await checkUserIncome(session.user.email)
+          const hasIncome = await checkUserIncome(session.user.email);
           if (hasIncome) {
             router.replace("/(tabs)/Home");
           } else {
-            router.replace("/profile/");
+            router.replace("/UserDetails/");
           }
         } else {
           router.replace("/(auth)/login");

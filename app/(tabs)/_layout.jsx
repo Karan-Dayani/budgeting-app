@@ -41,13 +41,6 @@ export default function TabLayout() {
           title: "Goals",
         }}
       />
-
-      <Tabs.Screen
-        name="Profile"
-        options={{
-          title: "Profile",
-        }}
-      />
     </Tabs>
   );
 }
