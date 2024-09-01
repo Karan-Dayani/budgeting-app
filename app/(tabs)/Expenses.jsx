@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
+import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { Box, Button, HStack, Slide } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
@@ -31,6 +31,7 @@ import CustomAlert from "../../components/modals/CustomAlert";
 import AlertScreen from "../../screens/AlertScreen";
 
 export default function ExpensesPage() {
+  const isFocused = useIsFocused();
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -87,7 +88,7 @@ export default function ExpensesPage() {
       setLoading(true);
       fetchData();
     }
-  }, [user, expense]);
+  }, [user, expense, isFocused]);
 
   const firstRenderRef = useRef(true);
   useEffect(() => {
@@ -263,12 +264,6 @@ export default function ExpensesPage() {
                     <CustomText className="text-white">Select Date</CustomText>
                   </Pressable>
                 )}
-                <Pressable
-                  onPress={() => setDatePickerVisibility(true)}
-                  className="rounded-3xl bg-[#41B3A2] p-3"
-                >
-                  <CustomText className="text-white">Select Category</CustomText>
-                </Pressable>
               </View>
             </View>
             <DateTimePickerModal

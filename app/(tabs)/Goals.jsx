@@ -17,7 +17,7 @@ import {
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
+import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import CircularProgress from "react-native-circular-progress-indicator";
@@ -30,6 +30,7 @@ import { useUser } from "../../components/globalState/UserContext";
 import { numberWithCommas } from "../utils";
 
 const Goals = () => {
+  const isFocused = useIsFocused();
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -71,7 +72,7 @@ const Goals = () => {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, isFocused]);
 
   const handleAddGoal = async () => {
     if (goal.goalName.trim() === "" || goal.goalTargetMoney <= 0) {
@@ -257,7 +258,7 @@ const Goals = () => {
                               <CircularProgress
                                 value={Math.round(
                                   (item.goalSavedMoney / item.goalTargetMoney) *
-                                  100
+                                    100
                                 )}
                                 radius={35}
                                 valueSuffix={"%"}
@@ -308,7 +309,10 @@ const Goals = () => {
                       );
                     })
                 ) : (
-                  <View className="p-6 rounded-xl mt-5 shadow-lg" style={{ backgroundColor: colors.itemBg }}>
+                  <View
+                    className="p-6 rounded-xl mt-5 shadow-lg"
+                    style={{ backgroundColor: colors.itemBg }}
+                  >
                     <CustomText className="text-white text-xl mb-3">
                       Set and track your personal goals here.
                     </CustomText>
@@ -371,7 +375,7 @@ const Goals = () => {
                       value={Math.round(
                         (selectedGoal.goalSavedMoney /
                           selectedGoal.goalTargetMoney) *
-                        100
+                          100
                       )}
                       radius={60}
                       valueSuffix={"%"}

@@ -23,6 +23,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState("");
   const [userName, setUserName] = useState("");
+  const [oldIncome, setOldIncome] = useState(0);
   const [income, setIncome] = useState(0);
   const [logOutModal, setLogOutModal] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
@@ -30,23 +31,50 @@ const ProfilePage = () => {
   const handleChangeSubmit = async () => {
     const incomeNumber = Number(income);
 
-    if (isNaN(incomeNumber) || incomeNumber <= 0) {
-      Alert.alert("Please enter a valid number for income.");
-      return;
-    } else {
-      const { data, error: updateError } = await supabase
-        .from("User Data")
-        .update({ username: userName, income: incomeNumber })
-        .eq("email", user?.user_metadata?.email)
-        .select();
-      if (updateError) {
-        Alert.alert("Error updating profile", updateError.message);
+    if (oldIncome !== income) {
+      if (isNaN(incomeNumber) || incomeNumber <= 0) {
+        Alert.alert("Please enter a valid number for income.");
+        return;
       } else {
-        setAlertVisible(true);
+        const { data, error: updateError } = await supabase
+          .from("User Data")
+          .update({
+            username: userName,
+            income: incomeNumber,
+            savings: incomeNumber,
+            expenses: [],
+            goals: [],
+          })
+          .eq("email", user?.user_metadata?.email)
+          .select();
+        if (updateError) {
+          Alert.alert("Error updating profile", updateError.message);
+        } else {
+          setAlertVisible(true);
+        }
+        setProfileModal(false);
+        setLoading(true);
       }
-      setProfileModal(false);
-      setLoading(true);
+    } else {
+      if (isNaN(incomeNumber) || incomeNumber <= 0) {
+        Alert.alert("Please enter a valid number for income.");
+        return;
+      } else {
+        const { data, error: updateError } = await supabase
+          .from("User Data")
+          .update({ username: userName })
+          .eq("email", user?.user_metadata?.email)
+          .select();
+        if (updateError) {
+          Alert.alert("Error updating profile", updateError.message);
+        } else {
+          setAlertVisible(true);
+        }
+        setProfileModal(false);
+        setLoading(true);
+      }
     }
+
     setLoading(false);
   };
 
@@ -76,6 +104,7 @@ const ProfilePage = () => {
     } else {
       setUserName(data[0]?.username || "");
       setIncome(data[0]?.income || 0);
+      setOldIncome(data[0]?.income || 0);
     }
   }
 
