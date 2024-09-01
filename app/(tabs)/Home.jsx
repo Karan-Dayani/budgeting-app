@@ -137,7 +137,7 @@ export default function Home() {
         {loading ? (
           <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-3xl bg-[#222831] justify-center p-4 mt-3">
+          <View className="rounded-3xl bg-[#222831] justify-center p-3 mt-3">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
               <CustomText className="text-white text-2xl">
                 Spendings
@@ -174,7 +174,7 @@ export default function Home() {
         {loading ? (
           <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-3xl bg-[#222831] justify-center p-4 mt-3 mb-32">
+          <View className="rounded-3xl bg-[#222831] justify-center p-3 mt-3 mb-32">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2">
               <CustomText className="text-white text-2xl">
                 Goals

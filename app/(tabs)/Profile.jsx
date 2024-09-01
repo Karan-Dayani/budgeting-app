@@ -20,6 +20,7 @@ const ProfilePage = () => {
   const { colors } = useTheme();
   const isFocused = useIsFocused();
   const [profileModal, setProfileModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState("");
   const [userName, setUserName] = useState("");
@@ -53,6 +54,7 @@ const ProfilePage = () => {
           setAlertVisible(true);
         }
         setProfileModal(false);
+        setConfirmModal(false)
         setLoading(true);
       }
     } else {
@@ -227,7 +229,11 @@ const ProfilePage = () => {
             <Pressable
               className="p-4 bg-[#41B3A2] items-center rounded-full mt-6 shadow-md"
               onPress={() => {
-                handleChangeSubmit();
+                if (oldIncome !== income) {
+                  setConfirmModal(true)
+                } else {
+                  handleChangeSubmit()
+                }
               }}
             >
               {loading ? (
@@ -242,6 +248,54 @@ const ProfilePage = () => {
             >
               <CustomText className="text-white text-lg">Cancel</CustomText>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmModal}
+        onRequestClose={() => {
+          setConfirmModal(!confirmModal);
+        }}
+      >
+        <View
+          className="flex-1 justify-center items-center"
+          style={{ backgroundColor: `${colors.background}dd` }}
+        >
+          <View
+            className="p-6 rounded-2xl w-4/5 shadow-lg"
+            style={{ backgroundColor: colors.inputBg }}
+          >
+            <CustomText
+              className="text-xl mt-4 font-semibold text-center"
+              style={{ color: colors.text }}
+            >
+              This will reset your data
+            </CustomText>
+            <CustomText
+              className="text-xl mb-4 font-semibold text-center"
+              style={{ color: colors.text }}
+            >
+              Are you sure you want to make this change?
+            </CustomText>
+            <View className="flex-row gap-3">
+              <Pressable
+                className="flex-1 p-4 bg-red-500 items-center rounded-full shadow-md"
+                onPress={() => {
+                  setConfirmModal(false)
+                }}
+              >
+                <CustomText className="text-white text-lg">No</CustomText>
+              </Pressable>
+              <Pressable
+                className="flex-1 p-4 bg-blue-500 items-center rounded-full shadow-md"
+                onPress={() => handleChangeSubmit()}
+              >
+                <CustomText className="text-white text-lg">Yes</CustomText>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
