@@ -6,9 +6,9 @@ import CustomText from '../CustomText'
 const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, loading }) => {
     const { colors } = useTheme()
     return (
-        <View className="flex-1 justify-center items-center bg-opacity-50" style={{ backgroundColor: colors.background }}>
-            <View className=" p-5 rounded-xl w-11/12" style={{ backgroundColor: colors.inputBg }}>
-                <CustomText className=" text-xl mb-3" style={{ color: colors.text }}>
+        <View className="flex-1 justify-center items-center bg-opacity-50 p-3" style={{ backgroundColor: colors.background }}>
+            <View className=" p-6 rounded-xl w-11/12" style={{ backgroundColor: colors.inputBg }}>
+                <CustomText className="text-xl mb-4 text-center" style={{ color: colors.text }}>
                     Set a Goal
                 </CustomText>
                 <TextInput
@@ -30,7 +30,7 @@ const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, lo
                     ?
                     <ActivityIndicator color="white" size={30} className="py-5" />
                     :
-                    <View className="flex-row gap-2">
+                    <View className="flex-row gap-x-3 mt-3">
                         <Pressable
                             className="flex-1 p-3 bg-red-500 items-center rounded-xl"
                             onPress={() => setModalVisible(false)}

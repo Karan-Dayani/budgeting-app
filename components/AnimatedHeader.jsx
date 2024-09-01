@@ -5,19 +5,27 @@ import { Menu } from 'native-base';
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useUser } from './globalState/UserContext';
+import CustomText from './CustomText';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-const AnimatedHeader = ({ toggleMenu, handleLogOut }) => {
+const AnimatedHeader = ({ toggleMenu, handleLogOut, user }) => {
     const { colors } = useTheme();
+
     return (
         <SafeAreaView >
-            <View className="py-2 flex-row justify-between">
+            <View className="pt-2 pb-4 px-2 flex-row justify-between items-center">
                 <View>
-                    <Text className=" text-3xl " style={{ fontFamily: "Jost", color: colors.text }}>CoinTrack</Text>
+                    <CustomText className="text-2xl font-semibold" style={{ color: colors.text }}>
+                        Hello, {user[0]?.username}
+                    </CustomText>
+                    <CustomText className="text-md text-gray-500" >
+                        Welcome back!
+                    </CustomText>
                 </View>
                 <View>
                     <View className="">
-                        <View className="flex-row">
-                            <Ionicons
+                        {/* <Ionicons
                                 name="notifications"
                                 size={25}
                                 color={colors.text}
@@ -50,11 +58,12 @@ const AnimatedHeader = ({ toggleMenu, handleLogOut }) => {
                                 <Menu.Item onPress={handleLogOut}>
                                     <Text className="text-red-400">Log out</Text>
                                 </Menu.Item>
-                            </Menu>
-                            <Pressable onPress={() => toggleMenu()}>
-                                {/* Additional Pressable */}
-                            </Pressable>
-                        </View>
+                            </Menu> */}
+                        <Pressable onPress={() => {
+                            router.replace("/Profile/")
+                        }}>
+                            <FontAwesome6 name="user-circle" size={32} color={colors.text} />
+                        </Pressable>
                     </View>
                 </View>
             </View>

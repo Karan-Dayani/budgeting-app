@@ -7,7 +7,7 @@ import CustomText from "../components/CustomText";
 const AlertScreen = ({ selectedDate }) => {
   const { colors } = useTheme();
   return (
-    <View>
+    <View style={{ alignItems: "center" }}>
       <LottieView
         autoPlay
         loop

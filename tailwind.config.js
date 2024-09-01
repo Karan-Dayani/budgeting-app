@@ -11,7 +11,7 @@ module.exports = {
     extend: {
       colors: {
         bgColor: "#191A19",
-        cardColor: "#3D2C8D",
+        cardColor: "#41B3A2",
       },
     },
   },

@@ -8,7 +8,7 @@ export const LightCustomTheme = {
         text: 'black', // Text color
         card: '#3D2C8D', // Card color
         tabBar: '#3D2C8D', // Tab bar color
-        tabBarBgColor: "#282A3A", // Bright white tab bar background
+        tabBarBgColor: "#191A19", // Bright white tab bar background
         tabBarBtActive: '#41B3A2', // Light Blue
         tabBarBtInActive: '#546E7A', // Muted Blue Gray
         login: "white", // Login background
@@ -30,7 +30,7 @@ export const DarkCustomTheme = {
         secondary: '#78909C', // Muted Blue Gray
         background: '#121212', // Pure Black
         header: '#121212', // Dark Charcoal
-        text: '#ECEFF1', // Light Gray
+        text: '#FFFFFF', // Light Gray
         card: '#1C1C1C', // Dark Charcoal
         tabBar: '#42A5F5', // Light Blue
         tabBarBgColor: '#1C1C1C', // Dark Charcoal for contrast

@@ -217,7 +217,7 @@ export default function ExpensesPage() {
       <SafeAreaView className="h-full">
         <Pressable
           onPress={() => setAddExpenseModal(true)}
-          className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-28 z-10"
+          className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
         >
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
@@ -244,25 +244,32 @@ export default function ExpensesPage() {
                   Total Expense:
                 </CustomText>
               </View>
-
-              {selectedDate ? (
-                <Pressable
-                  onPress={() => {
-                    setSelectedDate("");
-                    setDatePickerVisibility(false);
-                  }}
-                  className="bg-red-500 p-3 rounded-xl justify-center "
-                >
-                  <CustomText className="text-white">Reset</CustomText>
-                </Pressable>
-              ) : (
+              <View className="flex-row gap-x-3">
+                {selectedDate ? (
+                  <Pressable
+                    onPress={() => {
+                      setSelectedDate("");
+                      setDatePickerVisibility(false);
+                    }}
+                    className="bg-red-500 px-5 py-3 rounded-3xl justify-center "
+                  >
+                    <CustomText className="text-white">Reset</CustomText>
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    onPress={() => setDatePickerVisibility(true)}
+                    className="rounded-3xl bg-[#41B3A2] p-3"
+                  >
+                    <CustomText className="text-white">Select Date</CustomText>
+                  </Pressable>
+                )}
                 <Pressable
                   onPress={() => setDatePickerVisibility(true)}
-                  className="rounded-xl bg-[#41B3A2] p-3"
+                  className="rounded-3xl bg-[#41B3A2] p-3"
                 >
-                  <CustomText className="text-white">Select Date</CustomText>
+                  <CustomText className="text-white">Select Category</CustomText>
                 </Pressable>
-              )}
+              </View>
             </View>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
@@ -274,7 +281,7 @@ export default function ExpensesPage() {
         </View>
         <View className="flex-row my-4 gap-x-4">
           <Pressable
-            className="flex-1 p-2 rounded-md"
+            className="flex-1 p-3 rounded-3xl"
             onPress={() => setActiveTab("Non-Recurring")}
             style={{
               backgroundColor:
@@ -290,7 +297,7 @@ export default function ExpensesPage() {
           </Pressable>
 
           <Pressable
-            className="flex-1 p-2 rounded-md"
+            className="flex-1 p-3 rounded-3xl"
             onPress={() => setActiveTab("Recurring")}
             style={{
               backgroundColor:
@@ -321,7 +328,7 @@ export default function ExpensesPage() {
                       onLongPress={() => handleExpenseDetail(item)}
                     >
                       <View
-                        className="rounded-2xl px-5 py-4 my-2"
+                        className="rounded-3xl px-6 py-5 my-2"
                         style={{ backgroundColor: colors.inputBg }}
                       >
                         <View className="flex-row justify-between mb-2">

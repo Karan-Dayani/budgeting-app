@@ -219,7 +219,7 @@ const Goals = () => {
             {userGoals.length > 0 ? (
               <Pressable
                 onPress={() => setModalVisible(true)}
-                className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-28 z-10"
+                className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
               >
                 <Ionicons name="add" size={40} color="white" />
               </Pressable>
@@ -257,7 +257,7 @@ const Goals = () => {
                               <CircularProgress
                                 value={Math.round(
                                   (item.goalSavedMoney / item.goalTargetMoney) *
-                                    100
+                                  100
                                 )}
                                 radius={35}
                                 valueSuffix={"%"}
@@ -308,16 +308,16 @@ const Goals = () => {
                       );
                     })
                 ) : (
-                  <View className="bg-[#1F2937] px-6 py-4 rounded-xl mt-5 shadow-lg">
+                  <View className="p-6 rounded-xl mt-5 shadow-lg" style={{ backgroundColor: colors.itemBg }}>
                     <CustomText className="text-white text-xl mb-3">
                       Set and track your personal goals here.
                     </CustomText>
 
                     <Pressable
-                      className="p-2 bg-blue-500 items-center rounded-lg"
+                      className="p-2 mt-2 bg-[#41B3A2] items-center rounded-lg"
                       onPress={() => setModalVisible(true)}
                     >
-                      <CustomText className="text-white text-lg font-bold">
+                      <CustomText className="text-white text-lg ">
                         Add Goal
                       </CustomText>
                     </Pressable>
@@ -371,7 +371,7 @@ const Goals = () => {
                       value={Math.round(
                         (selectedGoal.goalSavedMoney /
                           selectedGoal.goalTargetMoney) *
-                          100
+                        100
                       )}
                       radius={60}
                       valueSuffix={"%"}

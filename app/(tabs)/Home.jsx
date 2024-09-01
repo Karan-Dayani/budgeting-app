@@ -1,4 +1,4 @@
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { Skeleton } from "native-base";
@@ -9,13 +9,16 @@ import {
   ScrollView,
   View,
   Animated,
-  StatusBar
+  StatusBar,
+  TouchableOpacity
 } from "react-native";
 import AnimatedHeader from "../../components/AnimatedHeader";
 import TotalIncome from "../../components/TotalIncome";
 import { supabase } from "../../lib/supabase";
 import CustomText from "../../components/CustomText";
 import { useUser } from "../../components/globalState/UserContext";
+import { numberWithCommas } from "../utils";
+import CircularProgress from "react-native-circular-progress-indicator";
 
 export default function Home() {
   const { user } = useUser();
@@ -109,6 +112,7 @@ export default function Home() {
           <AnimatedHeader
             toggleMenu={toggleMenu}
             handleLogOut={handleLogOut}
+            user={userData}
           />
         </Animated.View>
 
@@ -131,38 +135,46 @@ export default function Home() {
 
         {/* History */}
         {loading ? (
-          <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.300" />
+          <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-xl bg-[#222831] justify-center p-2 mt-3">
+          <View className="rounded-3xl bg-[#222831] justify-center p-4 mt-3">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
               <CustomText className="text-white text-2xl">
-                History
+                Spendings
               </CustomText>
-              <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
+
+              <AntDesign name="right" size={14} color="white" />
+
             </View>
             <View className="mx-1 mb-2">
-              {historyExpense?.map((item, index) => (
-                <View key={index} className="mb-2 p-3 bg-gray-700 rounded-xl">
-                  <View className="flex-row justify-between">
-                    <CustomText className="text-white text-lg">
-                      {item.expenseName}
-                    </CustomText>
-                    <CustomText className="text-red-500 text-lg">
-                      - ₹{item.expenseAmount}
-                    </CustomText>
+              {historyExpense?.length > 0
+                ?
+                historyExpense?.map((item, index) => (
+                  <View key={index} className="mb-3 p-4 bg-gray-700 rounded-3xl">
+                    <View className="flex-row justify-between">
+                      <CustomText className="text-white text-lg">
+                        {item.expenseName}
+                      </CustomText>
+                      <CustomText className="text-red-500 text-lg">
+                        - ₹{item.expenseAmount}
+                      </CustomText>
+                    </View>
+                    <CustomText className="text-gray-400">{item.expenseDate}</CustomText>
                   </View>
-                  <CustomText className="text-gray-400">{item.expenseDate}</CustomText>
-                </View>
-              ))}
+
+                ))
+                :
+                <CustomText className="text-white text-xl">No Expense added till yet</CustomText>
+              }
             </View>
           </View>
         )}
 
         {/* Goals */}
         {loading ? (
-          <Skeleton h="250px" my="1" rounded="lg" startColor="coolGray.300" />
+          <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-xl bg-[#222831] justify-center p-2 mt-3 mb-32">
+          <View className="rounded-3xl bg-[#222831] justify-center p-4 mt-3 mb-32">
             <View className="items-center justify-between flex-row mb-4 px-2 py-2">
               <CustomText className="text-white text-2xl">
                 Goals
@@ -173,19 +185,37 @@ export default function Home() {
               {historyGoal?.length > 0
                 ?
                 historyGoal?.map((item, i) => {
-                  const percentage = (item.goalSavedMoney / item.goalTargetMoney) * 100;
+
                   return (
-                    <View className="mb-2 py-1 gap-2" key={i}>
-                      <CustomText className="text-white text-lg">{item?.goalName}</CustomText>
-                      <View className="h-2 bg-gray-400 rounded-full overflow-hidden">
-                        <View
-                          className="bg-green-500 h-full"
-                          style={{ width: `${percentage > 100 ? 100 : percentage}%` }}
-                        ></View>
+                    <View key={i} className="mb-3 p-4 bg-gray-700 rounded-3xl ">
+                      <View className="flex-row justify-between">
+                        <View className="justify-center">
+                          <CustomText
+                            className="text-xl w-40 text-white"
+
+                          >
+                            {item.goalName}
+                          </CustomText>
+                          <CustomText
+                            className="text-md mt-2 text-white"
+
+                          >
+                            ₹{numberWithCommas(Number(item.goalSavedMoney))}{" "}
+                            / ₹
+                            {numberWithCommas(Number(item.goalTargetMoney))}
+                          </CustomText>
+                        </View>
+                        <View className="">
+                          <CircularProgress
+                            value={Math.round(
+                              (item.goalSavedMoney / item.goalTargetMoney) *
+                              100
+                            )}
+                            radius={35}
+                            valueSuffix={"%"}
+                          />
+                        </View>
                       </View>
-                      <CustomText className="text-white text-sm mt-1">
-                        ₹{item?.goalSavedMoney} / ₹{item?.goalTargetMoney}
-                      </CustomText>
                     </View>
                   );
                 })
