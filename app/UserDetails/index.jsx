@@ -49,8 +49,8 @@ const Profile = () => {
           headerShown: false,
         }}
       />
-      <View className="bg-[#191A19] pb-8 justify-center rounded-xl px-5 ">
-        <View className="mt-5">
+      <View className="bg-[#191A19] justify-center rounded-xl p-10 ">
+        <View className="">
           <Text className="text-white text-xl" style={{ fontFamily: "Nunito" }}>
             Username
           </Text>
