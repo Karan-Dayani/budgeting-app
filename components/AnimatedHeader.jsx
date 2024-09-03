@@ -1,6 +1,6 @@
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { Menu } from "native-base";
 import React from "react";
 import { View, Text, Pressable } from "react-native";
@@ -62,13 +62,16 @@ const AnimatedHeader = ({ toggleMenu, handleLogOut, user }) => {
                                     <Text className="text-red-400">Log out</Text>
                                 </Menu.Item>
                             </Menu> */}
-            <Pressable
+            {/* <Pressable
               onPress={() => {
-                router.push("/Profile/");
+                router.push("/profile/");
               }}
             >
               <FontAwesome6 name="user-circle" size={32} color={colors.text} />
-            </Pressable>
+            </Pressable> */}
+            <Link href={"/Profile/"}>
+              <FontAwesome6 name="user-circle" size={32} color={colors.text} />
+            </Link>
           </View>
         </View>
       </View>

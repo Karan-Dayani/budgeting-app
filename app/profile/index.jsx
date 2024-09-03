@@ -1,5 +1,5 @@
 import { useIsFocused, useTheme } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,6 +14,7 @@ import {
 import CustomText from "../../components/CustomText";
 import CustomSuccessAlert from "../../components/modals/CustomSuccessAlert";
 import { supabase } from "../../lib/supabase";
+import { AntDesign } from "@expo/vector-icons";
 
 const ProfilePage = () => {
   const { colors } = useTheme();
@@ -121,6 +122,11 @@ const ProfilePage = () => {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Stack.Screen options={{ headerShown: false }} />
+      <View className="flex-row absolute top-10 left-5 z-10 ">
+        <Link className="" href={"/(tabs)/Home"}>
+          <AntDesign name="arrowleft" size={26} color="black" />
+        </Link>
+      </View>
       <View className="bg-[#41B3A2] h-36 justify-center mb-5">
         <View className="h-32 w-full absolute z-10 items-center top-16">
           <Image
@@ -131,7 +137,7 @@ const ProfilePage = () => {
         </View>
       </View>
 
-      <View className="px-6 ">
+      <View className="px-6">
         {loading ? (
           // <View className="items-center mt-8">
           //   <Skeleton h="3" w="120" rounded="full" marginY="5" />
