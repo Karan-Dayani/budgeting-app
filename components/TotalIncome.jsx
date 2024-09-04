@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { getTotalExpense, numberWithCommas } from "../app/utils";
+import { supabase } from "../lib/supabase";
 
 const TotalIncome = ({ user }) => {
   const expense = numberWithCommas(getTotalExpense(user));
@@ -14,6 +15,19 @@ const TotalIncome = ({ user }) => {
   const handleExpensesClick = () => {
     router.push("/(tabs)/Expenses");
   };
+
+  const updateData = async () => {
+    const { data, error } = await supabase
+      .from("User Data")
+      .update({ savings: user[0]?.income })
+      .eq("email", user[0]?.email);
+  };
+
+  useEffect(() => {
+    if (new Date().getDate() === 1) {
+      updateData();
+    }
+  }, []);
 
   return (
     <View className="">

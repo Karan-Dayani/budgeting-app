@@ -9,10 +9,22 @@ export function numberWithCommas(x) {
 
 export const getTotalExpense = (user) => {
   if (user[0]?.expenses?.length === 0) return 0;
-  return user[0]?.expenses?.reduce(
-    (total, item) => total + item?.expenseAmount,
-    0
-  );
+
+  const currMonth = new Date().toLocaleString("default", {
+    month: "short",
+  });
+  const currYear = new Date().toLocaleString("default", {
+    year: "numeric",
+  });
+
+  return user[0]?.expenses?.reduce((total, item) => {
+    const [month, day, year] = item.expenseDate.split(" ");
+
+    if (month === currMonth && year === currYear) {
+      return total + item.expenseAmount;
+    }
+    return total;
+  }, 0);
 };
 
 export const getGoalSavings = (user) => {
