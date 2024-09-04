@@ -18,7 +18,8 @@ export const LightCustomTheme = {
         inputBg: "#DDDDDD", // Input background color
         itemBg: "#1E201E", // Expense background color
         progressCircleColor: "#059212",
-        progressInActive: "#EEEEEE"
+        progressInActive: "#EEEEEE",
+        chartBg: "#DDDDDD"
     }
 };
 
@@ -43,6 +44,7 @@ export const DarkCustomTheme = {
         inputBg: '#31363F', // Dark Charcoal
         itemBg: '#212121', // Slightly Lighter Black
         progressCircleColor: "#90D26D",
-        progressInActive: "#686D76"
+        progressInActive: "#686D76",
+        chartBg: "#191A19"
     }
 };

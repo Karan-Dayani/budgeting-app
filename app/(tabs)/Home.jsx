@@ -5,11 +5,13 @@ import { Skeleton } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
+  Dimensions,
   ScrollView,
   StatusBar,
   View
 } from "react-native";
 import {
+  LineChart,
   PieChart
 } from "react-native-chart-kit";
 import CircularProgress from "react-native-circular-progress-indicator";
@@ -25,7 +27,7 @@ export default function Home() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState([]);
-
+  const [monthlyExpenses, setMonthlyExpenses] = useState([]);
   const isFocused = useIsFocused();
   const { colors } = useTheme();
 
@@ -36,6 +38,10 @@ export default function Home() {
       .select("*")
       .eq("email", user?.user_metadata?.email);
     setUserData(data)
+
+    if (data?.length > 0) {
+      processExpenses(data[0]?.expenses);
+    }
   };
 
   useEffect(() => {
@@ -68,43 +74,109 @@ export default function Home() {
     extrapolate: 'clamp',
   });
 
-  const data = [
-    {
-      name: "Seoul",
-      population: 21500000,
-      color: "rgba(131, 167, 234, 1)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
+  const processExpenses = (expenses) => {
+
+    const months = Array(12).fill(0);
+
+    const monthMap = {
+      January: 0, Jan: 0,
+      February: 1, Feb: 1,
+      March: 2, Mar: 2,
+      April: 3, Apr: 3,
+      May: 4,
+      June: 5, Jun: 5,
+      July: 6, Jul: 6,
+      August: 7, Aug: 7,
+      September: 8, Sep: 8,
+      October: 9, Oct: 9,
+      November: 10, Nov: 10,
+      December: 11, Dec: 11,
+    };
+
+    expenses.forEach((expense) => {
+      let date;
+      if (typeof expense.expenseDate === "string") {
+
+        const parts = expense.expenseDate.split(" ");
+        const [monthStr, day, year] = parts;
+
+
+        const normalizedMonthStr = monthStr.charAt(0).toUpperCase() + monthStr.slice(1).toLowerCase();
+        const month = monthMap[normalizedMonthStr];
+
+        if (month !== undefined) {
+
+          date = new Date(year, month, day);
+        }
+      }
+
+      if (date instanceof Date && !isNaN(date)) {
+        const month = date.getMonth();
+        months[month] += expense.expenseAmount;
+      } else {
+        console.log('Invalid date:', expense.expenseDate);
+      }
+    });
+
+    const currentMonth = new Date().getMonth();
+
+
+    const lastFourMonths = [
+      (currentMonth - 3 + 12) % 12,
+      (currentMonth - 2 + 12) % 12,
+      (currentMonth - 1 + 12) % 12,
+      currentMonth,
+    ];
+
+    const monthlyExpenses = lastFourMonths.map(monthIndex => Math.round(months[monthIndex]));
+    setMonthlyExpenses(monthlyExpenses);
+  };
+
+  const chartConfig = {
+    backgroundGradientFrom: colors.chartBg,
+    backgroundGradientTo: colors.chartBg,
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(27, 27, 29, ${opacity})`,
+    labelColor: (opacity = 1) => colors.text,
+    strokeWidth: 3, // optional, default 3
+    propsForDots: {
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#C4C4C4"  // Changed dot color
     },
-    {
-      name: "Toronto",
-      population: 2800000,
-      color: "#F00",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
+    style: {
+      paddingLeft: 20, // Increase padding on the left side
     },
-    {
-      name: "Beijing",
-      population: 527612,
-      color: "red",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
-    },
-    {
-      name: "New York",
-      population: 8538000,
-      color: "#ffffff",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
-    },
-    {
-      name: "Moscow",
-      population: 11920000,
-      color: "rgb(0, 0, 255)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
+  };
+
+
+  const generateLabels = () => {
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    const currentMonth = new Date().getMonth();
+
+    const startMonth = (currentMonth - 3 + 12) % 12;
+
+    const labels = [];
+    for (let i = 0; i < 4; i++) {
+      labels.push(monthNames[(startMonth + i) % 12]);
     }
-  ];
+
+    return labels;
+  };
+
+  const data = {
+    labels: generateLabels(),
+    datasets: [
+      {
+        data: monthlyExpenses.slice(-4),
+        color: (opacity = 1) => `#41B3A2`,
+        strokeWidth: 1,
+      },
+    ],
+  };
+
+
 
   return (
     <View className="flex-1">
@@ -170,33 +242,21 @@ export default function Home() {
             </View>
           </>
         )}
-        <View className="w-full items-center justify-center bg-[#191A19] rounded-3xl mt-2 h-52">
-          <PieChart
-            data={data}
-            width={278}
-            height={200}
-            chartConfig={{
-              backgroundColor: "#e26a00",
-              backgroundGradientFrom: "#fb8c00",
-              backgroundGradientTo: "#ffa726",
-              decimalPlaces: 2, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 16
-              },
-              propsForDots: {
-                r: "6",
-                strokeWidth: "2",
-                stroke: "#ffa726"
-              }
-            }}
-            accessor={"population"}
-            backgroundColor={"transparent"}
-            paddingLeft={"15"}
-            absolute
-          />
-        </View>
+
+        {loading ? (
+          <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
+        ) : (
+          <View className="w-full items-center justify-center rounded-3xl mt-2 h-72 " style={{ backgroundColor: colors.chartBg }}>
+            <LineChart
+              data={data}
+              width={Dimensions.get("window").width - 20}
+              height={220}
+              chartConfig={chartConfig}
+              bezier
+              style={{ paddingLeft: 15 }} // Add padding to the chart style
+            />
+          </View>
+        )}
 
         {/* History */}
         {loading ? (
