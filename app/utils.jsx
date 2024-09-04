@@ -10,12 +10,14 @@ export function numberWithCommas(x) {
 export const getTotalExpense = (user) => {
   if (user[0]?.expenses?.length === 0) return 0;
 
-  const currMonth = new Date().toLocaleString("default", {
-    month: "short",
-  });
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const currMonth = monthNames[new Date().getMonth()];
+
   const currYear = new Date().toLocaleString("default", {
     year: "numeric",
   });
+
+  console.log(currMonth)
 
   return user[0]?.expenses?.reduce((total, item) => {
     const [month, day, year] = item.expenseDate.split(" ");
