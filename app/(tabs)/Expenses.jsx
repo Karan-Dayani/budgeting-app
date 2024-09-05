@@ -26,6 +26,8 @@ import { incomePercent, numberWithCommas } from "../utils";
 
 export default function ExpensesPage() {
   const isFocused = useIsFocused();
+  const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
+  const [month, date, year] = isCurrentMonth;
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -183,7 +185,13 @@ export default function ExpensesPage() {
     const updatedArray = prevArray.filter(
       (exp) => exp.expenseId !== selectedExpense.expenseId
     );
-    const updatedSavings = savings + selectedExpense.expenseAmount;
+    const updatedSavings = savings;
+    if (
+      selectedExpense.expenseDate.includes(month) &&
+      selectedExpense.expenseDate.includes(year)
+    ) {
+      updatedSavings = updatedSavings + selectedExpense.expenseAmount;
+    }
 
     await supabase
       .from("User Data")
@@ -198,9 +206,6 @@ export default function ExpensesPage() {
       setIsDeleted(false);
     }, 2500);
   };
-
-  const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
-  const [month, date, year] = isCurrentMonth;
 
   const filteredExpenses = userExpenses.filter(
     (expense) =>
