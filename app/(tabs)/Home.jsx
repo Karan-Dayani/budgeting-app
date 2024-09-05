@@ -11,6 +11,7 @@ import {
   View
 } from "react-native";
 import {
+  BarChart,
   LineChart,
   PieChart
 } from "react-native-chart-kit";
@@ -136,18 +137,18 @@ export default function Home() {
     backgroundGradientFrom: colors.chartBg,
     backgroundGradientTo: colors.chartBg,
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(27, 27, 29, ${opacity})`,
+    color: () => "#41B3A2", // Solid blue-green color without opacity
     labelColor: (opacity = 1) => colors.text,
-    strokeWidth: 3, // optional, default 3
-    propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-      stroke: "#C4C4C4"  // Changed dot color
+    strokeWidth: 3,
+    propsForBackgroundLines: {
+      stroke: "transparent",
     },
-    style: {
-      paddingLeft: 20, // Increase padding on the left side
-    },
+    fillShadowGradient: "#41B3A2", // Ensure bars are filled with solid color
+    fillShadowGradientOpacity: 0.7,  // No transparency in the gradient fill
   };
+
+
+
 
 
   const generateLabels = () => {
@@ -243,41 +244,54 @@ export default function Home() {
           </>
         )}
 
-        {loading ? (
-          <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
-        ) : (
-          <View className="w-full items-center justify-center rounded-3xl mt-2 h-72 " style={{ backgroundColor: colors.chartBg }}>
-            <LineChart
-              data={data}
-              width={Dimensions.get("window").width - 20}
-              height={220}
-              chartConfig={chartConfig}
-              bezier
-              style={{ paddingLeft: 15 }} // Add padding to the chart style
-            />
-          </View>
-        )}
+        <View className="w-full items-center">
+
+          {loading ? (
+            <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
+          ) : (
+            <>
+              <View className="w-full p-5 rounded-3xl mt-3 h-[22rem]" style={{ backgroundColor: colors.chartBg }}>
+                <CustomText className="text-2xl mb-8" style={{ color: colors.text }} >
+                  Monthly Expense Chart
+                </CustomText>
+                <View className="items-center justify-center">
+                  <BarChart
+                    data={data}
+                    width={Dimensions.get("window").width - 30}
+                    height={240}
+                    chartConfig={chartConfig}
+                    bezier
+                    style={{ paddingLeft: 60, paddingRight: 90 }}
+                    yAxisLabel="₹ "
+                    fromZero
+                  />
+                </View>
+              </View>
+            </>
+          )}
+        </View>
+
 
         {/* History */}
         {loading ? (
           <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-3xl bg-[#222831] justify-center p-3 mt-3">
+          <View className="rounded-3xl justify-center p-3 mt-3" style={{ backgroundColor: colors.chartBg }}>
             <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
-              <CustomText className="text-white text-2xl">
+              <CustomText className="text-2xl" style={{ color: colors.text }}>
                 Spendings
               </CustomText>
 
-              <AntDesign name="right" size={14} color="white" />
+              <AntDesign name="right" size={14} color={colors.text} />
 
             </View>
             <View className="mx-1 mb-2">
               {historyExpense?.length > 0
                 ?
                 historyExpense?.map((item, index) => (
-                  <View key={index} className="mb-3 p-4 bg-gray-700 rounded-3xl">
+                  <View key={index} className="mb-3 p-4 rounded-3xl" style={{ backgroundColor: colors.homeCardItem }}>
                     <View className="flex-row justify-between">
-                      <CustomText className="text-white text-lg">
+                      <CustomText className=" text-lg" style={{ color: colors.text }}>
                         {item.expenseName}
                       </CustomText>
                       <CustomText className="text-red-500 text-lg">
@@ -299,9 +313,9 @@ export default function Home() {
         {loading ? (
           <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
         ) : (
-          <View className="rounded-3xl bg-[#222831] justify-center p-3 mt-3 mb-32">
-            <View className="items-center justify-between flex-row mb-4 px-2 py-2">
-              <CustomText className="text-white text-2xl">
+          <View className="rounded-3xl  justify-center p-3 mt-3 mb-32" style={{ backgroundColor: colors.chartBg }}>
+            <View className="items-center justify-between flex-row mb-4 px-2 py-2" >
+              <CustomText className="text-2xl" style={{ color: colors.text }}>
                 Goals
               </CustomText>
               <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
@@ -312,18 +326,18 @@ export default function Home() {
                 historyGoal?.map((item, i) => {
 
                   return (
-                    <View key={i} className="mb-3 p-4 bg-gray-700 rounded-3xl ">
+                    <View key={i} className="mb-3 p-4 rounded-3xl bg-gray-700 " style={{ backgroundColor: colors.homeCardItem }}>
                       <View className="flex-row justify-between">
                         <View className="justify-center">
                           <CustomText
-                            className="text-xl w-40 text-white"
-
+                            className="text-xl w-40 "
+                            style={{ color: colors.text }}
                           >
                             {item.goalName}
                           </CustomText>
                           <CustomText
-                            className="text-md mt-2 text-white"
-
+                            className="text-md mt-2 "
+                            style={{ color: colors.text }}
                           >
                             ₹{numberWithCommas(Number(item.goalSavedMoney))}{" "}
                             / ₹

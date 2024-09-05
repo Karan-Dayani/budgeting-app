@@ -3,11 +3,10 @@ export const LightCustomTheme = {
     colors: {
         primary: 'rgb(255, 45, 85)', // Primary color
         secondary: "#4b5563", // Secondary color
-        background: '#F0F0F0', // Dull gray background
+        background: '#EEEEEE', // Dull gray background
         header: '#F0F0F0', // Same as background
         text: 'black', // Text color
         card: '#3D2C8D', // Card color
-        tabBar: '#3D2C8D', // Tab bar color
         tabBarBgColor: "#191A19", // Bright white tab bar background
         tabBarBtActive: '#41B3A2', // Light Blue
         tabBarBtInActive: '#546E7A', // Muted Blue Gray
@@ -19,7 +18,8 @@ export const LightCustomTheme = {
         itemBg: "#1E201E", // Expense background color
         progressCircleColor: "#059212",
         progressInActive: "#EEEEEE",
-        chartBg: "#DDDDDD"
+        chartBg: "white",
+        homeCardItem: "#EEEEEE"
     }
 };
 
@@ -33,7 +33,6 @@ export const DarkCustomTheme = {
         header: '#121212', // Dark Charcoal
         text: '#FFFFFF', // Light Gray
         card: '#1C1C1C', // Dark Charcoal
-        tabBar: '#42A5F5', // Light Blue
         tabBarBgColor: '#1C1C1C', // Dark Charcoal for contrast
         tabBarBtActive: '#41B3A2', // Light Blue
         tabBarBtInActive: '#546E7A', // Muted Blue Gray
@@ -45,6 +44,7 @@ export const DarkCustomTheme = {
         itemBg: '#212121', // Slightly Lighter Black
         progressCircleColor: "#90D26D",
         progressInActive: "#686D76",
-        chartBg: "#191A19"
+        chartBg: "#191A19",
+        homeCardItem: "#343131"
     }
 };

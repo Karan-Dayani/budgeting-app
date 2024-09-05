@@ -17,8 +17,6 @@ export const getTotalExpense = (user) => {
     year: "numeric",
   });
 
-  console.log(currMonth)
-
   return user[0]?.expenses?.reduce((total, item) => {
     const [month, day, year] = item.expenseDate.split(" ");
 
