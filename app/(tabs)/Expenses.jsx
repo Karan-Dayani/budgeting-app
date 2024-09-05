@@ -22,10 +22,7 @@ import CustomAlert from "../../components/modals/CustomAlert";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import { supabase } from "../../lib/supabase";
 import NoDataLoad from "../../screens/NoDataLoad";
-import {
-  incomePercent,
-  numberWithCommas
-} from "../utils";
+import { incomePercent, numberWithCommas } from "../utils";
 
 export default function ExpensesPage() {
   const isFocused = useIsFocused();
@@ -55,7 +52,6 @@ export default function ExpensesPage() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
 
-
   const { colors } = useTheme();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -66,10 +62,11 @@ export default function ExpensesPage() {
   };
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, i) => currentYear + i)
+  const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
 
-  const months = Array.from({ length: 12 }, (_, i) => new Date(-1, i).toLocaleString('default', { month: 'long' }));
-
+  const months = Array.from({ length: 12 }, (_, i) =>
+    new Date(-1, i).toLocaleString("default", { month: "long" })
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -202,21 +199,19 @@ export default function ExpensesPage() {
     }, 2500);
   };
 
+  const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
+  const [month, date, year] = isCurrentMonth;
 
-  const filteredExpenses = userExpenses.filter((expense) => {
-    const isDateSelected = selectedDate !== "";
-    const isMonthSelected = selectedMonth !== "";
-    const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
-    const [month, date, year] = isCurrentMonth
-
-    return (
-      (!isDateSelected && !isMonthSelected && isCurrentMonth) ||
-      (expense.expenseDate === selectedDate) ||
-      (expense.expenseDate.slice(0, 3) === selectedMonth.slice(0, 3)) &&
+  const filteredExpenses = userExpenses.filter(
+    (expense) =>
+      ((selectedDate === "" &&
+        selectedMonth === "" &&
+        expense.expenseDate.includes(month) &&
+        expense.expenseDate.includes(year)) ||
+        expense.expenseDate === selectedDate ||
+        expense.expenseDate.slice(0, 3) === selectedMonth.slice(0, 3)) &&
       expense.expenseType === activeTab
-    );
-  });
-
+  );
 
   return (
     <View className="px-5 flex-1 ">
@@ -267,27 +262,52 @@ export default function ExpensesPage() {
                   <Pressable
                     onPress={() => {
                       setSelectedDate("");
-                      setSelectedMonth("")
+                      setSelectedMonth("");
                       setDatePickerVisibility(false);
                     }}
                     className="bg-red-500 px-5 py-3 rounded-3xl justify-center "
                   >
-                    <CustomText className="text-white text-lg mx-2">Reset</CustomText>
+                    <CustomText className="text-white text-lg mx-2">
+                      Reset
+                    </CustomText>
                   </Pressable>
                 ) : (
-                  <Menu w="160" marginRight={5} backgroundColor={colors.inputBg} rounded="3xl" trigger={triggerProps => {
-                    return <Pressable accessibilityLabel="More options menu" {...triggerProps}>
-                      <View className="flex-row items-center rounded-3xl p-3" style={{ backgroundColor: colors.inputBg }}>
-                        <Ionicons name="filter" size={20} color={colors.text} />
-                        <CustomText className="text-lg mx-2" style={{ color: colors.text }}>Filter</CustomText>
-                      </View>
-                    </Pressable>;
-                  }}>
+                  <Menu
+                    w="160"
+                    marginRight={5}
+                    backgroundColor={colors.inputBg}
+                    rounded="3xl"
+                    trigger={(triggerProps) => {
+                      return (
+                        <Pressable
+                          accessibilityLabel="More options menu"
+                          {...triggerProps}
+                        >
+                          <View
+                            className="flex-row items-center rounded-3xl p-3"
+                            style={{ backgroundColor: colors.inputBg }}
+                          >
+                            <Ionicons
+                              name="filter"
+                              size={20}
+                              color={colors.text}
+                            />
+                            <CustomText
+                              className="text-lg mx-2"
+                              style={{ color: colors.text }}
+                            >
+                              Filter
+                            </CustomText>
+                          </View>
+                        </Pressable>
+                      );
+                    }}
+                  >
                     <Menu.Item
                       _text={{
                         color: colors.text,
-                        fontSize: 'lg',
-                        paddingBottom: 2
+                        fontSize: "lg",
+                        paddingBottom: 2,
                       }}
                       onPress={() => setDatePickerVisibility(true)}
                     >
@@ -296,8 +316,8 @@ export default function ExpensesPage() {
                     <Menu.Item
                       _text={{
                         color: colors.text,
-                        fontSize: 'lg',
-                        paddingBottom: 2
+                        fontSize: "lg",
+                        paddingBottom: 2,
                       }}
                       onPress={() => setMonthModal(true)}
                     >
@@ -306,8 +326,8 @@ export default function ExpensesPage() {
                     <Menu.Item
                       _text={{
                         color: colors.text,
-                        fontSize: 'lg',
-                        paddingBottom: 2
+                        fontSize: "lg",
+                        paddingBottom: 2,
                       }}
                     >
                       Category
@@ -465,33 +485,71 @@ export default function ExpensesPage() {
           setMonthModal(!monthModal);
         }}
       >
-        <View className="flex-1 justify-center items-center bg-opacity-80" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-          <View className="rounded-3xl p-4 w-10/12 max-h-1/2" style={{ backgroundColor: colors.chartBg }}>
-            <CustomText className="text-xl text-center mb-4" style={{ color: colors.text }}>Select Month</CustomText>
+        <View
+          className="flex-1 justify-center items-center bg-opacity-80"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+        >
+          <View
+            className="rounded-3xl p-4 w-10/12 max-h-1/2"
+            style={{ backgroundColor: colors.chartBg }}
+          >
+            <CustomText
+              className="text-xl text-center mb-4"
+              style={{ color: colors.text }}
+            >
+              Select Month
+            </CustomText>
             <View className="flex-row justify-between mb-4">
-              <View className="w-full" >
-                <CustomText className="text-lg text-center mb-2" style={{ color: colors.text }}>Months</CustomText>
-                <ScrollView style={{ maxHeight: 300 }} nestedScrollEnabled={true}>
+              <View className="w-full">
+                <CustomText
+                  className="text-lg text-center mb-2"
+                  style={{ color: colors.text }}
+                >
+                  Months
+                </CustomText>
+                <ScrollView
+                  style={{ maxHeight: 300 }}
+                  nestedScrollEnabled={true}
+                >
                   {months.map((item, i) => (
-                    <View key={i} className="my-2 py-4 px-4 rounded-3xl" style={{ backgroundColor: selectedMonth === item ? 'blue' : colors.homeCardItem }}>
-                      <Pressable onPress={() => {
-                        setSelectedMonth(item);
-                        setMonthModal(false)
-                      }}>
-                        <CustomText className="text-lg" style={{ color: selectedMonth === item ? 'white' : colors.text }}>{item}</CustomText>
+                    <View
+                      key={i}
+                      className="my-2 py-4 px-4 rounded-3xl"
+                      style={{
+                        backgroundColor:
+                          selectedMonth === item ? "blue" : colors.homeCardItem,
+                      }}
+                    >
+                      <Pressable
+                        onPress={() => {
+                          setSelectedMonth(item);
+                          setMonthModal(false);
+                        }}
+                      >
+                        <CustomText
+                          className="text-lg"
+                          style={{
+                            color:
+                              selectedMonth === item ? "white" : colors.text,
+                          }}
+                        >
+                          {item}
+                        </CustomText>
                       </Pressable>
                     </View>
                   ))}
                 </ScrollView>
               </View>
             </View>
-            <Pressable className="bg-red-500 rounded-3xl p-4 items-center mt-3" onPress={() => setMonthModal(false)}>
+            <Pressable
+              className="bg-red-500 rounded-3xl p-4 items-center mt-3"
+              onPress={() => setMonthModal(false)}
+            >
               <CustomText className="text-white">Close</CustomText>
             </Pressable>
           </View>
         </View>
       </Modal>
-
 
       <View className="flex-1">
         <CustomAlert
