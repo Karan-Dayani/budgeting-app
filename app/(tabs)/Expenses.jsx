@@ -25,6 +25,7 @@ import { supabase } from "../../lib/supabase";
 import NoDataLoad from "../../screens/NoDataLoad";
 import { incomePercent, Notification } from "../utils";
 import ExpenseTypePicker from "../../components/expense/ExpenseTypePicker";
+import CategoryPicker from "../../components/modals/CategoryPicker";
 
 export default function ExpensesPage() {
   const isFocused = useIsFocused();
@@ -35,10 +36,12 @@ export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const { user } = useUser();
   const [addExpenseModal, setAddExpenseModal] = useState(false);
   const [expenseDetail, setExpenseDetail] = useState(false);
   const [monthModal, setMonthModal] = useState(false);
+  const [categoryModel, setCategoryModel] = useState(false);
   const [expense, setExpense] = useState({
     expenseId: uuid.v4(),
     expenseName: "",
@@ -198,13 +201,15 @@ export default function ExpensesPage() {
     }, 2500);
   };
 
-  const filteredExpenses = userExpenses.filter(
+  let filteredExpenses = userExpenses.filter(
     (expense) =>
       ((selectedDate === "" &&
         selectedMonth === "" &&
+        selectedCategory === "" &&
         expense.expenseDate.includes(month) &&
         expense.expenseDate.includes(year)) ||
         expense.expenseDate === selectedDate ||
+        expense.expenseCategory === selectedCategory ||
         expense.expenseDate.slice(0, 3) === selectedMonth.slice(0, 3)) &&
       expense.expenseType === activeTab
   );
@@ -221,7 +226,10 @@ export default function ExpensesPage() {
         }}
       />
       <SafeAreaView className="h-full">
-        <Pressable onPress={() => setAddExpenseModal(true)} className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10">
+        <Pressable
+          onPress={() => setAddExpenseModal(true)}
+          className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
+        >
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
         <View className="w-full mt-4">
@@ -248,9 +256,10 @@ export default function ExpensesPage() {
                 </CustomText>
               </View>
               <View className="flex-row gap-x-3">
-                {selectedDate || selectedMonth ? (
+                {selectedDate || selectedMonth || selectedCategory ? (
                   <Pressable
                     onPress={() => {
+                      setSelectedCategory("");
                       setSelectedDate("");
                       setSelectedMonth("");
                       setDatePickerVisibility(false);
@@ -319,6 +328,7 @@ export default function ExpensesPage() {
                         fontSize: "lg",
                         paddingBottom: 2,
                       }}
+                      onPress={() => setCategoryModel(true)}
                     >
                       Category
                     </Menu.Item>
@@ -335,24 +345,39 @@ export default function ExpensesPage() {
           </View>
         </View>
         <View>
-          <ExpenseTypePicker setActiveTab={setActiveTab} activeTab={activeTab} />
+          <ExpenseTypePicker
+            setActiveTab={setActiveTab}
+            activeTab={activeTab}
+          />
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color={colors.text} className="justify-center h-96" />
+          <ActivityIndicator
+            size="large"
+            color={colors.text}
+            className="justify-center h-96"
+          />
         ) : (
           <FlatList
             data={filteredExpenses}
             keyExtractor={(item) => item.expenseId}
             renderItem={({ item }) => (
-              <ExpenseItem handleExpenseDetail={handleExpenseDetail} item={item} />
+              <ExpenseItem
+                handleExpenseDetail={handleExpenseDetail}
+                item={item}
+              />
             )}
             ListEmptyComponent={<NoDataLoad selectedDate={selectedDate} />}
           />
         )}
 
         {selectedExpense && (
-          <Modal animationType="fade" transparent={true} visible={expenseDetail} onRequestClose={closeExpenseDetail}>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={expenseDetail}
+            onRequestClose={closeExpenseDetail}
+          >
             <ExpenseDetail
               selectedExpense={selectedExpense}
               handleDeleteExpense={handleDeleteExpense}
@@ -361,7 +386,12 @@ export default function ExpensesPage() {
           </Modal>
         )}
 
-        <Modal animationType="slide" transparent={true} visible={addExpenseModal} onRequestClose={() => setAddExpenseModal(!addExpenseModal)}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={addExpenseModal}
+          onRequestClose={() => setAddExpenseModal(!addExpenseModal)}
+        >
           <AddExpenseModal
             expense={expense}
             handleExpenseChange={handleExpenseChange}
@@ -370,8 +400,30 @@ export default function ExpensesPage() {
           />
         </Modal>
 
-        <Modal animationType="slide" transparent={true} visible={monthModal} onRequestClose={() => setMonthModal(!monthModal)}>
-          <MonthPicker setMonthModal={setMonthModal} setSelectedMonth={setSelectedMonth} selectedMonth={selectedMonth} />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={monthModal}
+          onRequestClose={() => setMonthModal(!monthModal)}
+        >
+          <MonthPicker
+            setMonthModal={setMonthModal}
+            setSelectedMonth={setSelectedMonth}
+            selectedMonth={selectedMonth}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={categoryModel}
+          onRequestClose={() => setCategoryModel(!categoryModel)}
+        >
+          <CategoryPicker
+            setCategoryModel={setCategoryModel}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectedCategory}
+          />
         </Modal>
 
         <View className="flex-1">
@@ -393,10 +445,7 @@ export default function ExpensesPage() {
           text="Expense deleted!"
           bgColor="green.500"
         />
-
       </SafeAreaView>
     </View>
   );
 }
-
-
