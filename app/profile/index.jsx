@@ -174,14 +174,15 @@ const ProfilePage = () => {
             </CustomText>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          <Link
             className="p-4 rounded-full flex-row justify-between items-center mt-4 shadow-md"
             style={{ backgroundColor: colors.inputBg }}
+            href={"/Support/"}
           >
             <CustomText className="text-lg " style={{ color: colors.text }}>
               Support
             </CustomText>
-          </TouchableOpacity>
+          </Link>
 
           <TouchableOpacity
             className="p-4 rounded-full flex-row justify-between items-center mt-4 bg-red-500 shadow-md"
