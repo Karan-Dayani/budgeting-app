@@ -49,7 +49,7 @@ export default function ExpensesPage() {
     paymentMode: "",
     expenseDate: new Date().toDateString().slice(4),
     expenseCategory: "",
-    expenseType: "",
+    expenseType: "Non-Recurring",
   });
   const [userExpenses, setUserExpenses] = useState([]);
   const [income, setIncome] = useState(0);
@@ -179,7 +179,7 @@ export default function ExpensesPage() {
     const updatedArray = prevArray.filter(
       (exp) => exp.expenseId !== selectedExpense.expenseId
     );
-    const updatedSavings = savings;
+    let updatedSavings = savings;
     if (
       selectedExpense.expenseDate.includes(month) &&
       selectedExpense.expenseDate.includes(year)
