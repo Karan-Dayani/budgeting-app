@@ -32,6 +32,10 @@ export default function RootLayout() {
     Red_Hat: require("../assets/fonts/Red_Hat_Display/static/RedHatDisplay-Medium.ttf"),
     Montserrat: require("../assets/fonts/Montserrat/static/Montserrat-Medium.ttf"),
     Nunito_Sans: require("../assets/fonts/Nunito_Sans/static/NunitoSans_7pt-Medium.ttf"),
+    Poppins_SemiBold: require("../assets/fonts/Poppins/Poppins-SemiBold.ttf"),
+    Poppins_Bold: require("../assets/fonts/Poppins/Poppins-Bold.ttf"),
+    Noto_Sans: require("../assets/fonts/Noto_Sans/static/NotoSans_SemiCondensed-ExtraBold.ttf"),
+    Noto_Sans_SemiBold: require("../assets/fonts/Noto_Sans/static/NotoSans_SemiCondensed-SemiBold.ttf")
   });
 
   useEffect(() => {

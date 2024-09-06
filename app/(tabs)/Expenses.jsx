@@ -1,28 +1,30 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { Box, HStack, Menu, Slide } from "native-base";
+import { Menu } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Modal,
   Pressable,
   SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
   View,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import uuid from "react-native-uuid";
 import CustomText from "../../components/CustomText";
+import ExpenseItem from "../../components/expense/ExpenseItem";
 import { useUser } from "../../components/globalState/UserContext";
 import AddExpenseModal from "../../components/modals/AddExpenseModal";
 import CustomAlert from "../../components/modals/CustomAlert";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
+import MonthPicker from "../../components/modals/MonthPicker";
 import { supabase } from "../../lib/supabase";
 import NoDataLoad from "../../screens/NoDataLoad";
-import { incomePercent, numberWithCommas } from "../utils";
+import { incomePercent, Notification } from "../utils";
+import ExpenseTypePicker from "../../components/expense/ExpenseTypePicker";
 
 export default function ExpensesPage() {
   const isFocused = useIsFocused();
@@ -61,15 +63,8 @@ export default function ExpensesPage() {
     hideDatePicker();
   };
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
-
-  const months = Array.from({ length: 12 }, (_, i) =>
-    new Date(-1, i).toLocaleString("default", { month: "long" })
-  );
-
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       const { data, error } = await supabase
         .from("User Data")
         .select("expenses, savings, income")
@@ -83,9 +78,8 @@ export default function ExpensesPage() {
         setSavings(data[0]?.savings || 0);
         setIncome(data[0]?.income || 0);
       }
-
       setLoading(false);
-    }
+    };
 
     if (user) {
       setLoading(true);
@@ -108,10 +102,7 @@ export default function ExpensesPage() {
   }, [savings, income]);
 
   const handleExpenseChange = (fieldName, value) => {
-    setExpense((prevData) => ({
-      ...prevData,
-      [fieldName]: value,
-    }));
+    setExpense((prevData) => ({ ...prevData, [fieldName]: value }));
   };
 
   const handleExpenseDetail = (item) => {
@@ -214,24 +205,18 @@ export default function ExpensesPage() {
   );
 
   return (
-    <View className="px-5 flex-1 ">
+    <View className="px-5 flex-1">
       <Stack.Screen
         options={{
           headerShown: true,
           headerShadowVisible: false,
           headerTitle: "",
-          headerTitleStyle: {
-            color: colors.text,
-            fontSize: 25,
-          },
+          headerTitleStyle: { color: colors.text, fontSize: 25 },
           headerStyle: { backgroundColor: colors.header, height: 50 },
         }}
       />
       <SafeAreaView className="h-full">
-        <Pressable
-          onPress={() => setAddExpenseModal(true)}
-          className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
-        >
+        <Pressable onPress={() => setAddExpenseModal(true)} className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10">
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
         <View className="w-full mt-4">
@@ -333,13 +318,6 @@ export default function ExpensesPage() {
                       Category
                     </Menu.Item>
                   </Menu>
-                  // <Pressable
-                  //   onPress={() => console.log("hi")}
-                  //   className="flex-row items-center bg-gray-700 rounded-3xl p-3"
-                  // >
-                  //   <Ionicons name="filter" size={20} color={colors.text} />
-                  //   <CustomText className="text-white text-lg mx-2">Filter</CustomText>
-                  // </Pressable>
                 )}
               </View>
             </View>
@@ -351,108 +329,25 @@ export default function ExpensesPage() {
             />
           </View>
         </View>
-        <View className="flex-row my-4 gap-x-4">
-          <Pressable
-            className="flex-1 p-3 rounded-3xl"
-            onPress={() => setActiveTab("Non-Recurring")}
-            style={{
-              backgroundColor:
-                activeTab === "Non-Recurring" ? "#57A6A1" : colors.inputBg,
-            }}
-          >
-            <CustomText
-              style={{ color: colors.text }}
-              className="text-lg text-center"
-            >
-              Non-Recurring
-            </CustomText>
-          </Pressable>
-
-          <Pressable
-            className="flex-1 p-3 rounded-3xl"
-            onPress={() => setActiveTab("Recurring")}
-            style={{
-              backgroundColor:
-                activeTab === "Recurring" ? "#57A6A1" : colors.inputBg,
-            }}
-          >
-            <CustomText
-              style={{ color: colors.text }}
-              className="text-lg text-center"
-            >
-              Recurring
-            </CustomText>
-          </Pressable>
+        <View>
+          <ExpenseTypePicker setActiveTab={setActiveTab} activeTab={activeTab} />
         </View>
+
         {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.text}
-            className="justify-center h-96"
-          />
+          <ActivityIndicator size="large" color={colors.text} className="justify-center h-96" />
         ) : (
-          <ScrollView className="mt-2" showsVerticalScrollIndicator={false}>
-            <View className="w-full mb-40">
-              {filteredExpenses.length > 0 ? (
-                filteredExpenses?.map((item, index) => (
-                  <View key={index}>
-                    <TouchableOpacity
-                      onLongPress={() => handleExpenseDetail(item)}
-                    >
-                      <View
-                        className="rounded-3xl px-6 py-5 my-2"
-                        style={{ backgroundColor: colors.inputBg }}
-                      >
-                        <View className="flex-row justify-between mb-2">
-                          <CustomText
-                            className="text-xl"
-                            style={{
-                              color: colors.text,
-                            }}
-                          >
-                            {item?.expenseName}
-                          </CustomText>
-                          <CustomText
-                            className="text-lg"
-                            style={{
-                              color: colors.text,
-                            }}
-                          >
-                            ₹{numberWithCommas(Number(item?.expenseAmount))}
-                          </CustomText>
-                        </View>
-                        <CustomText
-                          style={{
-                            color: colors.secondary,
-                          }}
-                        >
-                          Payment Mode: {item?.paymentMode}
-                        </CustomText>
-                        <CustomText
-                          style={{
-                            color: colors.secondary,
-                          }}
-                        >
-                          Date: {item?.expenseDate}
-                        </CustomText>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                ))
-              ) : (
-                <NoDataLoad selectedDate={selectedDate} />
-              )}
-            </View>
-          </ScrollView>
+          <FlatList
+            data={filteredExpenses}
+            keyExtractor={(item) => item.expenseId}
+            renderItem={({ item }) => (
+              <ExpenseItem handleExpenseDetail={handleExpenseDetail} item={item} />
+            )}
+            ListEmptyComponent={<NoDataLoad selectedDate={selectedDate} />}
+          />
         )}
 
         {selectedExpense && (
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={expenseDetail}
-            onRequestClose={closeExpenseDetail}
-          >
+          <Modal animationType="fade" transparent={true} visible={expenseDetail} onRequestClose={closeExpenseDetail}>
             <ExpenseDetail
               selectedExpense={selectedExpense}
               handleDeleteExpense={handleDeleteExpense}
@@ -460,139 +355,43 @@ export default function ExpensesPage() {
             />
           </Modal>
         )}
-      </SafeAreaView>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={addExpenseModal}
-        onRequestClose={() => {
-          setAddExpenseModal(!addExpenseModal);
-        }}
-      >
-        <AddExpenseModal
-          expense={expense}
-          handleExpenseChange={handleExpenseChange}
-          handleSaveExpense={handleSaveExpense}
-          setAddExpenseModal={setAddExpenseModal}
-        />
-      </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={monthModal}
-        onRequestClose={() => {
-          setMonthModal(!monthModal);
-        }}
-      >
-        <View
-          className="flex-1 justify-center items-center bg-opacity-80"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
-        >
-          <View
-            className="rounded-3xl p-4 w-10/12 max-h-1/2"
-            style={{ backgroundColor: colors.chartBg }}
-          >
-            <CustomText
-              className="text-xl text-center mb-4"
-              style={{ color: colors.text }}
-            >
-              Select Month
-            </CustomText>
-            <View className="flex-row justify-between mb-4">
-              <View className="w-full">
-                <CustomText
-                  className="text-lg text-center mb-2"
-                  style={{ color: colors.text }}
-                >
-                  Months
-                </CustomText>
-                <ScrollView
-                  style={{ maxHeight: 300 }}
-                  nestedScrollEnabled={true}
-                >
-                  {months.map((item, i) => (
-                    <View
-                      key={i}
-                      className="my-2 py-4 px-4 rounded-3xl"
-                      style={{
-                        backgroundColor:
-                          selectedMonth === item ? "blue" : colors.homeCardItem,
-                      }}
-                    >
-                      <Pressable
-                        onPress={() => {
-                          setSelectedMonth(item);
-                          setMonthModal(false);
-                        }}
-                      >
-                        <CustomText
-                          className="text-lg"
-                          style={{
-                            color:
-                              selectedMonth === item ? "white" : colors.text,
-                          }}
-                        >
-                          {item}
-                        </CustomText>
-                      </Pressable>
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            </View>
-            <Pressable
-              className="bg-red-500 rounded-3xl p-4 items-center mt-3"
-              onPress={() => setMonthModal(false)}
-            >
-              <CustomText className="text-white">Close</CustomText>
-            </Pressable>
-          </View>
+        <Modal animationType="slide" transparent={true} visible={addExpenseModal} onRequestClose={() => setAddExpenseModal(!addExpenseModal)}>
+          <AddExpenseModal
+            expense={expense}
+            handleExpenseChange={handleExpenseChange}
+            handleSaveExpense={handleSaveExpense}
+            setAddExpenseModal={setAddExpenseModal}
+          />
+        </Modal>
+
+        <Modal animationType="slide" transparent={true} visible={monthModal} onRequestClose={() => setMonthModal(!monthModal)}>
+          <MonthPicker setMonthModal={setMonthModal} setSelectedMonth={setSelectedMonth} selectedMonth={selectedMonth} />
+        </Modal>
+
+        <View className="flex-1">
+          <CustomAlert
+            visible={alertVisible}
+            mainMessage="Low Savings"
+            message="Your savings are running low!, It's time to cut back on expenses."
+            onClose={() => setAlertVisible(false)}
+          />
         </View>
-      </Modal>
 
-      <View className="flex-1">
-        <CustomAlert
-          visible={alertVisible}
-          mainMessage="Low Savings"
-          message="Your savings are running low!, It's time to cut back on expenses."
-          onClose={() => setAlertVisible(false)}
+        <Notification
+          isVisible={isSaved}
+          text="Expense saved!"
+          bgColor="green.500"
         />
-      </View>
+        <Notification
+          isVisible={isDeleted}
+          text="Expense deleted!"
+          bgColor="green.500"
+        />
 
-      <Notification
-        isVisible={isSaved}
-        text="Expense saved!"
-        bgColor="green.500"
-      />
-      <Notification
-        isVisible={isDeleted}
-        text="Expense deleted!"
-        bgColor="green.500"
-      />
+      </SafeAreaView>
     </View>
   );
 }
 
-function Notification({ isVisible, text, bgColor }) {
-  return (
-    <Slide in={isVisible} placement="top">
-      <Box
-        w="100%"
-        position="absolute"
-        p="2"
-        borderRadius="xs"
-        alignItems="center"
-        justifyContent="center"
-        safeArea
-        _dark={{ bg: bgColor }}
-        _light={{ bg: bgColor }}
-      >
-        <HStack space={2}>
-          <Ionicons name="checkmark" size={24} color="white" />
-          <CustomText className="text-white">{text}</CustomText>
-        </HStack>
-      </Box>
-    </Slide>
-  );
-}
+

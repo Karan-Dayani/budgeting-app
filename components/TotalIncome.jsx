@@ -4,6 +4,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { getTotalExpense, numberWithCommas } from "../app/utils";
 import { supabase } from "../lib/supabase";
+import CustomText from "./CustomText";
 
 const TotalIncome = ({ user }) => {
   const expense = numberWithCommas(getTotalExpense(user));
@@ -33,12 +34,12 @@ const TotalIncome = ({ user }) => {
     <View className="">
       <View className="rounded-3xl bg-[#41B3A2] justify-center px-5 py-3 mb-2 flex-2">
         <View className="items-center justify-between flex-row mb-4">
-          <Text
+          <CustomText
             className="text-white text-xl"
-            style={{ fontFamily: "Red_Hat" }}
+
           >
             Monthly Income
-          </Text>
+          </CustomText>
           {/* <AntDesign
                         name="right"
                         size={14}
@@ -47,31 +48,31 @@ const TotalIncome = ({ user }) => {
                     /> */}
         </View>
         {income ? (
-          <Text
+          <CustomText
             className="text-white text-3xl"
             style={{ fontFamily: "Red_Hat" }}
           >
             ₹{income}
-          </Text>
+          </CustomText>
         ) : (
-          <Text
+          <CustomText
             className="text-white text-3xl"
-            style={{ fontFamily: "Red_Hat" }}
+
           >
             Not mentioned
-          </Text>
+          </CustomText>
         )}
       </View>
       <View className="flex-row w-full justify-between">
         <View className="flex-1 rounded-3xl bg-green-800 p-3 shadow-2xl mr-2">
           <View className="items-center justify-between flex-row mb-4">
             <View className="flex-row items-center gap-2">
-              <Text
+              <CustomText
                 className="text-white text-xl"
-                style={{ fontFamily: "Red_Hat" }}
+
               >
                 Savings
-              </Text>
+              </CustomText>
             </View>
             {/* <AntDesign
                             name="right"
@@ -80,24 +81,24 @@ const TotalIncome = ({ user }) => {
                             style={{ marginRight: 10 }}
                         /> */}
           </View>
-          <Text
+          <CustomText
             className="text-white text-3xl"
             style={{ fontFamily: "Red_Hat" }}
           >
             ₹{savings}
-          </Text>
+          </CustomText>
         </View>
         <View
           className="flex-1 rounded-3xl bg-red-700 p-3 shadow-2xl ml-0"
           onStartShouldSetResponder={() => handleExpensesClick()}
         >
           <View className="items-center justify-between flex-row mb-4">
-            <Text
+            <CustomText
               className="text-white text-xl"
-              style={{ fontFamily: "Red_Hat" }}
+
             >
               Expenses
-            </Text>
+            </CustomText>
             {/* <AntDesign
                             name="right"
                             size={14}
@@ -105,12 +106,12 @@ const TotalIncome = ({ user }) => {
                             style={{ marginRight: 10 }}
                         /> */}
           </View>
-          <Text
+          <CustomText
             className="text-white text-3xl"
             style={{ fontFamily: "Red_Hat" }}
           >
             ₹{expense}
-          </Text>
+          </CustomText>
         </View>
       </View>
     </View>

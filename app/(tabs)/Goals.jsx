@@ -27,7 +27,7 @@ import { supabase } from "../../lib/supabase";
 import GoalComplete from "../../screens/GoalComplete";
 import CustomText from "../../components/CustomText";
 import { useUser } from "../../components/globalState/UserContext";
-import { numberWithCommas } from "../utils";
+import { Notification, numberWithCommas } from "../utils";
 
 const Goals = () => {
   const isFocused = useIsFocused();
@@ -258,7 +258,7 @@ const Goals = () => {
                               <CircularProgress
                                 value={Math.round(
                                   (item.goalSavedMoney / item.goalTargetMoney) *
-                                    100
+                                  100
                                 )}
                                 radius={35}
                                 valueSuffix={"%"}
@@ -375,7 +375,7 @@ const Goals = () => {
                       value={Math.round(
                         (selectedGoal.goalSavedMoney /
                           selectedGoal.goalTargetMoney) *
-                          100
+                        100
                       )}
                       radius={60}
                       valueSuffix={"%"}
@@ -516,27 +516,3 @@ const Goals = () => {
 };
 
 export default Goals;
-
-function Notification({ isVisible, text, bgColor }) {
-  return (
-    <Slide in={isVisible} placement="top">
-      <Box
-        w="100%"
-        position="absolute"
-        p="2"
-        borderRadius="xs"
-        bg="emerald.500"
-        alignItems="center"
-        justifyContent="center"
-        safeArea
-        _dark={{ bg: bgColor }}
-        _light={{ bg: bgColor }}
-      >
-        <HStack space={2}>
-          <Ionicons name="checkmark" size={24} color="white" />
-          <CustomText className="text-white">{text}</CustomText>
-        </HStack>
-      </Box>
-    </Slide>
-  );
-}
