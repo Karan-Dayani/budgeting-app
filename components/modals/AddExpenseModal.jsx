@@ -74,7 +74,46 @@ const AddExpenseModal = ({
       </CustomText>
       <View className="rounded-t-3xl" style={{ backgroundColor: colors.expenseForm, paddingBottom: 20 }}>
         {/* Amount TextInput */}
-        <View className="p-5 rounded-t-3xl flex-row gap-x-2" style={{ backgroundColor: colors.expenseAmount }}>
+        <View className="flex-row rounded-t-3xl" style={{ backgroundColor: colors.expenseAmount }}>
+          <Pressable
+            className="flex-1 p-3 rounded-tl-3xl"
+            onPress={() => {
+              setFormType("Non-Recurring");
+              handleExpenseChange("expenseType", "Non-Recurring");
+            }}
+            style={{
+              backgroundColor:
+                formType === "Non-Recurring" ? "#57A6A1" : colors.inputBg,
+            }}
+          >
+            <CustomText
+              style={{ color: colors.text }}
+              className="text-lg text-center"
+            >
+              Non-Recurring
+            </CustomText>
+          </Pressable>
+
+          <Pressable
+            className="flex-1 p-3  rounded-tr-3xl"
+            onPress={() => {
+              setFormType("Recurring");
+              handleExpenseChange("expenseType", "Recurring");
+            }}
+            style={{
+              backgroundColor:
+                formType === "Recurring" ? "#57A6A1" : colors.inputBg,
+            }}
+          >
+            <CustomText
+              style={{ color: colors.text }}
+              className="text-lg text-center"
+            >
+              Recurring
+            </CustomText>
+          </Pressable>
+        </View>
+        <View className="p-5  flex-row gap-x-2" style={{ backgroundColor: colors.expenseAmount }}>
           <View className="flex-1">
             <CustomText className="text-2xl mb-4" style={{ color: colors.text }}>
               Amount
@@ -104,51 +143,9 @@ const AddExpenseModal = ({
             </Pressable>
           </View>
         </View>
-        <View className="px-5 py-4">
+        <View className="px-5 py-5">
 
-          <CustomText className="mb-2 text-lg" style={{ color: colors.text }}>
-            Type
-          </CustomText>
 
-          <View className="flex-row mb-5 gap-x-4">
-            <Pressable
-              className="flex-1 p-3 rounded-3xl"
-              onPress={() => {
-                setFormType("Non-Recurring");
-                handleExpenseChange("expenseType", "Non-Recurring");
-              }}
-              style={{
-                backgroundColor:
-                  formType === "Non-Recurring" ? "#57A6A1" : colors.inputBg,
-              }}
-            >
-              <CustomText
-                style={{ color: colors.text }}
-                className="text-lg text-center"
-              >
-                Non-Recurring
-              </CustomText>
-            </Pressable>
-
-            <Pressable
-              className="flex-1 p-3 rounded-3xl"
-              onPress={() => {
-                setFormType("Recurring");
-                handleExpenseChange("expenseType", "Recurring");
-              }}
-              style={{
-                backgroundColor:
-                  formType === "Recurring" ? "#57A6A1" : colors.inputBg,
-              }}
-            >
-              <CustomText
-                style={{ color: colors.text }}
-                className="text-lg text-center"
-              >
-                Recurring
-              </CustomText>
-            </Pressable>
-          </View>
 
           {/* Expense Name */}
           <CustomText className="text-xl mb-1" style={{ color: colors.text }}>
