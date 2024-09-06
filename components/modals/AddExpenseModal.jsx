@@ -74,7 +74,7 @@ const AddExpenseModal = ({
       </CustomText>
       <View className="rounded-t-3xl" style={{ backgroundColor: colors.expenseForm, paddingBottom: 20 }}>
         {/* Amount TextInput */}
-        <View className="p-5 rounded-t-3xl flex-row gap-x-2 bg-[#45474B]">
+        <View className="p-5 rounded-t-3xl flex-row gap-x-2" style={{ backgroundColor: colors.expenseAmount }}>
           <View className="flex-1">
             <CustomText className="text-2xl mb-4" style={{ color: colors.text }}>
               Amount

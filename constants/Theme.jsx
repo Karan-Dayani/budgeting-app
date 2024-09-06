@@ -14,6 +14,7 @@ export const LightCustomTheme = {
         loginInput: "#EEEEEE", // Input field color
         expenseForm: "white",
         expenseInput: "#f3f4f6",
+        expenseAmount: "#DDDDDD",
         inputBg: "#DDDDDD", // Input background color
         itemBg: "#1E201E", // Expense background color
         progressCircleColor: "#059212",
@@ -40,6 +41,7 @@ export const DarkCustomTheme = {
         loginInput: '#263238', // Dark Blue Gray
         expenseForm: "#1C1C1C",
         expenseInput: "#31363F",
+        expenseAmount: "#45474B",
         inputBg: '#31363F', // Dark Charcoal
         itemBg: '#212121', // Slightly Lighter Black
         progressCircleColor: "#90D26D",
