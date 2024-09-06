@@ -158,7 +158,7 @@ export default function ExpensesPage() {
       paymentMode: "",
       expenseDate: new Date().toDateString().slice(4),
       expenseCategory: "",
-      expenseType: "",
+      expenseType: "Non-Recurring",
     });
 
     setAddExpenseModal(false);
