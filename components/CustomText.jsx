@@ -7,7 +7,7 @@ const CustomText = ({ style, ...props }) => {
 
 const styles = StyleSheet.create({
     text: {
-        fontFamily: 'Poppins_SemiBold', // Apply the Montserrat font globally
+        fontFamily: 'Jost', // Apply the Montserrat font globally
     },
 });
 

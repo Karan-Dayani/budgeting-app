@@ -60,7 +60,7 @@ const AddExpenseModal = ({
 
   const handlePaymentModeSelect = (mode) => {
     console.log(mode.value)
-    setSelectedPaymentMode(mode.label);
+    setSelectedPaymentMode(mode.icon);
     handleExpenseChange("paymentMode", mode.value);
     setShowPaymentModeModal(false); // Close payment mode modal
   };
@@ -74,19 +74,35 @@ const AddExpenseModal = ({
       </CustomText>
       <View className="rounded-t-3xl" style={{ backgroundColor: colors.expenseForm, paddingBottom: 20 }}>
         {/* Amount TextInput */}
-        <View className="p-5 rounded-t-3xl bg-[#45474B]">
-          <CustomText className="text-2xl mb-4" style={{ color: colors.text }}>
-            Amount
-          </CustomText>
-          <Pressable
-            onPress={() => setShowKeyboard(true)} // Open custom keyboard modal
-            className="p-6 mb-4 rounded-3xl shadow-sm"
-            style={{ backgroundColor: colors.expenseInput }}
-          >
-            <CustomText className="text-3xl" style={{ color: colors.text }}>
-              ₹ {amount || "0"}
+        <View className="p-5 rounded-t-3xl flex-row gap-x-2 bg-[#45474B]">
+          <View className="flex-1">
+            <CustomText className="text-2xl mb-4" style={{ color: colors.text }}>
+              Amount
             </CustomText>
-          </Pressable>
+            <Pressable
+              onPress={() => setShowKeyboard(true)}
+              className="p-6 mb-4 rounded-3xl shadow-sm"
+              style={{ backgroundColor: colors.expenseInput }}
+            >
+              <CustomText className="text-3xl" style={{ color: colors.text }}>
+                ₹ {amount || "0"}
+              </CustomText>
+            </Pressable>
+          </View>
+          <View className="w-20">
+            <CustomText className="text-2xl mb-4" style={{ color: colors.text }}>
+              Mode
+            </CustomText>
+            <Pressable
+              onPress={() => setShowPaymentModeModal(true)}
+              className="p-6 mb-4 rounded-3xl shadow-sm"
+              style={{ backgroundColor: colors.expenseInput }}
+            >
+              <CustomText className="text-3xl text-center" style={{ color: colors.text }}>
+                {<Ionicons name={selectedPaymentMode} size={30} color="white" /> || "Mode"}
+              </CustomText>
+            </Pressable>
+          </View>
         </View>
         <View className="px-5 py-4">
 
@@ -135,7 +151,7 @@ const AddExpenseModal = ({
           </View>
 
           {/* Expense Name */}
-          <CustomText className="text-xl mb-2" style={{ color: colors.text }}>
+          <CustomText className="text-xl mb-1" style={{ color: colors.text }}>
             Title
           </CustomText>
           <TextInput
@@ -146,7 +162,7 @@ const AddExpenseModal = ({
             style={{
               backgroundColor: colors.expenseInput,
               color: colors.text,
-              fontFamily: "Poppins_SemiBold"
+              fontFamily: "Jost"
             }}
             placeholderTextColor="gray"
           />
@@ -166,18 +182,7 @@ const AddExpenseModal = ({
           </Pressable>
 
           {/* Payment Mode */}
-          <CustomText className="text-lg mb-1" style={{ color: colors.text }}>
-            Payment Mode
-          </CustomText>
-          <Pressable
-            onPress={() => setShowPaymentModeModal(true)} // Open Payment Mode modal
-            className="p-4 mb-4 rounded-3xl shadow-sm"
-            style={{ backgroundColor: colors.expenseInput }}
-          >
-            <CustomText className="text-lg" style={{ color: colors.text }}>
-              {selectedPaymentMode || "Select Payment Mode"}
-            </CustomText>
-          </Pressable>
+
 
           {/* Save Expense Button */}
           <Pressable
@@ -237,7 +242,7 @@ const AddExpenseModal = ({
                 style={{
                   backgroundColor: colors.expenseInput,
                   color: colors.text,
-                  fontFamily: "Poppins_SemiBold"
+                  fontFamily: "Jost"
                 }}
                 className="text-3xl text-center p-5 mb-4 rounded-xl"
               />
