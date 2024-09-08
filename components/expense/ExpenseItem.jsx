@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, TouchableOpacity } from 'react-native'
 import React from 'react'
 import CustomText from '../CustomText'
 import { numberWithCommas } from '../../app/utils'
@@ -9,7 +9,7 @@ const ExpenseItem = ({ handleExpenseDetail, item }) => {
     const { colors } = useTheme()
 
     return (
-        <Pressable onPress={() => handleExpenseDetail(item)}>
+        <TouchableOpacity onPress={() => handleExpenseDetail(item)}>
             <View className="rounded-3xl px-6 py-5 my-2" style={{ backgroundColor: colors.inputBg }}>
                 <View className="flex-row justify-between mb-2">
                     <CustomText className="text-xl" style={{ color: colors.text }}>
@@ -26,7 +26,7 @@ const ExpenseItem = ({ handleExpenseDetail, item }) => {
                     Date: {item?.expenseDate}
                 </CustomText>
             </View>
-        </Pressable>
+        </TouchableOpacity>
     )
 }
 

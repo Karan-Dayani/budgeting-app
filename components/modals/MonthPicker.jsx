@@ -1,17 +1,19 @@
-import { View, Text, ScrollView, Pressable } from 'react-native'
-import React from 'react'
+import { View, Text, ScrollView, Pressable } from 'react-native';
+import React from 'react';
 import { useTheme } from '@react-navigation/native';
 import CustomText from '../CustomText';
 
-const MonthPicker = ({ setMonthModal, setSelectedMonth, selectedMonth }) => {
+const MonthPicker = ({ setMonthModal, setFilters, filters }) => {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
 
+    // List of months
     const months = Array.from({ length: 12 }, (_, i) =>
         new Date(-1, i).toLocaleString("default", { month: "long" })
     );
 
-    const { colors } = useTheme()
+    const { colors } = useTheme();
+
     return (
         <View
             className="flex-1 justify-center items-center bg-opacity-80"
@@ -39,20 +41,20 @@ const MonthPicker = ({ setMonthModal, setSelectedMonth, selectedMonth }) => {
                                     className="my-2 py-4 px-4 rounded-3xl"
                                     style={{
                                         backgroundColor:
-                                            selectedMonth === item ? "blue" : colors.homeCardItem,
+                                            filters.month === item ? "blue" : colors.homeCardItem,
                                     }}
                                 >
                                     <Pressable
                                         onPress={() => {
-                                            setSelectedMonth(item);
-                                            setMonthModal(false);
+                                            setFilters({ ...filters, month: item });
+                                            setMonthModal(false); // Close the modal after selection
                                         }}
                                     >
                                         <CustomText
                                             className="text-lg"
                                             style={{
                                                 color:
-                                                    selectedMonth === item ? "white" : colors.text,
+                                                    filters.month === item ? "white" : colors.text,
                                             }}
                                         >
                                             {item}
@@ -71,7 +73,7 @@ const MonthPicker = ({ setMonthModal, setSelectedMonth, selectedMonth }) => {
                 </Pressable>
             </View>
         </View>
-    )
-}
+    );
+};
 
-export default MonthPicker
+export default MonthPicker;

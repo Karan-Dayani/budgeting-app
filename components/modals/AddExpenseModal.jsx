@@ -15,6 +15,7 @@ import {
 } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import CustomText from "../CustomText";
+import { numberWithCommas } from "../../app/utils";
 
 const AddExpenseModal = ({
   expense,
@@ -43,16 +44,14 @@ const AddExpenseModal = ({
   const { colors } = useTheme();
   const [amount, setAmount] = useState("");
   const [formType, setFormType] = useState("Non-Recurring");
-  const [showKeyboard, setShowKeyboard] = useState(false);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [showPaymentModeModal, setShowPaymentModeModal] = useState(false);
+  const [showModal, setShowModal] = useState(null);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
   const handleKeyPress = (key) => {
     if (key === "backspace") {
       setAmount((prev) => prev.slice(0, -1));
     } else if (key === "." && amount.includes(".")) {
-      return; // Prevent multiple decimal points
+      return;
     } else {
       setAmount((prev) => prev + key);
     }
@@ -60,20 +59,18 @@ const AddExpenseModal = ({
 
   const handleSetAmount = () => {
     handleExpenseChange("expenseAmount", parseFloat(amount) || 0);
-    setShowKeyboard(false); // Close modal
+    setShowModal(null);
   };
 
   const handleCategorySelect = (category) => {
-    console.log(category.value);
     handleExpenseChange("expenseCategory", category.value);
-    setShowCategoryModal(false); // Close category modal
+    setShowModal(null);
   };
 
   const handlePaymentModeSelect = (mode) => {
-    console.log(mode.value);
     setSelectedPaymentMode(mode.icon);
     handleExpenseChange("paymentMode", mode.value);
-    setShowPaymentModeModal(false); // Close payment mode modal
+    setShowModal(null);
   };
 
   return (
@@ -81,7 +78,10 @@ const AddExpenseModal = ({
       className="flex-1 justify-end"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
     >
-      <CustomText className="text-white text-3xl pl-3 pb-2 font-semibold">
+      <CustomText
+        className="text-white text-3xl pl-3 pb-2 font-semibold"
+        style={{ fontFamily: "Poppins_SemiBold" }}
+      >
         Add Expense
       </CustomText>
       <View
@@ -132,53 +132,62 @@ const AddExpenseModal = ({
           </Pressable>
         </View>
         <View
-          className="p-5  flex-row gap-x-2"
+          className="p-5 h-46"
           style={{ backgroundColor: colors.expenseAmount }}
         >
-          <View className="flex-1">
-            <CustomText
-              className="text-2xl mb-4"
-              style={{ color: colors.text }}
-            >
-              Amount
-            </CustomText>
-            <Pressable
-              onPress={() => setShowKeyboard(true)}
-              className="p-6 mb-4 rounded-3xl shadow-sm"
-              style={{ backgroundColor: colors.expenseInput }}
-            >
-              <CustomText className="text-3xl" style={{ color: colors.text }}>
-                ₹ {amount || "0"}
-              </CustomText>
-            </Pressable>
-          </View>
-          <View className="w-20">
-            <CustomText
-              className="text-2xl mb-4"
-              style={{ color: colors.text }}
-            >
-              Mode
-            </CustomText>
-            <Pressable
-              onPress={() => setShowPaymentModeModal(true)}
-              className="p-6 mb-4 rounded-3xl shadow-sm"
-              style={{ backgroundColor: colors.expenseInput }}
-            >
+          <View className="h-42 flex-row gap-x-2">
+            <View className="flex-1">
               <CustomText
-                className="text-3xl text-center"
+                className="text-2xl mb-4"
                 style={{ color: colors.text }}
               >
-                {(
-                  <Ionicons
-                    name={selectedPaymentMode}
-                    size={30}
-                    color="white"
-                  />
-                ) || "Mode"}
+                Amount
               </CustomText>
-            </Pressable>
+              <Pressable
+                onPress={() => setShowModal("keyboard")}
+                className="p-6 mb-4 rounded-3xl shadow-sm"
+                style={{ backgroundColor: colors.expenseInput }}
+              >
+                <CustomText
+                  className="text-3xl"
+                  style={{
+                    color: colors.text,
+                    fontFamily: "Poppins_SemiBold",
+                  }}
+                >
+                  ₹ {numberWithCommas(amount) || "0"}
+                </CustomText>
+              </Pressable>
+            </View>
+            <View className="w-20">
+              <CustomText
+                className="text-2xl mb-4"
+                style={{ color: colors.text }}
+              >
+                Mode
+              </CustomText>
+              <Pressable
+                onPress={() => setShowModal("paymentMode")}
+                className="p-6 mb-3 rounded-3xl shadow-sm"
+                style={{ backgroundColor: colors.expenseInput }}
+              >
+                <CustomText
+                  className="text-2xl text-center"
+                  style={{ color: colors.text }}
+                >
+                  {(
+                    <Ionicons
+                      name={selectedPaymentMode}
+                      size={30}
+                      color="white"
+                    />
+                  ) || "Mode"}
+                </CustomText>
+              </Pressable>
+            </View>
           </View>
         </View>
+
         <View className="px-5 py-5">
           {/* Expense Name */}
           <CustomText className="text-xl mb-1" style={{ color: colors.text }}>
@@ -202,7 +211,7 @@ const AddExpenseModal = ({
             Category
           </CustomText>
           <Pressable
-            onPress={() => setShowCategoryModal(true)} // Open category modal
+            onPress={() => setShowModal("category")} // Open category modal
             className="p-4 mb-4 rounded-3xl shadow-sm"
             style={{ backgroundColor: colors.expenseInput }}
           >
@@ -210,8 +219,6 @@ const AddExpenseModal = ({
               {expense.expenseCategory || "Select Category"}
             </CustomText>
           </Pressable>
-
-          {/* Payment Mode */}
 
           {/* Save Expense Button */}
           <Pressable
@@ -231,34 +238,12 @@ const AddExpenseModal = ({
           </Pressable>
         </View>
 
-        {/* Buttons */}
-        {/* <View className="flex-row justify-between mt-5">
-          <Pressable
-            onPress={() => setAddExpenseModal(false)}
-            className="bg-red-500 p-4 rounded-full justify-center shadow-lg"
-          >
-            <Entypo name="cross" size={25} color="white" />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              if (!amount || !expense.expenseName) {
-                Alert.alert("Error", "Please enter an amount and title");
-              } else {
-                handleSaveExpense();
-              }
-            }}
-            className="bg-green-500 p-4 rounded-full justify-center shadow-lg"
-          >
-            <MaterialIcons name="check" size={25} color="white" />
-          </Pressable>
-        </View> */}
-
         {/* Custom Keyboard Modal */}
         <Modal
-          visible={showKeyboard}
+          visible={showModal === "keyboard"}
           animationType="slide"
           transparent={true}
-          onRequestClose={() => setShowKeyboard(false)}
+          onRequestClose={() => setShowModal(null)}
         >
           <View
             className="flex-1 justify-center"
@@ -277,23 +262,23 @@ const AddExpenseModal = ({
 
               {/* TextInput for Amount in Modal */}
               <TextInput
-                value={amount}
+                value={numberWithCommas(amount)}
                 editable={false} // Make it read-only since we use the custom keyboard
                 style={{
                   backgroundColor: colors.expenseInput,
                   color: colors.text,
-                  fontFamily: "Jost",
+                  fontFamily: "Poppins_SemiBold",
                 }}
                 className="text-3xl text-center p-5 mb-4 rounded-xl"
               />
 
               {/* Custom Numeric Keyboard */}
-              <View className="flex-wrap flex-row justify-between mb-5">
+              <View className="flex-wrap flex-row justify-center mb-5 rounded-3xl bg-slate-700">
                 {["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0"].map(
                   (key) => (
                     <Pressable
                       key={key}
-                      className="bg-slate-700 p-4 m-1 rounded-xl justify-center items-center w-[30%]"
+                      className=" p-4 m-1  justify-center items-center w-[30%]"
                       onPress={() => handleKeyPress(key)}
                     >
                       <CustomText
@@ -306,7 +291,7 @@ const AddExpenseModal = ({
                   )
                 )}
                 <Pressable
-                  className="bg-slate-700 p-4 m-1 rounded-xl justify-center items-center w-[30%]"
+                  className=" p-4 m-1 justify-center items-center w-[30%]"
                   onPress={() => handleKeyPress("backspace")}
                 >
                   <Entypo name="back" size={25} color="white" />
@@ -328,10 +313,10 @@ const AddExpenseModal = ({
 
         {/* Category Modal */}
         <Modal
-          visible={showCategoryModal}
+          visible={showModal === "category"}
           animationType="slide"
           transparent={true}
-          onRequestClose={() => setShowCategoryModal(false)}
+          onRequestClose={() => setShowModal(null)}
         >
           <View
             className="flex-1 justify-end"
@@ -357,7 +342,7 @@ const AddExpenseModal = ({
                 )}
               />
               <Pressable
-                onPress={() => setShowCategoryModal(false)}
+                onPress={() => setShowModal(null)}
                 className="mt-4 bg-gray-300 p-3 rounded-full"
               >
                 <CustomText className="text-center">Cancel</CustomText>
@@ -368,10 +353,10 @@ const AddExpenseModal = ({
 
         {/* Payment Mode Modal */}
         <Modal
-          visible={showPaymentModeModal}
+          visible={showModal === "paymentMode"}
           animationType="slide"
           transparent={true}
-          onRequestClose={() => setShowPaymentModeModal(false)}
+          onRequestClose={() => setShowModal(null)}
         >
           <View
             className="flex-1 justify-end"

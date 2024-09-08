@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { Menu } from "native-base";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -34,9 +34,6 @@ export default function ExpensesPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
   const { user } = useUser();
   const [addExpenseModal, setAddExpenseModal] = useState(false);
   const [expenseDetail, setExpenseDetail] = useState(false);
@@ -59,17 +56,26 @@ export default function ExpensesPage() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
 
+  const [filters, setFilters] = useState({
+    date: "",
+    month: "",
+    category: "",
+  });
+
   const { colors } = useTheme();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const handleConfirm = (date) => {
-    setSelectedDate(new Date(date).toDateString().slice(4));
+    setFilters({ ...filters, "date": new Date(date).toDateString().slice(4) });
     hideDatePicker();
   };
 
+
   useEffect(() => {
     const fetchData = async () => {
+      if (!user) return;
+
       const { data, error } = await supabase
         .from("User Data")
         .select("expenses, savings, income")
@@ -86,11 +92,12 @@ export default function ExpensesPage() {
       setLoading(false);
     };
 
-    if (user) {
+    if (isFocused) {
       setLoading(true);
       fetchData();
     }
-  }, [user, expense, isFocused]);
+  }, [user, isFocused]);
+
 
   const firstRenderRef = useRef(true);
 
@@ -126,18 +133,12 @@ export default function ExpensesPage() {
       setHasShownSavingsAlert(true);
     }
 
-    if (
-      !expense.expenseName.trim() ||
-      !expense.expenseAmount ||
-      !expense.paymentMode.trim() ||
-      !expense.expenseCategory.trim() ||
-      !expense.expenseType.trim()
-    ) {
-      Alert.alert("Please fill in all the fields before saving.");
+    if (!expense.expenseName || !expense.expenseAmount || !expense.paymentMode || !expense.expenseCategory || !expense.expenseType) {
+      Alert.alert("Please fill in all fields");
       return;
     }
 
-    const { data, err } = await supabase
+    const { data } = await supabase
       .from("User Data")
       .select("expenses")
       .eq("email", user?.user_metadata?.email);
@@ -146,10 +147,13 @@ export default function ExpensesPage() {
     const updatedArray = [expense, ...prevArray];
     const updatedSavings = savings - expense.expenseAmount;
 
+
     await supabase
       .from("User Data")
       .update({ expenses: updatedArray, savings: updatedSavings })
       .eq("email", user?.user_metadata?.email);
+
+    setUserExpenses(updatedArray);
 
     setExpense({
       expenseId: uuid.v4(),
@@ -162,11 +166,12 @@ export default function ExpensesPage() {
     });
 
     setAddExpenseModal(false);
-    setIsSaved(!isSaved);
-    setTimeout(() => {
-      setIsSaved(false);
-    }, 2500);
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2500);
   };
+
+
+
 
   const handleDeleteExpense = async () => {
     const { data, err } = await supabase
@@ -201,18 +206,20 @@ export default function ExpensesPage() {
     }, 2500);
   };
 
-  let filteredExpenses = userExpenses.filter(
-    (expense) =>
-      ((selectedDate === "" &&
-        selectedMonth === "" &&
-        selectedCategory === "" &&
-        expense.expenseDate.includes(month) &&
-        expense.expenseDate.includes(year)) ||
-        expense.expenseDate === selectedDate ||
-        expense.expenseCategory === selectedCategory ||
-        expense.expenseDate.slice(0, 3) === selectedMonth.slice(0, 3)) &&
-      expense.expenseType === activeTab
-  );
+  const filteredExpenses = useMemo(() => {
+    return userExpenses.filter(
+      (expense) =>
+        ((filters.date === "" &&
+          filters.month === "" &&
+          filters.category === "" &&
+          expense.expenseDate.includes(month) &&
+          expense.expenseDate.includes(year)) ||
+          expense.expenseDate === filters.date ||
+          expense.expenseCategory === filters.category ||
+          expense.expenseDate.slice(0, 3) === filters.month.slice(0, 3)) &&
+        expense.expenseType === activeTab
+    );
+  }, [userExpenses, filters, activeTab, month, year]);
 
   return (
     <View className="px-5 flex-1">
@@ -236,32 +243,28 @@ export default function ExpensesPage() {
           <View>
             <View className="flex-row justify-between items-center mb-4">
               <View>
-                {selectedDate ? (
-                  <CustomText
-                    className={`text-xl  ml-1`}
-                    style={{ color: colors.text }}
-                  >
-                    {selectedDate}
-                  </CustomText>
-                ) : (
-                  <CustomText
-                    className={`text-xl ml-1`}
-                    style={{ color: colors.text }}
-                  >
-                    All Expenses
-                  </CustomText>
-                )}
-                <CustomText className={`px-1`} style={{ color: colors.text }}>
-                  Total Expense:
+                <CustomText className={`text-xl ml-1`} style={{ color: colors.text }}>
+                  {filters?.date
+                    ? filters.date
+                    : filters?.month
+                      ? filters.month
+                      : filters?.category
+                        ? filters.category
+                        : "All Expenses"}
                 </CustomText>
+                {/* <CustomText className={`px-1`} style={{ color: colors.text }}>
+                  Total Expense:
+                </CustomText> */}
               </View>
               <View className="flex-row gap-x-3">
-                {selectedDate || selectedMonth || selectedCategory ? (
+                {filters?.date || filters?.month || filters?.category ? (
                   <Pressable
                     onPress={() => {
-                      setSelectedCategory("");
-                      setSelectedDate("");
-                      setSelectedMonth("");
+                      setFilters({
+                        date: "",
+                        month: "",
+                        category: "",
+                      })
                       setDatePickerVisibility(false);
                     }}
                     className="bg-red-500 px-5 py-3 rounded-3xl justify-center "
@@ -367,7 +370,7 @@ export default function ExpensesPage() {
                 item={item}
               />
             )}
-            ListEmptyComponent={<NoDataLoad selectedDate={selectedDate} />}
+            ListEmptyComponent={<NoDataLoad filters={filters} />}
           />
         )}
 
@@ -408,8 +411,8 @@ export default function ExpensesPage() {
         >
           <MonthPicker
             setMonthModal={setMonthModal}
-            setSelectedMonth={setSelectedMonth}
-            selectedMonth={selectedMonth}
+            setFilters={setFilters}
+            filters={filters}
           />
         </Modal>
 
@@ -421,8 +424,8 @@ export default function ExpensesPage() {
         >
           <CategoryPicker
             setCategoryModel={setCategoryModel}
-            setSelectedCategory={setSelectedCategory}
-            selectedCategory={selectedCategory}
+            setFilters={setFilters}
+            filters={filters}
           />
         </Modal>
 

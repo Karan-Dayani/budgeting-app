@@ -279,7 +279,7 @@ export default function Home() {
           <View className="rounded-3xl justify-center p-3 mt-3" style={{ backgroundColor: colors.chartBg }}>
             <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
               <CustomText className="text-2xl" style={{ color: colors.text }}>
-                Spendings
+                History
               </CustomText>
 
               <AntDesign name="right" size={14} color={colors.text} />

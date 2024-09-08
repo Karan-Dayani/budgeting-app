@@ -6,8 +6,8 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 const CategoryPicker = ({
   setCategoryModel,
-  setSelectedCategory,
-  selectedCategory,
+  setFilters,
+  filters,
 }) => {
   const CategoryData = [
     { label: "Food", value: "Food", icon: "utensils" },
@@ -46,14 +46,14 @@ const CategoryPicker = ({
                   className="my-2 py-4 px-4 rounded-3xl"
                   style={{
                     backgroundColor:
-                      selectedCategory === item.value
+                      filters.category === item.value
                         ? "blue"
                         : colors.homeCardItem,
                   }}
                 >
                   <Pressable
                     onPress={() => {
-                      setSelectedCategory(item.value);
+                      setFilters({ ...filters, category: item.label });
                       setCategoryModel(false);
                     }}
                     className="flex-row gap-x-2 items-center"
@@ -63,7 +63,7 @@ const CategoryPicker = ({
                       className="text-lg"
                       style={{
                         color:
-                          selectedCategory === item.value
+                          filters.category === item.value
                             ? "white"
                             : colors.text,
                       }}

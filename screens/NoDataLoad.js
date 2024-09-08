@@ -4,7 +4,7 @@ import LottieView from "lottie-react-native";
 import { useTheme } from "@react-navigation/native";
 import CustomText from "../components/CustomText";
 
-const NoDataLoad = ({ selectedDate }) => {
+const NoDataLoad = ({ filters }) => {
   const { colors } = useTheme();
   return (
     <View style={styles.animationContainer}>
@@ -30,7 +30,7 @@ const NoDataLoad = ({ selectedDate }) => {
           No data
         </CustomText>
         <CustomText style={{ color: colors.text, fontSize: 20 }}>
-          {selectedDate}
+          {filters?.date}
         </CustomText>
       </View>
     </View>
