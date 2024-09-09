@@ -5,7 +5,7 @@ import CustomText from "../CustomText";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 const CategoryPicker = ({
-  setCategoryModel,
+  setShowModal,
   setFilters,
   filters,
 }) => {
@@ -54,7 +54,7 @@ const CategoryPicker = ({
                   <Pressable
                     onPress={() => {
                       setFilters({ ...filters, category: item.label });
-                      setCategoryModel(false);
+                      setShowModal(null);
                     }}
                     className="flex-row gap-x-2 items-center"
                   >
@@ -78,7 +78,7 @@ const CategoryPicker = ({
         </View>
         <Pressable
           className="bg-red-500 rounded-3xl p-4 items-center mt-3"
-          onPress={() => setCategoryModel(false)}
+          onPress={() => setShowModal(null)}
         >
           <CustomText className="text-white">Close</CustomText>
         </Pressable>

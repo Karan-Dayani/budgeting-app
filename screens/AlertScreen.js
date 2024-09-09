@@ -4,7 +4,7 @@ import LottieView from "lottie-react-native";
 import { useTheme } from "@react-navigation/native";
 import CustomText from "../components/CustomText";
 
-const AlertScreen = ({ selectedDate }) => {
+const AlertScreen = () => {
   const { colors } = useTheme();
   return (
     <View style={{ alignItems: "center" }}>
@@ -32,9 +32,7 @@ const AlertScreen = ({ selectedDate }) => {
             width: "80%",
           }}
         >
-          <CustomText style={{ color: colors.text, fontSize: 20 }}>
-            {selectedDate}
-          </CustomText>
+          <CustomText style={{ color: colors.text, fontSize: 20 }} />
         </View>
       </View>
     </View>

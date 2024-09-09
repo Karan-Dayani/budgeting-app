@@ -3,7 +3,7 @@ import React from 'react';
 import { useTheme } from '@react-navigation/native';
 import CustomText from '../CustomText';
 
-const MonthPicker = ({ setMonthModal, setFilters, filters }) => {
+const MonthPicker = ({ setShowModal, setFilters, filters }) => {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
 
@@ -47,7 +47,7 @@ const MonthPicker = ({ setMonthModal, setFilters, filters }) => {
                                     <Pressable
                                         onPress={() => {
                                             setFilters({ ...filters, month: item });
-                                            setMonthModal(false); // Close the modal after selection
+                                            setShowModal(null); // Close the modal after selection
                                         }}
                                     >
                                         <CustomText
@@ -67,7 +67,7 @@ const MonthPicker = ({ setMonthModal, setFilters, filters }) => {
                 </View>
                 <Pressable
                     className="bg-red-500 rounded-3xl p-4 items-center mt-3"
-                    onPress={() => setMonthModal(false)}
+                    onPress={() => setShowModal(null)}
                 >
                     <CustomText className="text-white">Close</CustomText>
                 </Pressable>

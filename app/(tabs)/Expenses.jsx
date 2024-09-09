@@ -23,22 +23,22 @@ import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import MonthPicker from "../../components/modals/MonthPicker";
 import { supabase } from "../../lib/supabase";
 import NoDataLoad from "../../screens/NoDataLoad";
-import { incomePercent, Notification } from "../utils";
+import AlertScreen from "../../screens/AlertScreen"
+import { incomePercent, Notification, numberWithCommas } from "../utils";
 import ExpenseTypePicker from "../../components/expense/ExpenseTypePicker";
 import CategoryPicker from "../../components/modals/CategoryPicker";
 
 export default function ExpensesPage() {
+  const { user } = useUser();
   const isFocused = useIsFocused();
+
   const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
   const [month, date, year] = isCurrentMonth;
-  const [isSaved, setIsSaved] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
+
   const [loading, setLoading] = useState(true);
-  const { user } = useUser();
-  const [addExpenseModal, setAddExpenseModal] = useState(false);
-  const [expenseDetail, setExpenseDetail] = useState(false);
-  const [monthModal, setMonthModal] = useState(false);
-  const [categoryModel, setCategoryModel] = useState(false);
+  const [notify, setNotify] = useState();
+  const [showModal, setShowModal] = useState()
+
   const [expense, setExpense] = useState({
     expenseId: uuid.v4(),
     expenseName: "",
@@ -48,12 +48,13 @@ export default function ExpensesPage() {
     expenseCategory: "",
     expenseType: "Non-Recurring",
   });
+
   const [userExpenses, setUserExpenses] = useState([]);
   const [income, setIncome] = useState(0);
   const [savings, setSavings] = useState(0);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [activeTab, setActiveTab] = useState("Non-Recurring");
-  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertVisible, setAlertVisible] = useState();
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -119,22 +120,27 @@ export default function ExpensesPage() {
 
   const handleExpenseDetail = (item) => {
     setSelectedExpense(item);
-    setExpenseDetail(true);
+    setShowModal("expenseDetail");
   };
 
   const closeExpenseDetail = () => {
-    setExpenseDetail(false);
+    setShowModal(null);
     setSelectedExpense(null);
   };
 
   const handleSaveExpense = async () => {
     if (savings <= Number(incomePercent(income)) && !hasShownSavingsAlert) {
-      setAlertVisible(true);
+      setAlertVisible("lowSavings");
       setHasShownSavingsAlert(true);
     }
 
     if (!expense.expenseName || !expense.expenseAmount || !expense.paymentMode || !expense.expenseCategory || !expense.expenseType) {
       Alert.alert("Please fill in all fields");
+      return;
+    }
+
+    if (savings < expense.expenseAmount) {
+      setAlertVisible("exceedAmount");
       return;
     }
 
@@ -165,46 +171,60 @@ export default function ExpensesPage() {
       expenseType: "Non-Recurring",
     });
 
-    setAddExpenseModal(false);
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2500);
+    setShowModal(null);
+    setNotify("Saved");
+    setTimeout(() => setNotify(null), 2500);
   };
 
 
 
 
   const handleDeleteExpense = async () => {
-    const { data, err } = await supabase
-      .from("User Data")
-      .select("expenses")
-      .eq("email", user?.user_metadata?.email);
+    try {
+      const { data, error } = await supabase
+        .from("User Data")
+        .select("expenses, income")
+        .eq("email", user?.user_metadata?.email);
 
-    const prevArray = data[0]?.expenses || [];
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-    const updatedArray = prevArray.filter(
-      (exp) => exp.expenseId !== selectedExpense.expenseId
-    );
-    let updatedSavings = savings;
-    if (
-      selectedExpense.expenseDate.includes(month) &&
-      selectedExpense.expenseDate.includes(year)
-    ) {
-      updatedSavings = updatedSavings + selectedExpense.expenseAmount;
+      const prevArray = data[0]?.expenses || [];
+      const userIncome = data[0]?.income || 0;
+
+      const updatedArray = prevArray.filter(
+        (exp) => exp.expenseId !== selectedExpense.expenseId
+      );
+
+      const totalExpenses = updatedArray.reduce(
+        (sum, expense) => sum + expense.expenseAmount,
+        0
+      );
+
+      const updatedSavings = userIncome - totalExpenses;
+      await supabase
+        .from("User Data")
+        .update({ expenses: updatedArray, savings: updatedSavings })
+        .eq("email", user?.user_metadata?.email);
+
+
+      setUserExpenses(updatedArray);
+      setSavings(updatedSavings);
+
+
+      setShowModal(null);
+      setSelectedExpense(null);
+
+      setNotify("Deleted");
+      setTimeout(() => setNotify(null), 2500);
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      Alert.alert("Error deleting expense");
     }
-
-    await supabase
-      .from("User Data")
-      .update({ expenses: updatedArray, savings: updatedSavings })
-      .eq("email", user?.user_metadata?.email);
-    setUserExpenses(updatedArray);
-    setExpenseDetail(false);
-    setSelectedExpense(null);
-
-    setIsDeleted(!isDeleted);
-    setTimeout(() => {
-      setIsDeleted(false);
-    }, 2500);
   };
+
 
   const filteredExpenses = useMemo(() => {
     return userExpenses.filter(
@@ -221,6 +241,7 @@ export default function ExpensesPage() {
     );
   }, [userExpenses, filters, activeTab, month, year]);
 
+
   return (
     <View className="px-5 flex-1">
       <Stack.Screen
@@ -234,7 +255,7 @@ export default function ExpensesPage() {
       />
       <SafeAreaView className="h-full">
         <Pressable
-          onPress={() => setAddExpenseModal(true)}
+          onPress={() => setShowModal("addExpense")}
           className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
         >
           <Ionicons name="add" size={40} color="white" />
@@ -252,9 +273,9 @@ export default function ExpensesPage() {
                         ? filters.category
                         : "All Expenses"}
                 </CustomText>
-                {/* <CustomText className={`px-1`} style={{ color: colors.text }}>
-                  Total Expense:
-                </CustomText> */}
+                <CustomText className={`px-1`} style={{ color: colors.text }}>
+                  Total Expense: {numberWithCommas(filteredExpenses.reduce((sum, expense) => sum + expense.expenseAmount, 0))}
+                </CustomText>
               </View>
               <View className="flex-row gap-x-3">
                 {filters?.date || filters?.month || filters?.category ? (
@@ -321,7 +342,7 @@ export default function ExpensesPage() {
                         fontSize: "lg",
                         paddingBottom: 2,
                       }}
-                      onPress={() => setMonthModal(true)}
+                      onPress={() => setShowModal("monthModal")}
                     >
                       Month
                     </Menu.Item>
@@ -331,7 +352,7 @@ export default function ExpensesPage() {
                         fontSize: "lg",
                         paddingBottom: 2,
                       }}
-                      onPress={() => setCategoryModel(true)}
+                      onPress={() => setShowModal("categoryModal")}
                     >
                       Category
                     </Menu.Item>
@@ -378,7 +399,7 @@ export default function ExpensesPage() {
           <Modal
             animationType="fade"
             transparent={true}
-            visible={expenseDetail}
+            visible={showModal === "expenseDetail"}
             onRequestClose={closeExpenseDetail}
           >
             <ExpenseDetail
@@ -392,25 +413,25 @@ export default function ExpensesPage() {
         <Modal
           animationType="slide"
           transparent={true}
-          visible={addExpenseModal}
-          onRequestClose={() => setAddExpenseModal(!addExpenseModal)}
+          visible={showModal === "addExpense"}
+          onRequestClose={() => setShowModal(null)}
         >
           <AddExpenseModal
             expense={expense}
             handleExpenseChange={handleExpenseChange}
             handleSaveExpense={handleSaveExpense}
-            setAddExpenseModal={setAddExpenseModal}
+            setShowModal={setShowModal}
           />
         </Modal>
 
         <Modal
           animationType="slide"
           transparent={true}
-          visible={monthModal}
-          onRequestClose={() => setMonthModal(!monthModal)}
+          visible={showModal === "monthModal"}
+          onRequestClose={() => setShowModal(null)}
         >
           <MonthPicker
-            setMonthModal={setMonthModal}
+            setShowModal={setShowModal}
             setFilters={setFilters}
             filters={filters}
           />
@@ -419,11 +440,11 @@ export default function ExpensesPage() {
         <Modal
           animationType="slide"
           transparent={true}
-          visible={categoryModel}
-          onRequestClose={() => setCategoryModel(!categoryModel)}
+          visible={showModal === "categoryModal"}
+          onRequestClose={() => setShowModal(null)}
         >
           <CategoryPicker
-            setCategoryModel={setCategoryModel}
+            setShowModal={setShowModal}
             setFilters={setFilters}
             filters={filters}
           />
@@ -431,23 +452,30 @@ export default function ExpensesPage() {
 
         <View className="flex-1">
           <CustomAlert
-            visible={alertVisible}
+            visible={alertVisible === "lowSavings"}
             mainMessage="Low Savings"
             message="Your savings are running low!, It's time to cut back on expenses."
-            onClose={() => setAlertVisible(false)}
+            onClose={() => setAlertVisible(null)}
+            AlertScreen={AlertScreen}
+          />
+        </View>
+
+        <View className="flex-1">
+          <CustomAlert
+            visible={alertVisible === "exceedAmount"}
+            mainMessage="Amount Exceeded"
+            message="It seems your savings are insufficient to cover this expense. Please review your spending and adjust accordingly."
+            onClose={() => setAlertVisible(null)}
+            AlertScreen={AlertScreen}
           />
         </View>
 
         <Notification
-          isVisible={isSaved}
-          text="Expense saved!"
+          isVisible={notify === "Saved" || notify === "Deleted"}
+          text={notify === "Saved" ? "Expense Saved!" : "Expense Deleted!"}
           bgColor="green.500"
         />
-        <Notification
-          isVisible={isDeleted}
-          text="Expense deleted!"
-          bgColor="green.500"
-        />
+
       </SafeAreaView>
     </View>
   );

@@ -15,14 +15,15 @@ import CustomText from "../../components/CustomText";
 import CustomSuccessAlert from "../../components/modals/CustomSuccessAlert";
 import { supabase } from "../../lib/supabase";
 import { AntDesign } from "@expo/vector-icons";
+import { useUser } from "../../components/globalState/UserContext";
 
 const ProfilePage = () => {
   const { colors } = useTheme();
+  const { user } = useUser()
   const isFocused = useIsFocused();
   const [profileModal, setProfileModal] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState("");
   const [userName, setUserName] = useState("");
   const [oldIncome, setOldIncome] = useState(0);
   const [income, setIncome] = useState(0);
@@ -83,16 +84,6 @@ const ProfilePage = () => {
   const handleLogOut = async () => {
     const { error } = await supabase.auth.signOut();
   };
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setUser(user);
-      } else {
-        Alert.alert("Error accessing user");
-      }
-    });
-  }, []);
 
   async function fetchData() {
     const { data, error } = await supabase

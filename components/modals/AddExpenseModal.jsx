@@ -21,8 +21,9 @@ const AddExpenseModal = ({
   expense,
   handleExpenseChange,
   handleSaveExpense,
-  setAddExpenseModal,
+  setShowModal
 }) => {
+
   const PaymentModeData = [
     { label: "Cash", value: "Cash", icon: "cash-outline" },
     { label: "Online", value: "Online", icon: "globe-outline" },
@@ -44,7 +45,7 @@ const AddExpenseModal = ({
   const { colors } = useTheme();
   const [amount, setAmount] = useState("");
   const [formType, setFormType] = useState("Non-Recurring");
-  const [showModal, setShowModal] = useState(null);
+  const [addExpenseModals, setAddExpenseModals] = useState(null);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
   const handleKeyPress = (key) => {
@@ -59,18 +60,18 @@ const AddExpenseModal = ({
 
   const handleSetAmount = () => {
     handleExpenseChange("expenseAmount", parseFloat(amount) || 0);
-    setShowModal(null);
+    setAddExpenseModals(null);
   };
 
   const handleCategorySelect = (category) => {
     handleExpenseChange("expenseCategory", category.value);
-    setShowModal(null);
+    setAddExpenseModals(null);
   };
 
   const handlePaymentModeSelect = (mode) => {
     setSelectedPaymentMode(mode.icon);
     handleExpenseChange("paymentMode", mode.value);
-    setShowModal(null);
+    setAddExpenseModals(null);
   };
 
   return (
@@ -144,7 +145,7 @@ const AddExpenseModal = ({
                 Amount
               </CustomText>
               <Pressable
-                onPress={() => setShowModal("keyboard")}
+                onPress={() => setAddExpenseModals("keyboard")}
                 className="p-6 mb-4 rounded-3xl shadow-sm"
                 style={{ backgroundColor: colors.expenseInput }}
               >
@@ -167,7 +168,7 @@ const AddExpenseModal = ({
                 Mode
               </CustomText>
               <Pressable
-                onPress={() => setShowModal("paymentMode")}
+                onPress={() => setAddExpenseModals("paymentMode")}
                 className="p-6 mb-3 rounded-3xl shadow-sm"
                 style={{ backgroundColor: colors.expenseInput }}
               >
@@ -211,7 +212,7 @@ const AddExpenseModal = ({
             Category
           </CustomText>
           <Pressable
-            onPress={() => setShowModal("category")} // Open category modal
+            onPress={() => setAddExpenseModals("category")} // Open category modal
             className="p-4 mb-4 rounded-3xl shadow-sm"
             style={{ backgroundColor: colors.expenseInput }}
           >
@@ -227,7 +228,7 @@ const AddExpenseModal = ({
                 Alert.alert("Error", "Please enter an amount and title");
               } else {
                 handleSaveExpense();
-                setAddExpenseModal(false);
+                setShowModal(null);
               }
             }}
             className="bg-[#57A6A1] p-4 rounded-3xl mt-4"
@@ -240,10 +241,10 @@ const AddExpenseModal = ({
 
         {/* Custom Keyboard Modal */}
         <Modal
-          visible={showModal === "keyboard"}
+          visible={addExpenseModals === "keyboard"}
           animationType="slide"
           transparent={true}
-          onRequestClose={() => setShowModal(null)}
+          onRequestClose={() => setAddExpenseModals(null)}
         >
           <View
             className="flex-1 justify-center"
@@ -313,10 +314,10 @@ const AddExpenseModal = ({
 
         {/* Category Modal */}
         <Modal
-          visible={showModal === "category"}
+          visible={addExpenseModals === "category"}
           animationType="slide"
           transparent={true}
-          onRequestClose={() => setShowModal(null)}
+          onRequestClose={() => setAddExpenseModals(null)}
         >
           <View
             className="flex-1 justify-end"
@@ -342,7 +343,7 @@ const AddExpenseModal = ({
                 )}
               />
               <Pressable
-                onPress={() => setShowModal(null)}
+                onPress={() => setAddExpenseModals(null)}
                 className="mt-4 bg-gray-300 p-3 rounded-full"
               >
                 <CustomText className="text-center">Cancel</CustomText>
@@ -353,10 +354,10 @@ const AddExpenseModal = ({
 
         {/* Payment Mode Modal */}
         <Modal
-          visible={showModal === "paymentMode"}
+          visible={addExpenseModals === "paymentMode"}
           animationType="slide"
           transparent={true}
-          onRequestClose={() => setShowModal(null)}
+          onRequestClose={() => setAddExpenseModals(null)}
         >
           <View
             className="flex-1 justify-end"

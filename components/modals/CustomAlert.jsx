@@ -2,9 +2,8 @@ import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { View, Modal, TouchableOpacity } from 'react-native';
 import CustomText from '../CustomText';
-import AlertScreen from "../../screens/AlertScreen";
 
-const CustomAlert = ({ visible, mainMessage, message, onClose }) => {
+const CustomAlert = ({ visible, mainMessage, message, onClose, AlertScreen }) => {
     const { colors } = useTheme();
 
     return (
@@ -15,10 +14,8 @@ const CustomAlert = ({ visible, mainMessage, message, onClose }) => {
             onRequestClose={onClose}
         >
             <View className="flex-1 px-5 justify-center items-center bg-black/50">
-                <View className="rounded-3xl p-6 w-11/12 shadow-2xl " style={{ backgroundColor: colors.inputBg }}>
-                    <View >
-                        <AlertScreen />
-                    </View>
+                <View className="rounded-3xl p-6 w-11/12 shadow-2xl" style={{ backgroundColor: colors.inputBg }}>
+                    {AlertScreen && <AlertScreen />}
                     <CustomText className="text-2xl font-bold mb-4 text-center" style={{ color: colors.text }}>
                         {mainMessage}
                     </CustomText>
@@ -26,10 +23,10 @@ const CustomAlert = ({ visible, mainMessage, message, onClose }) => {
                         {message}
                     </CustomText>
                     <TouchableOpacity
-                        className="bg-blue-600 p-4 rounded-full"
+                        className="bg-blue-600 p-4 rounded-full mt-2"
                         onPress={onClose}
                     >
-                        <CustomText className="text-white text-center font-medium">
+                        <CustomText className="text-white text-center  font-medium">
                             Close
                         </CustomText>
                     </TouchableOpacity>

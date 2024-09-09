@@ -4,7 +4,7 @@ import LottieView from "lottie-react-native";
 import { useTheme } from "@react-navigation/native";
 import CustomText from "../components/CustomText";
 
-const SuccessAlert = ({ selectedDate }) => {
+const SuccessAlert = () => {
   const { colors } = useTheme();
   return (
     <View style={{ alignItems: "center" }}>
@@ -35,9 +35,7 @@ const SuccessAlert = ({ selectedDate }) => {
             borderRadius: 200,
           }}
         >
-          <CustomText style={{ color: colors.text, fontSize: 20 }}>
-            {selectedDate}
-          </CustomText>
+          <CustomText style={{ color: colors.text, fontSize: 20 }} />
         </View>
       </View>
     </View>
