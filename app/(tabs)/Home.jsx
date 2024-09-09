@@ -32,6 +32,23 @@ export default function Home() {
   const isFocused = useIsFocused();
   const { colors } = useTheme();
 
+  const fadeInOpacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeInOpacity, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+
+    Animated.timing(translateY, {
+      toValue: 0,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
 
   const getUserRow = async () => {
     const { data, error } = await supabase
@@ -137,17 +154,15 @@ export default function Home() {
     backgroundGradientFrom: colors.chartBg,
     backgroundGradientTo: colors.chartBg,
     decimalPlaces: 0,
-    color: () => "#41B3A2", // Solid blue-green color without opacity
+    color: () => "#41B3A2",
     labelColor: (opacity = 1) => colors.text,
     strokeWidth: 3,
     propsForBackgroundLines: {
       stroke: "transparent",
     },
-    fillShadowGradient: "#41B3A2", // Ensure bars are filled with solid color
-    fillShadowGradientOpacity: 0.7,  // No transparency in the gradient fill
+    fillShadowGradient: "#41B3A2",
+    fillShadowGradientOpacity: 0.7,
   };
-
-
 
 
 
@@ -178,7 +193,6 @@ export default function Home() {
   };
 
 
-
   return (
     <View className="flex-1">
       <Stack.Screen
@@ -205,7 +219,7 @@ export default function Home() {
           right: 0,
           height: StatusBar.currentHeight,
           backgroundColor: colors.background,
-          opacity: blackBarOpacity,
+          opacity: fadeInOpacity,
           zIndex: 10,
         }}
       />
@@ -219,6 +233,7 @@ export default function Home() {
       >
         {/* Animated Header */}
         <Animated.View
+
         >
           <AnimatedHeader
             toggleMenu={toggleMenu}
@@ -226,144 +241,166 @@ export default function Home() {
             user={userData}
           />
         </Animated.View>
+        <Animated.View
+          style={{
+            opacity: fadeInOpacity,
+            transform: [{ translateY }],
+          }}
+        >
+          {/* Content sections */}
+          {loading ? (
+            <>
+              <Skeleton h="100px" mb="1" rounded="20px" startColor="coolGray.300" />
+              <View className="flex-row justify-between">
+                <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
+                <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
+              </View>
+            </>
+          ) : (
+            <>
+              <Animated.View className="w-full">
+                <TotalIncome user={userData} />
+              </Animated.View>
+            </>
+          )}
+        </Animated.View>
 
-        {/* Content sections */}
-        {loading ? (
-          <>
-            <Skeleton h="100px" mb="1" rounded="20px" startColor="coolGray.300" />
-            <View className="flex-row justify-between">
-              <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
-              <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
-            </View>
-          </>
-        ) : (
-          <>
-            <View className="w-full">
-              <TotalIncome user={userData} />
-            </View>
-          </>
-        )}
+        <Animated.View
+          style={{
+            opacity: fadeInOpacity,
+            transform: [{ translateY }],
+          }}
+        >
 
-        <View className="w-full items-center">
+          <View className="w-full items-center">
 
+            {loading ? (
+              <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
+            ) : (
+              <>
+                <View className="w-full p-5 rounded-3xl mt-3 h-[22rem]" style={{ backgroundColor: colors.chartBg }}>
+                  <CustomText className="text-2xl mb-8" style={{ color: colors.text }} >
+                    Monthly Expense Chart
+                  </CustomText>
+                  <View className="items-center justify-center">
+                    <BarChart
+                      data={data}
+                      width={Dimensions.get("window").width - 30}
+                      height={240}
+                      chartConfig={chartConfig}
+                      bezier
+                      style={{ paddingLeft: 60, paddingRight: 90 }}
+                      yAxisLabel="₹ "
+                      fromZero
+                    />
+                  </View>
+                </View>
+              </>
+            )}
+          </View>
+        </Animated.View>
+
+        <Animated.View
+          style={{
+            opacity: fadeInOpacity,
+            transform: [{ translateY }],
+          }}
+        >
+
+          {/* History */}
           {loading ? (
             <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
           ) : (
-            <>
-              <View className="w-full p-5 rounded-3xl mt-3 h-[22rem]" style={{ backgroundColor: colors.chartBg }}>
-                <CustomText className="text-2xl mb-8" style={{ color: colors.text }} >
-                  Monthly Expense Chart
+            <View className="rounded-3xl justify-center p-3 mt-3" style={{ backgroundColor: colors.chartBg }}>
+              <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
+                <CustomText className="text-2xl" style={{ color: colors.text }}>
+                  History
                 </CustomText>
-                <View className="items-center justify-center">
-                  <BarChart
-                    data={data}
-                    width={Dimensions.get("window").width - 30}
-                    height={240}
-                    chartConfig={chartConfig}
-                    bezier
-                    style={{ paddingLeft: 60, paddingRight: 90 }}
-                    yAxisLabel="₹ "
-                    fromZero
-                  />
-                </View>
+
+                <AntDesign name="right" size={14} color={colors.text} />
+
               </View>
-            </>
-          )}
-        </View>
-
-
-        {/* History */}
-        {loading ? (
-          <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
-        ) : (
-          <View className="rounded-3xl justify-center p-3 mt-3" style={{ backgroundColor: colors.chartBg }}>
-            <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
-              <CustomText className="text-2xl" style={{ color: colors.text }}>
-                History
-              </CustomText>
-
-              <AntDesign name="right" size={14} color={colors.text} />
-
-            </View>
-            <View className="mx-1 mb-2">
-              {historyExpense?.length > 0
-                ?
-                historyExpense?.map((item, index) => (
-                  <View key={index} className="mb-3 p-4 rounded-3xl" style={{ backgroundColor: colors.homeCardItem }}>
-                    <View className="flex-row justify-between">
-                      <CustomText className=" text-lg" style={{ color: colors.text }}>
-                        {item.expenseName}
-                      </CustomText>
-                      <CustomText className="text-red-500 text-lg">
-                        - ₹{item.expenseAmount}
-                      </CustomText>
-                    </View>
-                    <CustomText className="text-gray-400">{item.expenseDate}</CustomText>
-                  </View>
-
-                ))
-                :
-                <CustomText className="text-white text-xl">No Expense added till yet</CustomText>
-              }
-            </View>
-          </View>
-        )}
-
-        {/* Goals */}
-        {loading ? (
-          <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
-        ) : (
-          <View className="rounded-3xl  justify-center p-3 mt-3 mb-32" style={{ backgroundColor: colors.chartBg }}>
-            <View className="items-center justify-between flex-row mb-4 px-2 py-2" >
-              <CustomText className="text-2xl" style={{ color: colors.text }}>
-                Goals
-              </CustomText>
-              <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
-            </View>
-            <View className="mx-2 mb-2">
-              {historyGoal?.length > 0
-                ?
-                historyGoal?.map((item, i) => {
-
-                  return (
-                    <View key={i} className="mb-3 p-4 rounded-3xl bg-gray-700 " style={{ backgroundColor: colors.homeCardItem }}>
+              <View className="mx-1 mb-2">
+                {historyExpense?.length > 0
+                  ?
+                  historyExpense?.map((item, index) => (
+                    <View key={index} className="mb-3 p-4 rounded-3xl" style={{ backgroundColor: colors.homeCardItem }}>
                       <View className="flex-row justify-between">
-                        <View className="justify-center">
-                          <CustomText
-                            className="text-xl w-40 "
-                            style={{ color: colors.text }}
-                          >
-                            {item.goalName}
-                          </CustomText>
-                          <CustomText
-                            className="text-md mt-2 "
-                            style={{ color: colors.text }}
-                          >
-                            ₹{numberWithCommas(Number(item.goalSavedMoney))}{" "}
-                            / ₹
-                            {numberWithCommas(Number(item.goalTargetMoney))}
-                          </CustomText>
-                        </View>
-                        <View className="">
-                          <CircularProgress
-                            value={Math.round(
-                              (item.goalSavedMoney / item.goalTargetMoney) *
-                              100
-                            )}
-                            radius={35}
-                            valueSuffix={"%"}
-                          />
+                        <CustomText className=" text-lg" style={{ color: colors.text }}>
+                          {item.expenseName}
+                        </CustomText>
+                        <CustomText className="text-red-500 text-lg">
+                          - ₹{item.expenseAmount}
+                        </CustomText>
+                      </View>
+                      <CustomText className="text-gray-400">{item.expenseDate}</CustomText>
+                    </View>
+
+                  ))
+                  :
+                  <CustomText className="text-white text-xl">No Expense added till yet</CustomText>
+                }
+              </View>
+            </View>
+          )}
+
+
+          {/* Goals */}
+          {loading ? (
+            <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
+          ) : (
+            <View className="rounded-3xl  justify-center p-3 mt-3 mb-32" style={{ backgroundColor: colors.chartBg }}>
+              <View className="items-center justify-between flex-row mb-4 px-2 py-2" >
+                <CustomText className="text-2xl" style={{ color: colors.text }}>
+                  Goals
+                </CustomText>
+                <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
+              </View>
+              <View className="mx-2 mb-2">
+                {historyGoal?.length > 0
+                  ?
+                  historyGoal?.map((item, i) => {
+
+                    return (
+                      <View key={i} className="mb-3 p-4 rounded-3xl bg-gray-700 " style={{ backgroundColor: colors.homeCardItem }}>
+                        <View className="flex-row justify-between">
+                          <View className="justify-center">
+                            <CustomText
+                              className="text-xl w-40 "
+                              style={{ color: colors.text }}
+                            >
+                              {item.goalName}
+                            </CustomText>
+                            <CustomText
+                              className="text-md mt-2 "
+                              style={{ color: colors.text }}
+                            >
+                              ₹{numberWithCommas(Number(item.goalSavedMoney))}{" "}
+                              / ₹
+                              {numberWithCommas(Number(item.goalTargetMoney))}
+                            </CustomText>
+                          </View>
+                          <View className="">
+                            <CircularProgress
+                              value={Math.round(
+                                (item.goalSavedMoney / item.goalTargetMoney) *
+                                100
+                              )}
+                              radius={35}
+                              valueSuffix={"%"}
+                            />
+                          </View>
                         </View>
                       </View>
-                    </View>
-                  );
-                })
-                :
-                <CustomText className="text-white text-xl">No Goals added till yet</CustomText>
-              }
+                    );
+                  })
+                  :
+                  <CustomText className="text-white text-xl">No Goals added till yet</CustomText>
+                }
+              </View>
             </View>
-          </View>
-        )}
+          )}
+        </Animated.View>
       </ScrollView>
     </View>
   );

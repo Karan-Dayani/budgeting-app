@@ -1,19 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-    Pressable
+    Pressable,
+    View
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 
 
-const ExpenseAddButton = ({ setShowModal, animation }) => {
+const ExpenseAddButton = ({ setShowModal }) => {
     return (
 
-        <Animatable.View
-            className="absolute right-1 z-10 h-full"
-            animation={animation}
-            duration={500}
-            delay={200}
+        <View
+            className="absolute right-1 z-10  h-full"
         >
             <Pressable
                 onPress={() => setShowModal("addExpense")}
@@ -21,7 +19,7 @@ const ExpenseAddButton = ({ setShowModal, animation }) => {
             >
                 <Ionicons name="add" size={40} color="white" />
             </Pressable>
-        </Animatable.View>
+        </View>
 
     )
 }

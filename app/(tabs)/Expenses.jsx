@@ -29,6 +29,8 @@ export default function ExpensesPage() {
   const { user } = useUser();
   const isFocused = useIsFocused();
 
+  const [animations, setAnimations] = useState([]);
+
   const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
   const [month, date, year] = isCurrentMonth;
 
@@ -53,8 +55,6 @@ export default function ExpensesPage() {
   const [activeTab, setActiveTab] = useState("Non-Recurring");
   const [alertVisible, setAlertVisible] = useState();
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
-  const flatListRef = useRef();
-  const [scrollToTop, setScrollToTop] = useState(true);
 
   const [filters, setFilters] = useState({
     date: "",
@@ -65,6 +65,29 @@ export default function ExpensesPage() {
   const { colors } = useTheme();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const hasAnimatedRef = useRef(false);
+
+  useEffect(() => {
+    if (!loading && filteredExpenses.length > 0 && !hasAnimatedRef.current) {
+      const newAnimations = filteredExpenses.map(() => new Animated.Value(0));
+      setAnimations(newAnimations);
+
+      const animationsSequence = newAnimations.map((anim, index) => {
+        return Animated.timing(anim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+          delay: index * 100,
+        });
+      });
+
+      Animated.stagger(100, animationsSequence).start(() => {
+        hasAnimatedRef.current = true;
+      });
+    }
+  }, [loading, filteredExpenses]);
+
 
   const handleConfirm = (date) => {
     setFilters({ ...filters, "date": new Date(date).toDateString().slice(4) });
@@ -104,7 +127,6 @@ export default function ExpensesPage() {
     if (firstRenderRef.current) {
       firstRenderRef.current = false;
     } else {
-      console.log(income);
       if (savings <= incomePercent(income) && !hasShownSavingsAlert) {
         setAlertVisible(true);
         setHasShownSavingsAlert(true);
@@ -158,7 +180,6 @@ export default function ExpensesPage() {
       .eq("email", user?.user_metadata?.email);
 
     setUserExpenses(updatedArray);
-
     setExpense({
       expenseId: uuid.v4(),
       expenseName: "",
@@ -205,7 +226,6 @@ export default function ExpensesPage() {
         .update({ expenses: updatedArray, savings: updatedSavings })
         .eq("email", user?.user_metadata?.email);
 
-
       setUserExpenses(updatedArray);
       setSavings(updatedSavings);
 
@@ -237,10 +257,6 @@ export default function ExpensesPage() {
     );
   }, [userExpenses, filters, activeTab, month, year]);
 
-  const handleScroll = (event) => {
-    const { contentOffset } = event.nativeEvent;
-    setScrollToTop(Math.floor(contentOffset.y) < 20);
-  };
 
   return (
     <View className="px-5 flex-1">
@@ -255,12 +271,10 @@ export default function ExpensesPage() {
       />
       <SafeAreaView className="h-full">
 
-        {scrollToTop && (
-          <ExpenseAddButton setShowModal={setShowModal} animation={"lightSpeedIn"} />
-        )}
-        {!scrollToTop && (
-          <ExpenseAddButton setShowModal={setShowModal} animation={"lightSpeedOut"} />
-        )}
+        <>
+          <ExpenseAddButton setShowModal={setShowModal} />
+        </>
+
 
         <View>
           <ExpenseHeader
@@ -286,18 +300,39 @@ export default function ExpensesPage() {
           <FlatList
             data={filteredExpenses}
             keyExtractor={(item) => item.expenseId}
-            scrollEventThrottle={16}
-            renderItem={({ item, index }) => (
-              <ExpenseItem
-                handleExpenseDetail={handleExpenseDetail}
-                item={item}
-                isLast={index === filteredExpenses.length - 1}
-              />
-            )}
-            onScroll={handleScroll}
+            renderItem={({ item, index }) => {
+              const itemAnimation =
+                index < 7 ? animations[index] || new Animated.Value(1) : new Animated.Value(1);
+
+              const animatedStyle = index < 7
+                ? {
+                  opacity: itemAnimation,
+                  transform: [
+                    {
+                      translateY: itemAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0],
+                      }),
+                    },
+                  ],
+                }
+                : {};
+
+              return (
+                <Animated.View style={animatedStyle}>
+                  <ExpenseItem
+                    handleExpenseDetail={handleExpenseDetail}
+                    item={item}
+                    isLast={index === filteredExpenses.length - 1}
+                  />
+                </Animated.View>
+              );
+            }}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={<NoDataLoad filters={filters} />}
+            contentContainerStyle={{ paddingBottom: 50 }}
           />
+
         )}
 
         {selectedExpense && (

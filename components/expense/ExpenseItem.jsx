@@ -10,7 +10,7 @@ const ExpenseItem = ({ handleExpenseDetail, item, isLast }) => {
     return (
         <TouchableOpacity onPress={() => handleExpenseDetail(item)}>
             <View
-                className={`rounded-3xl px-6 py-5 my-2 ${isLast ? 'mb-32' : ''}`}
+                className={`rounded-3xl px-6 py-5 ${isLast ? 'mb-32' : 'mb-3'}`} // Apply mb-32 only if it's the last item
                 style={{ backgroundColor: colors.inputBg }}
             >
                 <View className="flex-row justify-between mb-2">
