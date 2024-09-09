@@ -27,6 +27,7 @@ import AlertScreen from "../../screens/AlertScreen"
 import { incomePercent, Notification, numberWithCommas } from "../utils";
 import ExpenseTypePicker from "../../components/expense/ExpenseTypePicker";
 import CategoryPicker from "../../components/modals/CategoryPicker";
+import * as Animatable from "react-native-animatable";
 
 export default function ExpensesPage() {
   const { user } = useUser();
@@ -56,6 +57,8 @@ export default function ExpensesPage() {
   const [activeTab, setActiveTab] = useState("Non-Recurring");
   const [alertVisible, setAlertVisible] = useState();
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
+  const flatListRef = useRef();
+  const [scrollToTop, setScrollToTop] = useState(true);
 
   const [filters, setFilters] = useState({
     date: "",
@@ -241,6 +244,10 @@ export default function ExpensesPage() {
     );
   }, [userExpenses, filters, activeTab, month, year]);
 
+  const handleScroll = (event) => {
+    const { contentOffset } = event.nativeEvent;
+    setScrollToTop(Math.floor(contentOffset.y) < 20);
+  };
 
   return (
     <View className="px-5 flex-1">
@@ -254,12 +261,39 @@ export default function ExpensesPage() {
         }}
       />
       <SafeAreaView className="h-full">
-        <Pressable
-          onPress={() => setShowModal("addExpense")}
-          className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
-        >
-          <Ionicons name="add" size={40} color="white" />
-        </Pressable>
+        {scrollToTop && (
+          <Animatable.View
+            className="absolute right-1 z-10 h-full"
+            animation="lightSpeedIn"
+            duration={500}
+            delay={200}
+          >
+            <Pressable
+              onPress={() => setShowModal("addExpense")}
+              className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
+            >
+              <Ionicons name="add" size={40} color="white" />
+            </Pressable>
+          </Animatable.View>
+        )}
+        {!scrollToTop && (
+          <Animatable.View
+            className="absolute right-1  z-10 h-full"
+            animation="lightSpeedOut"
+            duration={500}
+            delay={100}
+          >
+            <Pressable
+              onPress={() => setShowModal("addExpense")}
+              className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
+              animation="lightSpeedIn"
+              duration={500}
+              delay={200}
+            >
+              <Ionicons name="add" size={40} color="white" />
+            </Pressable>
+          </Animatable.View>
+        )}
         <View className="w-full mt-4">
           <View>
             <View className="flex-row justify-between items-center mb-4">
@@ -391,7 +425,9 @@ export default function ExpensesPage() {
                 item={item}
               />
             )}
+            onScroll={handleScroll}
             ListEmptyComponent={<NoDataLoad filters={filters} />}
+            className="mb-20"
           />
         )}
 
