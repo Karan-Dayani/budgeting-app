@@ -1,33 +1,29 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { Menu } from "native-base";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   FlatList,
   Modal,
-  Pressable,
   SafeAreaView,
-  View,
+  View
 } from "react-native";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import uuid from "react-native-uuid";
-import CustomText from "../../components/CustomText";
+import ExpenseAddButton from "../../components/expense/ExpenseAddButton";
+import ExpenseHeader from "../../components/expense/ExpenseHeader";
 import ExpenseItem from "../../components/expense/ExpenseItem";
 import { useUser } from "../../components/globalState/UserContext";
 import AddExpenseModal from "../../components/modals/AddExpenseModal";
+import CategoryPicker from "../../components/modals/CategoryPicker";
 import CustomAlert from "../../components/modals/CustomAlert";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import MonthPicker from "../../components/modals/MonthPicker";
 import { supabase } from "../../lib/supabase";
+import AlertScreen from "../../screens/AlertScreen";
 import NoDataLoad from "../../screens/NoDataLoad";
-import AlertScreen from "../../screens/AlertScreen"
-import { incomePercent, Notification, numberWithCommas } from "../utils";
-import ExpenseTypePicker from "../../components/expense/ExpenseTypePicker";
-import CategoryPicker from "../../components/modals/CategoryPicker";
-import * as Animatable from "react-native-animatable";
+import { incomePercent, Notification } from "../utils";
 
 export default function ExpensesPage() {
   const { user } = useUser();
@@ -74,7 +70,6 @@ export default function ExpensesPage() {
     setFilters({ ...filters, "date": new Date(date).toDateString().slice(4) });
     hideDatePicker();
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -180,8 +175,6 @@ export default function ExpensesPage() {
   };
 
 
-
-
   const handleDeleteExpense = async () => {
     try {
       const { data, error } = await supabase
@@ -253,7 +246,7 @@ export default function ExpensesPage() {
     <View className="px-5 flex-1">
       <Stack.Screen
         options={{
-          headerShown: true,
+          headerShown: false,
           headerShadowVisible: false,
           headerTitle: "",
           headerTitleStyle: { color: colors.text, fontSize: 25 },
@@ -261,151 +254,25 @@ export default function ExpensesPage() {
         }}
       />
       <SafeAreaView className="h-full">
+
         {scrollToTop && (
-          <Animatable.View
-            className="absolute right-1 z-10 h-full"
-            animation="lightSpeedIn"
-            duration={500}
-            delay={200}
-          >
-            <Pressable
-              onPress={() => setShowModal("addExpense")}
-              className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
-            >
-              <Ionicons name="add" size={40} color="white" />
-            </Pressable>
-          </Animatable.View>
+          <ExpenseAddButton setShowModal={setShowModal} animation={"lightSpeedIn"} />
         )}
         {!scrollToTop && (
-          <Animatable.View
-            className="absolute right-1  z-10 h-full"
-            animation="lightSpeedOut"
-            duration={500}
-            delay={100}
-          >
-            <Pressable
-              onPress={() => setShowModal("addExpense")}
-              className="bg-[#41B3A2] p-3 rounded-full absolute right-2 bottom-32 z-10"
-              animation="lightSpeedIn"
-              duration={500}
-              delay={200}
-            >
-              <Ionicons name="add" size={40} color="white" />
-            </Pressable>
-          </Animatable.View>
+          <ExpenseAddButton setShowModal={setShowModal} animation={"lightSpeedOut"} />
         )}
-        <View className="w-full mt-4">
-          <View>
-            <View className="flex-row justify-between items-center mb-4">
-              <View>
-                <CustomText className={`text-xl ml-1`} style={{ color: colors.text }}>
-                  {filters?.date
-                    ? filters.date
-                    : filters?.month
-                      ? filters.month
-                      : filters?.category
-                        ? filters.category
-                        : "All Expenses"}
-                </CustomText>
-                <CustomText className={`px-1`} style={{ color: colors.text }}>
-                  Total Expense: {numberWithCommas(filteredExpenses.reduce((sum, expense) => sum + expense.expenseAmount, 0))}
-                </CustomText>
-              </View>
-              <View className="flex-row gap-x-3">
-                {filters?.date || filters?.month || filters?.category ? (
-                  <Pressable
-                    onPress={() => {
-                      setFilters({
-                        date: "",
-                        month: "",
-                        category: "",
-                      })
-                      setDatePickerVisibility(false);
-                    }}
-                    className="bg-red-500 px-5 py-3 rounded-3xl justify-center "
-                  >
-                    <CustomText className="text-white text-lg mx-2">
-                      Reset
-                    </CustomText>
-                  </Pressable>
-                ) : (
-                  <Menu
-                    w="160"
-                    marginRight={5}
-                    backgroundColor={colors.inputBg}
-                    rounded="3xl"
-                    trigger={(triggerProps) => {
-                      return (
-                        <Pressable
-                          accessibilityLabel="More options menu"
-                          {...triggerProps}
-                        >
-                          <View
-                            className="flex-row items-center rounded-3xl p-3"
-                            style={{ backgroundColor: colors.inputBg }}
-                          >
-                            <Ionicons
-                              name="filter"
-                              size={20}
-                              color={colors.text}
-                            />
-                            <CustomText
-                              className="text-lg mx-2"
-                              style={{ color: colors.text }}
-                            >
-                              Filter
-                            </CustomText>
-                          </View>
-                        </Pressable>
-                      );
-                    }}
-                  >
-                    <Menu.Item
-                      _text={{
-                        color: colors.text,
-                        fontSize: "lg",
-                        paddingBottom: 2,
-                      }}
-                      onPress={() => setDatePickerVisibility(true)}
-                    >
-                      Date
-                    </Menu.Item>
-                    <Menu.Item
-                      _text={{
-                        color: colors.text,
-                        fontSize: "lg",
-                        paddingBottom: 2,
-                      }}
-                      onPress={() => setShowModal("monthModal")}
-                    >
-                      Month
-                    </Menu.Item>
-                    <Menu.Item
-                      _text={{
-                        color: colors.text,
-                        fontSize: "lg",
-                        paddingBottom: 2,
-                      }}
-                      onPress={() => setShowModal("categoryModal")}
-                    >
-                      Category
-                    </Menu.Item>
-                  </Menu>
-                )}
-              </View>
-            </View>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleConfirm}
-              onCancel={() => setDatePickerVisibility(false)}
-            />
-          </View>
-        </View>
+
         <View>
-          <ExpenseTypePicker
-            setActiveTab={setActiveTab}
+          <ExpenseHeader
+            filters={filters}
+            setFilters={setFilters}
+            setDatePickerVisibility={setDatePickerVisibility}
+            setShowModal={setShowModal}
+            handleConfirm={handleConfirm}
             activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isDatePickerVisible={isDatePickerVisible}
+            filteredExpenses={filteredExpenses}
           />
         </View>
 
@@ -419,15 +286,17 @@ export default function ExpensesPage() {
           <FlatList
             data={filteredExpenses}
             keyExtractor={(item) => item.expenseId}
-            renderItem={({ item }) => (
+            scrollEventThrottle={16}
+            renderItem={({ item, index }) => (
               <ExpenseItem
                 handleExpenseDetail={handleExpenseDetail}
                 item={item}
+                isLast={index === filteredExpenses.length - 1}
               />
             )}
             onScroll={handleScroll}
+            showsVerticalScrollIndicator={false}
             ListEmptyComponent={<NoDataLoad filters={filters} />}
-            className="mb-20"
           />
         )}
 
