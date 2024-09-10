@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   TextInput,
@@ -6,6 +6,8 @@ import {
   Alert,
   Modal,
   FlatList,
+  Animated,
+  Dimensions,
 } from "react-native";
 import {
   Entypo,
@@ -48,6 +50,20 @@ const AddExpenseModal = ({
   const [addExpenseModals, setAddExpenseModals] = useState(null);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
+  const screenWidth = Dimensions.get('window').width
+
+
+  const slideAnim = useRef(new Animated.Value(0)).current
+  const tabWidth = (screenWidth) / 2
+
+  useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: formType === "Recurring" ? tabWidth : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start()
+  }, [formType])
+
   const handleKeyPress = (key) => {
     if (key === "backspace") {
       setAmount((prev) => prev.slice(0, -1));
@@ -86,24 +102,31 @@ const AddExpenseModal = ({
         Add Expense
       </CustomText>
       <View
-        className="rounded-t-3xl"
         style={{ backgroundColor: colors.expenseForm, paddingBottom: 20 }}
       >
         {/* Amount TextInput */}
         <View
-          className="flex-row rounded-t-3xl"
-          style={{ backgroundColor: colors.expenseAmount }}
+          className="flex-row relative"
+          style={{ backgroundColor: colors.expenseForm }}
         >
+          <Animated.View
+            style={{
+              position: "absolute",
+              left: 0,
+              height: "100%",
+              width: tabWidth,
+              backgroundColor: "#57A6A1",
+              transform: [{ translateX: slideAnim }],
+            }}
+          />
+
           <Pressable
             className="flex-1 p-3 rounded-tl-3xl"
             onPress={() => {
               setFormType("Non-Recurring");
               handleExpenseChange("expenseType", "Non-Recurring");
             }}
-            style={{
-              backgroundColor:
-                formType === "Non-Recurring" ? "#57A6A1" : colors.inputBg,
-            }}
+            style={{ zIndex: 1 }}
           >
             <CustomText
               style={{ color: colors.text }}
@@ -119,10 +142,7 @@ const AddExpenseModal = ({
               setFormType("Recurring");
               handleExpenseChange("expenseType", "Recurring");
             }}
-            style={{
-              backgroundColor:
-                formType === "Recurring" ? "#57A6A1" : colors.inputBg,
-            }}
+            style={{ zIndex: 1 }}
           >
             <CustomText
               style={{ color: colors.text }}
