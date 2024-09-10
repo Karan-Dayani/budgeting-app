@@ -241,21 +241,33 @@ export default function ExpensesPage() {
     }
   };
 
-
   const filteredExpenses = useMemo(() => {
-    return userExpenses.filter(
-      (expense) =>
-        ((filters.date === "" &&
-          filters.month === "" &&
-          filters.category === "" &&
-          expense.expenseDate.includes(month) &&
-          expense.expenseDate.includes(year)) ||
-          expense.expenseDate === filters.date ||
-          expense.expenseCategory === filters.category ||
-          expense.expenseDate.slice(0, 3) === filters.month.slice(0, 3)) &&
-        expense.expenseType === activeTab
-    );
+    return userExpenses.filter((expense) => {
+
+      if (activeTab === "Non-Recurring") {
+        return (
+          ((filters.date === "" && filters.month === "" && filters.category === "" && expense.expenseDate.includes(month) && expense.expenseDate.includes(year)) ||
+            expense.expenseDate === filters.date ||
+            expense.expenseCategory === filters.category ||
+            expense.expenseDate.slice(0, 3) === filters.month.slice(0, 3)) &&
+          expense.expenseType === activeTab
+        );
+      }
+
+      if (activeTab === "Recurring") {
+        return (
+          ((filters.date === "" && filters.month === "" && filters.category === "") ||
+            expense.expenseDate === filters.date ||
+            expense.expenseCategory === filters.category ||
+            expense.expenseDate.slice(0, 3) === filters.month.slice(0, 3)) &&
+          expense.expenseType === activeTab
+        );
+      }
+
+      return false;
+    });
   }, [userExpenses, filters, activeTab, month, year]);
+
 
 
   return (
