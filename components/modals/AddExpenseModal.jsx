@@ -23,9 +23,8 @@ const AddExpenseModal = ({
   expense,
   handleExpenseChange,
   handleSaveExpense,
-  setShowModal
+  setShowModal,
 }) => {
-
   const PaymentModeData = [
     { label: "Cash", value: "Cash", icon: "cash-outline" },
     { label: "Online", value: "Online", icon: "globe-outline" },
@@ -50,19 +49,18 @@ const AddExpenseModal = ({
   const [addExpenseModals, setAddExpenseModals] = useState(null);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
-  const screenWidth = Dimensions.get('window').width
+  const screenWidth = Dimensions.get("window").width;
 
-
-  const slideAnim = useRef(new Animated.Value(0)).current
-  const tabWidth = (screenWidth) / 2
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const tabWidth = screenWidth / 2;
 
   useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: formType === "Recurring" ? tabWidth : 0,
       duration: 200,
       useNativeDriver: true,
-    }).start()
-  }, [formType])
+    }).start();
+  }, [formType]);
 
   const handleKeyPress = (key) => {
     if (key === "backspace") {
@@ -101,9 +99,7 @@ const AddExpenseModal = ({
       >
         Add Expense
       </CustomText>
-      <View
-        style={{ backgroundColor: colors.expenseForm, paddingBottom: 20 }}
-      >
+      <View style={{ backgroundColor: colors.expenseForm, paddingBottom: 20 }}>
         {/* Amount TextInput */}
         <View
           className="flex-row relative"
@@ -141,6 +137,7 @@ const AddExpenseModal = ({
             onPress={() => {
               setFormType("Recurring");
               handleExpenseChange("expenseType", "Recurring");
+              handleExpenseChange("times", 1);
             }}
             style={{ zIndex: 1 }}
           >

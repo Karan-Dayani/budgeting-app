@@ -8,13 +8,9 @@ import {
   Dimensions,
   ScrollView,
   StatusBar,
-  View
+  View,
 } from "react-native";
-import {
-  BarChart,
-  LineChart,
-  PieChart
-} from "react-native-chart-kit";
+import { BarChart, LineChart, PieChart } from "react-native-chart-kit";
 import CircularProgress from "react-native-circular-progress-indicator";
 import AnimatedHeader from "../../components/AnimatedHeader";
 import CustomText from "../../components/CustomText";
@@ -49,21 +45,24 @@ export default function Home() {
     }).start();
   }, []);
 
-
   const getUserRow = async () => {
     const { data, error } = await supabase
       .from("User Data")
       .select("*")
       .eq("email", user?.user_metadata?.email);
-    setUserData(data)
+    setUserData(data);
+
+    let barData = data[0]?.expenses.filter(
+      (expense) => expense.expenseType === "Non-Recurring"
+    );
 
     if (data?.length > 0) {
-      processExpenses(data[0]?.expenses);
+      processExpenses(barData);
     }
   };
 
   useEffect(() => {
-    getUserRow()
+    getUserRow();
 
     const timer = setTimeout(() => {
       setLoading(false);
@@ -89,41 +88,49 @@ export default function Home() {
   const blackBarOpacity = scrollY.interpolate({
     inputRange: [0, 65],
     outputRange: [0, 1],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   const processExpenses = (expenses) => {
-
     const months = Array(12).fill(0);
 
     const monthMap = {
-      January: 0, Jan: 0,
-      February: 1, Feb: 1,
-      March: 2, Mar: 2,
-      April: 3, Apr: 3,
+      January: 0,
+      Jan: 0,
+      February: 1,
+      Feb: 1,
+      March: 2,
+      Mar: 2,
+      April: 3,
+      Apr: 3,
       May: 4,
-      June: 5, Jun: 5,
-      July: 6, Jul: 6,
-      August: 7, Aug: 7,
-      September: 8, Sep: 8,
-      October: 9, Oct: 9,
-      November: 10, Nov: 10,
-      December: 11, Dec: 11,
+      June: 5,
+      Jun: 5,
+      July: 6,
+      Jul: 6,
+      August: 7,
+      Aug: 7,
+      September: 8,
+      Sep: 8,
+      October: 9,
+      Oct: 9,
+      November: 10,
+      Nov: 10,
+      December: 11,
+      Dec: 11,
     };
 
     expenses.forEach((expense) => {
       let date;
       if (typeof expense.expenseDate === "string") {
-
         const parts = expense.expenseDate.split(" ");
         const [monthStr, day, year] = parts;
 
-
-        const normalizedMonthStr = monthStr.charAt(0).toUpperCase() + monthStr.slice(1).toLowerCase();
+        const normalizedMonthStr =
+          monthStr.charAt(0).toUpperCase() + monthStr.slice(1).toLowerCase();
         const month = monthMap[normalizedMonthStr];
 
         if (month !== undefined) {
-
           date = new Date(year, month, day);
         }
       }
@@ -132,12 +139,11 @@ export default function Home() {
         const month = date.getMonth();
         months[month] += expense.expenseAmount;
       } else {
-        console.log('Invalid date:', expense.expenseDate);
+        console.log("Invalid date:", expense.expenseDate);
       }
     });
 
     const currentMonth = new Date().getMonth();
-
 
     const lastFourMonths = [
       (currentMonth - 3 + 12) % 12,
@@ -146,7 +152,9 @@ export default function Home() {
       currentMonth,
     ];
 
-    const monthlyExpenses = lastFourMonths.map(monthIndex => Math.round(months[monthIndex]));
+    const monthlyExpenses = lastFourMonths.map((monthIndex) =>
+      Math.round(months[monthIndex])
+    );
     setMonthlyExpenses(monthlyExpenses);
   };
 
@@ -164,10 +172,21 @@ export default function Home() {
     fillShadowGradientOpacity: 0.7,
   };
 
-
-
   const generateLabels = () => {
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
 
     const currentMonth = new Date().getMonth();
 
@@ -192,7 +211,6 @@ export default function Home() {
     ],
   };
 
-
   return (
     <View className="flex-1">
       <Stack.Screen
@@ -213,7 +231,7 @@ export default function Home() {
 
       <Animated.View
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
@@ -232,9 +250,7 @@ export default function Home() {
         scrollEventThrottle={16}
       >
         {/* Animated Header */}
-        <Animated.View
-
-        >
+        <Animated.View>
           <AnimatedHeader
             toggleMenu={toggleMenu}
             handleLogOut={handleLogOut}
@@ -250,10 +266,27 @@ export default function Home() {
           {/* Content sections */}
           {loading ? (
             <>
-              <Skeleton h="100px" mb="1" rounded="20px" startColor="coolGray.300" />
+              <Skeleton
+                h="100px"
+                mb="1"
+                rounded="20px"
+                startColor="coolGray.300"
+              />
               <View className="flex-row justify-between">
-                <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
-                <Skeleton h="100px" w="156px" my="1" rounded="20px" startColor="coolGray.300" />
+                <Skeleton
+                  h="100px"
+                  w="156px"
+                  my="1"
+                  rounded="20px"
+                  startColor="coolGray.300"
+                />
+                <Skeleton
+                  h="100px"
+                  w="156px"
+                  my="1"
+                  rounded="20px"
+                  startColor="coolGray.300"
+                />
               </View>
             </>
           ) : (
@@ -271,15 +304,24 @@ export default function Home() {
             transform: [{ translateY }],
           }}
         >
-
           <View className="w-full items-center">
-
             {loading ? (
-              <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
+              <Skeleton
+                h="250px"
+                my="1"
+                rounded="3xl"
+                startColor="coolGray.300"
+              />
             ) : (
               <>
-                <View className="w-full p-5 rounded-3xl mt-3 h-[22rem]" style={{ backgroundColor: colors.chartBg }}>
-                  <CustomText className="text-2xl mb-8" style={{ color: colors.text }} >
+                <View
+                  className="w-full p-5 rounded-3xl mt-3 h-[22rem]"
+                  style={{ backgroundColor: colors.chartBg }}
+                >
+                  <CustomText
+                    className="text-2xl mb-8"
+                    style={{ color: colors.text }}
+                  >
                     Monthly Expense Chart
                   </CustomText>
                   <View className="items-center justify-center">
@@ -306,63 +348,92 @@ export default function Home() {
             transform: [{ translateY }],
           }}
         >
-
           {/* History */}
           {loading ? (
-            <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
+            <Skeleton
+              h="250px"
+              my="1"
+              rounded="3xl"
+              startColor="coolGray.300"
+            />
           ) : (
-            <View className="rounded-3xl justify-center p-3 mt-3" style={{ backgroundColor: colors.chartBg }}>
+            <View
+              className="rounded-3xl justify-center p-3 mt-3"
+              style={{ backgroundColor: colors.chartBg }}
+            >
               <View className="items-center justify-between flex-row mb-4 px-2 py-2 shadow-2xl">
                 <CustomText className="text-2xl" style={{ color: colors.text }}>
                   History
                 </CustomText>
 
                 <AntDesign name="right" size={14} color={colors.text} />
-
               </View>
               <View className="mx-1 mb-2">
-                {historyExpense?.length > 0
-                  ?
+                {historyExpense?.length > 0 ? (
                   historyExpense?.map((item, index) => (
-                    <View key={index} className="mb-3 p-4 rounded-3xl" style={{ backgroundColor: colors.homeCardItem }}>
+                    <View
+                      key={index}
+                      className="mb-3 p-4 rounded-3xl"
+                      style={{ backgroundColor: colors.homeCardItem }}
+                    >
                       <View className="flex-row justify-between">
-                        <CustomText className=" text-lg" style={{ color: colors.text }}>
+                        <CustomText
+                          className=" text-lg"
+                          style={{ color: colors.text }}
+                        >
                           {item.expenseName}
                         </CustomText>
                         <CustomText className="text-red-500 text-lg">
                           - ₹{item.expenseAmount}
                         </CustomText>
                       </View>
-                      <CustomText className="text-gray-400">{item.expenseDate}</CustomText>
+                      <CustomText className="text-gray-400">
+                        {item.expenseDate}
+                      </CustomText>
                     </View>
-
                   ))
-                  :
-                  <CustomText className="text-white text-xl">No Expense added till yet</CustomText>
-                }
+                ) : (
+                  <CustomText className="text-white text-xl">
+                    No Expense added till yet
+                  </CustomText>
+                )}
               </View>
             </View>
           )}
 
-
           {/* Goals */}
           {loading ? (
-            <Skeleton h="250px" my="1" rounded="3xl" startColor="coolGray.300" />
+            <Skeleton
+              h="250px"
+              my="1"
+              rounded="3xl"
+              startColor="coolGray.300"
+            />
           ) : (
-            <View className="rounded-3xl  justify-center p-3 mt-3 mb-32" style={{ backgroundColor: colors.chartBg }}>
-              <View className="items-center justify-between flex-row mb-4 px-2 py-2" >
+            <View
+              className="rounded-3xl  justify-center p-3 mt-3 mb-32"
+              style={{ backgroundColor: colors.chartBg }}
+            >
+              <View className="items-center justify-between flex-row mb-4 px-2 py-2">
                 <CustomText className="text-2xl" style={{ color: colors.text }}>
                   Goals
                 </CustomText>
-                <AntDesign name="right" size={14} color="white" style={{ marginRight: 10 }} />
+                <AntDesign
+                  name="right"
+                  size={14}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
               </View>
               <View className="mx-2 mb-2">
-                {historyGoal?.length > 0
-                  ?
+                {historyGoal?.length > 0 ? (
                   historyGoal?.map((item, i) => {
-
                     return (
-                      <View key={i} className="mb-3 p-4 rounded-3xl bg-gray-700 " style={{ backgroundColor: colors.homeCardItem }}>
+                      <View
+                        key={i}
+                        className="mb-3 p-4 rounded-3xl bg-gray-700 "
+                        style={{ backgroundColor: colors.homeCardItem }}
+                      >
                         <View className="flex-row justify-between">
                           <View className="justify-center">
                             <CustomText
@@ -375,16 +446,15 @@ export default function Home() {
                               className="text-md mt-2 "
                               style={{ color: colors.text }}
                             >
-                              ₹{numberWithCommas(Number(item.goalSavedMoney))}{" "}
-                              / ₹
-                              {numberWithCommas(Number(item.goalTargetMoney))}
+                              ₹{numberWithCommas(Number(item.goalSavedMoney))} /
+                              ₹{numberWithCommas(Number(item.goalTargetMoney))}
                             </CustomText>
                           </View>
                           <View className="">
                             <CircularProgress
                               value={Math.round(
                                 (item.goalSavedMoney / item.goalTargetMoney) *
-                                100
+                                  100
                               )}
                               radius={35}
                               valueSuffix={"%"}
@@ -394,9 +464,11 @@ export default function Home() {
                       </View>
                     );
                   })
-                  :
-                  <CustomText className="text-white text-xl">No Goals added till yet</CustomText>
-                }
+                ) : (
+                  <CustomText className="text-white text-xl">
+                    No Goals added till yet
+                  </CustomText>
+                )}
               </View>
             </View>
           )}
