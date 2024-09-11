@@ -128,11 +128,11 @@ export default function ExpensesPage() {
       firstRenderRef.current = false;
     } else {
       if (savings <= incomePercent(income) && !hasShownSavingsAlert) {
-        setAlertVisible(true);
+        setAlertVisible("lowSavings");
         setHasShownSavingsAlert(true);
       }
     }
-  }, [savings, income]);
+  }, [savings, income, expense]);
 
   const handleExpenseChange = (fieldName, value) => {
     setExpense((prevData) => ({ ...prevData, [fieldName]: value }));
@@ -149,6 +149,7 @@ export default function ExpensesPage() {
   };
 
   const handleSaveExpense = async () => {
+
     if (savings <= Number(incomePercent(income)) && !hasShownSavingsAlert) {
       setAlertVisible("lowSavings");
       setHasShownSavingsAlert(true);

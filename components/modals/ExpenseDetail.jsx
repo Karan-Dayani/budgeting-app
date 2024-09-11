@@ -17,25 +17,21 @@ const ExpenseDetail = ({
             <View className="rounded-3xl p-8 w-10/12 shadow-lg" style={{ backgroundColor: "#31363F" }}>
                 <CustomText
                     className="text-white text-3xl mb-2"
-
                 >
                     {selectedExpense?.expenseName}
                 </CustomText>
                 <CustomText
                     className="text-yellow-400 text-2xl mb-2"
-
                 >
                     ₹{numberWithCommas(selectedExpense?.expenseAmount)}
                 </CustomText>
                 <CustomText
                     className="text-gray-400 text-xl mb-2"
-
                 >
                     Date: {selectedExpense?.expenseDate}
                 </CustomText>
                 <CustomText
                     className="text-gray-400 text-xl mb-4"
-
                 >
                     Payment Mode: {selectedExpense?.paymentMode}
                 </CustomText>
@@ -45,7 +41,6 @@ const ExpenseDetail = ({
                 >
                     <CustomText
                         className="text-white text-center text-lg"
-
                     >
                         Delete
                     </CustomText>
@@ -56,7 +51,6 @@ const ExpenseDetail = ({
                 >
                     <CustomText
                         className="text-white text-center text-lg"
-
                     >
                         Close
                     </CustomText>
