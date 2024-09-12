@@ -1,8 +1,9 @@
-import { View, Text, TextInput, Pressable, Alert } from "react-native";
+import { View, Text, TextInput, Pressable, Alert, ActivityIndicator, ImageBackground, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack, router } from "expo-router";
-import { getUser } from "../api";
 import { supabase } from "../../lib/supabase";
+import CustomText from "../../components/CustomText";
+import { useTheme } from "@react-navigation/native";
 
 const Profile = () => {
   const [name, setName] = useState("");
@@ -10,6 +11,8 @@ const Profile = () => {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { colors } = useTheme()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -39,61 +42,74 @@ const Profile = () => {
 
   const handleSubmit = () => {
     addDetails();
-    router.replace("/(tabs)/");
+    router.replace("/(tabs)/Home");
   };
 
   return (
-    <View className="h-full justify-center px-5">
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-      />
-      <View className="bg-[#191A19] justify-center rounded-xl p-10 ">
-        <View className="">
-          <Text className="text-white text-xl" style={{ fontFamily: "Nunito" }}>
-            Username
-          </Text>
-          <TextInput
-            value={name}
-            onChangeText={(value) => setName(value)}
-            className="rounded-lg my-3 text-white p-2 bg-[#31363F]"
-            placeholderTextColor="white"
-            placeholder="Username"
-          />
-          <Text className="text-white text-xl" style={{ fontFamily: "Nunito" }}>
-            Your Monthly Income
-          </Text>
-          <TextInput
-            value={income}
-            onChangeText={(value) => setIncome(value)}
-            className="rounded-lg my-3 text-white p-2 bg-[#31363F]"
-            placeholderTextColor="white"
-            placeholder="0"
-            inputMode="numeric"
-            keyboardType="numeric"
-          />
-          {error ? (
-            <Text className="text-red-500 mt-2">{error}</Text>
-          ) : (
-            <Text className="text-gray-400 mt-2">
-              Please enter your monthly income. This helps us tailor your budget
-              and savings goals.
-            </Text>
-          )}
+    <ImageBackground
+      source={require("../../assets/images/CoinTrackLogin.png")}
+      style={{ flex: 1 }}
+    >
+      <View className="h-full justify-center px-5">
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+        />
+        <View className=" justify-center rounded-3xl p-10 " style={{ backgroundColor: colors.expenseForm }}>
+          <View className="justify-center items-center mb-10">
+            <Image
+              source={require("../../assets/images/UserDetails.png")}
+              className="w-64 h-64"
+            />
+          </View>
+          <View>
+            <CustomText className=" text-xl" style={{ color: colors.text }}>
+              Username
+            </CustomText>
+            <TextInput
+              value={name}
+              onChangeText={(value) => setName(value)}
+              className="rounded-2xl my-3  py-2 px-3 "
+              style={{ backgroundColor: colors.expenseInput, color: colors.text }}
+              placeholderTextColor="gray"
+              placeholder="Username"
+            />
+            <CustomText className=" text-xl" style={{ color: colors.text }} >
+              Your Monthly Income
+            </CustomText>
+            <TextInput
+              value={income}
+              onChangeText={(value) => setIncome(value)}
+              className="rounded-2xl my-3 text-white py-2 px-3"
+              style={{ backgroundColor: colors.expenseInput, color: colors.text }}
+              placeholderTextColor="gray"
+              placeholder="0"
+              inputMode="numeric"
+              keyboardType="numeric"
+            />
+            {error ? (
+              <CustomText className="text-red-500 mt-2">{error}</CustomText>
+            ) : (
+              <CustomText className="text-gray-400 mt-2">
+                Please enter your monthly income. This helps us tailor your budget
+                and savings goals.
+              </CustomText>
+            )}
+          </View>
+          <Pressable
+            className="p-3 bg-[#41B3A2] items-center rounded-2xl mt-5"
+            onPress={() => handleSubmit()}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <CustomText className="text-white text-lg">Submit</CustomText>
+            )}
+          </Pressable>
         </View>
-        <Pressable
-          className="p-3 bg-[#41B3A2] items-center rounded-lg mt-5"
-          onPress={() => handleSubmit()}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="text-white text-lg">Submit</Text>
-          )}
-        </Pressable>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 

@@ -52,7 +52,7 @@ export default function Home() {
       .eq("email", user?.user_metadata?.email);
     setUserData(data);
 
-    let barData = data[0]?.expenses.filter(
+    let barData = data[0]?.expenses?.filter(
       (expense) => expense.expenseType === "Non-Recurring"
     );
 
@@ -120,7 +120,7 @@ export default function Home() {
       Dec: 11,
     };
 
-    expenses.forEach((expense) => {
+    expenses?.forEach((expense) => {
       let date;
       if (typeof expense.expenseDate === "string") {
         const parts = expense.expenseDate.split(" ");
@@ -210,6 +210,9 @@ export default function Home() {
       },
     ],
   };
+
+
+  const checkDataLength = data?.datasets[0]?.data.filter((x) => x > 0).length
 
   return (
     <View className="flex-1">
@@ -324,17 +327,23 @@ export default function Home() {
                   >
                     Monthly Expense Chart
                   </CustomText>
-                  <View className="items-center justify-center">
-                    <BarChart
-                      data={data}
-                      width={Dimensions.get("window").width - 30}
-                      height={240}
-                      chartConfig={chartConfig}
-                      bezier
-                      style={{ paddingLeft: 60, paddingRight: 90 }}
-                      yAxisLabel="₹ "
-                      fromZero
-                    />
+                  <View className={`${checkDataLength > 0 ? "items-center justify-center" : "justify-center"}`}>
+                    {checkDataLength ?
+                      <BarChart
+                        data={data}
+                        width={Dimensions.get("window").width - 30}
+                        height={240}
+                        chartConfig={chartConfig}
+                        bezier
+                        style={{ paddingLeft: 60, paddingRight: 90 }}
+                        yAxisLabel="₹ "
+                        fromZero
+                      />
+                      :
+                      <CustomText className=" text-xl" style={{ color: colors.text }}>
+                        No Expense added till yet
+                      </CustomText>
+                    }
                   </View>
                 </View>
               </>
@@ -393,7 +402,7 @@ export default function Home() {
                     </View>
                   ))
                 ) : (
-                  <CustomText className="text-white text-xl">
+                  <CustomText className=" text-xl" style={{ color: colors.text }}>
                     No Expense added till yet
                   </CustomText>
                 )}
@@ -454,7 +463,7 @@ export default function Home() {
                             <CircularProgress
                               value={Math.round(
                                 (item.goalSavedMoney / item.goalTargetMoney) *
-                                  100
+                                100
                               )}
                               radius={35}
                               valueSuffix={"%"}
@@ -465,7 +474,7 @@ export default function Home() {
                     );
                   })
                 ) : (
-                  <CustomText className="text-white text-xl">
+                  <CustomText className=" text-xl" style={{ color: colors.text }}>
                     No Goals added till yet
                   </CustomText>
                 )}

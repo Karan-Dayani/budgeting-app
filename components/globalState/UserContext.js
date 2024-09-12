@@ -16,8 +16,6 @@ export const UserProvider = ({ children }) => {
       } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
-      } else {
-        console.error("Error accessing user");
       }
       setLoading(false);
     };

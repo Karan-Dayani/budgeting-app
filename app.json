@@ -3,15 +3,15 @@
     "name": "budgeting-app",
     "slug": "budgeting-app",
     "version": "1.0.0",
-    "backgroundColor": "#191A19",
+    "backgroundColor": "#41B3A2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#191A19"
+      "image": "./assets/images/CointTrack.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#41B3A2"
     },
     "ios": {
       "supportsTablet": true

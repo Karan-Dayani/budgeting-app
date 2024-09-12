@@ -1,6 +1,6 @@
-import { View, Text } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Redirect, router } from "expo-router";
+import { View } from "react-native";
+import React, { useEffect } from "react";
+import { router } from "expo-router";
 import { supabase } from "../lib/supabase";
 import SplashScreenLoad from "../screens/splashScreenLoad";
 
@@ -10,7 +10,6 @@ const Index = () => {
       .from("User Data")
       .select("income")
       .eq("email", email);
-
     return data && data[0].income;
   };
 
@@ -28,6 +27,7 @@ const Index = () => {
           router.replace("/(auth)/login");
         }
       });
+
       supabase.auth.onAuthStateChange(async (_event, session) => {
         if (session) {
           const hasIncome = await checkUserIncome(session.user.email);
@@ -40,12 +40,16 @@ const Index = () => {
           router.replace("/(auth)/login");
         }
       });
-    }, 1500);
+    }, 2000);
 
     return () => clearTimeout(delay);
   }, []);
 
-  return <SplashScreenLoad />;
+  return (
+    <View style={{ flex: 1, backgroundColor: "#41B3A2" }}>
+      <SplashScreenLoad />
+    </View>
+  );
 };
 
 export default Index;

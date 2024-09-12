@@ -222,7 +222,7 @@ const TotalIncome = ({ user }) => {
             className="text-white text-3xl"
             style={{ fontFamily: "Red_Hat" }}
           >
-            ₹{expense}
+            ₹{expense || 0}
           </CustomText>
         </View>
       </View>
