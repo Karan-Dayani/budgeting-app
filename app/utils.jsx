@@ -10,11 +10,10 @@ export const getTotalExpense = (user) => {
   if (user[0]?.expenses?.length === 0) return 0;
 
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth(); // Get the current month (0-indexed)
-  const currentYear = currentDate.getFullYear(); // Get the current year
-  const currentDay = currentDate.getDate(); // Get the current day of the month
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  const currentDay = currentDate.getDate();
 
-  // Helper function to parse the custom "MMM DD YYYY" date format
   const parseExpenseDate = (expenseDate) => {
     const monthNames = [
       "Jan",
@@ -31,14 +30,13 @@ export const getTotalExpense = (user) => {
       "Dec",
     ];
     const [month, day, year] = expenseDate.split(" ");
-    const monthIndex = monthNames.indexOf(month); // Convert month name to month index (0-11)
+    const monthIndex = monthNames.indexOf(month);
     return { monthIndex, day: parseInt(day), year: parseInt(year) };
   };
 
   return user[0]?.expenses?.reduce((total, item) => {
     const { monthIndex, day, year } = parseExpenseDate(item.expenseDate);
 
-    // Non-recurring expenses for the current month and year
     if (
       item.expenseType === "Non-Recurring" &&
       monthIndex === currentMonth &&
@@ -47,9 +45,7 @@ export const getTotalExpense = (user) => {
       return total + item.expenseAmount;
     }
 
-    // Recurring expenses logic
     if (item.expenseType === "Recurring") {
-      // Recurring expenses should be counted only if today is the same day or after the recurring date in any month
       if (currentDay >= day) {
         return total + item.expenseAmount;
       }
