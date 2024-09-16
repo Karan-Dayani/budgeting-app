@@ -72,6 +72,7 @@ const AddExpenseModal = ({
     }
   };
 
+
   const handleSetAmount = () => {
     handleExpenseChange("expenseAmount", parseFloat(amount) || 0);
     setAddExpenseModals(null);
@@ -285,9 +286,11 @@ const AddExpenseModal = ({
                 style={{
                   backgroundColor: colors.expenseInput,
                   color: colors.text,
-                  fontFamily: "Poppins_SemiBold",
+                  fontFamily: "Noto_Sans",
                 }}
-                className="text-3xl text-center p-5 mb-4 rounded-xl"
+                placeholder="₹0"
+                placeholderTextColor="gray"
+                className="text-3xl text-right p-5 mb-4 rounded-xl"
               />
 
               {/* Custom Numeric Keyboard */}
@@ -296,7 +299,7 @@ const AddExpenseModal = ({
                   (key) => (
                     <Pressable
                       key={key}
-                      className=" p-4 m-1  justify-center items-center w-[30%]"
+                      className=" p-4 m-1  items-center w-[30%]"
                       onPress={() => handleKeyPress(key)}
                     >
                       <CustomText

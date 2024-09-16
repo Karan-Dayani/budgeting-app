@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
+  BackHandler,
   FlatList,
   Modal,
   SafeAreaView,
@@ -55,6 +56,29 @@ export default function ExpensesPage() {
   const [activeTab, setActiveTab] = useState("Non-Recurring");
   const [alertVisible, setAlertVisible] = useState();
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
+
+  const handleInputs = () => {
+    if (expense.expenseName || expense.expenseAmount || expense.paymentMode || expense.expenseCategory) {
+      setAlertVisible("discardInputs")
+    } else {
+      setShowModal(null)
+    }
+  }
+
+  const handleInputsField = () => {
+    setExpense({
+      expenseId: uuid.v4(),
+      expenseName: "",
+      expenseAmount: 0,
+      paymentMode: "",
+      expenseDate: new Date().toDateString().slice(4),
+      expenseCategory: "",
+      expenseType: "Non-Recurring",
+    });
+    setShowModal(null)
+    setAlertVisible(null)
+  }
+
 
   const [filters, setFilters] = useState({
     date: "",
@@ -269,7 +293,26 @@ export default function ExpensesPage() {
     });
   }, [userExpenses, filters, activeTab, month, year]);
 
-
+  const alertConfig = {
+    lowSavings: {
+      mainMessage: "Low Savings",
+      message: "Your savings are running low! It's time to cut back on expenses.",
+      alerts: true,
+      AlertScreen: AlertScreen,
+    },
+    exceedAmount: {
+      mainMessage: "Amount Exceeded",
+      message: "It seems your savings are insufficient to cover this expense. Please review your spending and adjust accordingly.",
+      alerts: true,
+      AlertScreen: AlertScreen,
+    },
+    discardInputs: {
+      mainMessage: "Discard data",
+      message: "Your Data will be discarded, Are you sure?",
+      alerts: false,
+      task: handleInputsField
+    }
+  };
 
   return (
     <View className="px-5 flex-1">
@@ -367,7 +410,7 @@ export default function ExpensesPage() {
           animationType="slide"
           transparent={true}
           visible={showModal === "addExpense"}
-          onRequestClose={() => setShowModal(null)}
+          onRequestClose={handleInputs}
         >
           <AddExpenseModal
             expense={expense}
@@ -404,23 +447,17 @@ export default function ExpensesPage() {
         </Modal>
 
         <View className="flex-1">
-          <CustomAlert
-            visible={alertVisible === "lowSavings"}
-            mainMessage="Low Savings"
-            message="Your savings are running low!, It's time to cut back on expenses."
-            onClose={() => setAlertVisible(null)}
-            AlertScreen={AlertScreen}
-          />
-        </View>
-
-        <View className="flex-1">
-          <CustomAlert
-            visible={alertVisible === "exceedAmount"}
-            mainMessage="Amount Exceeded"
-            message="It seems your savings are insufficient to cover this expense. Please review your spending and adjust accordingly."
-            onClose={() => setAlertVisible(null)}
-            AlertScreen={AlertScreen}
-          />
+          {alertVisible && (
+            <CustomAlert
+              visible={!!alertVisible}
+              mainMessage={alertConfig[alertVisible]?.mainMessage}
+              message={alertConfig[alertVisible]?.message}
+              onClose={() => setAlertVisible(null)}
+              alerts={alertConfig[alertVisible]?.alerts}
+              task={alertConfig[alertVisible]?.task}
+              AlertScreen={alertConfig[alertVisible]?.AlertScreen}
+            />
+          )}
         </View>
 
         <Notification

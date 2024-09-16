@@ -3,9 +3,8 @@ import React from 'react';
 import { View, Modal, TouchableOpacity } from 'react-native';
 import CustomText from '../CustomText';
 
-const CustomAlert = ({ visible, mainMessage, message, onClose, AlertScreen }) => {
+const CustomAlert = ({ visible, mainMessage, message, onClose, alerts, task, AlertScreen }) => {
     const { colors } = useTheme();
-
     return (
         <Modal
             transparent={true}
@@ -22,14 +21,30 @@ const CustomAlert = ({ visible, mainMessage, message, onClose, AlertScreen }) =>
                     <CustomText className="text-base mb-6 text-center" style={{ color: colors.text }}>
                         {message}
                     </CustomText>
-                    <TouchableOpacity
-                        className="bg-blue-600 p-4 rounded-full mt-2"
-                        onPress={onClose}
-                    >
-                        <CustomText className="text-white text-center  font-medium">
-                            Close
-                        </CustomText>
-                    </TouchableOpacity>
+                    <View className="flex-row gap-x-3">
+
+                        <TouchableOpacity
+                            className="bg-red-600 p-4 rounded-full mt-2 flex-1"
+                            onPress={onClose}
+                        >
+                            <CustomText className="text-white text-center text-md">
+                                Close
+                            </CustomText>
+                        </TouchableOpacity>
+                        {!alerts
+                            ?
+                            <TouchableOpacity
+                                className="bg-blue-600 p-4 rounded-full mt-2 flex-1"
+                                onPress={task}
+                            >
+                                <CustomText className="text-white text-center  text-md">
+                                    Yes
+                                </CustomText>
+                            </TouchableOpacity>
+                            :
+                            <></>
+                        }
+                    </View>
                 </View>
             </View>
         </Modal>
