@@ -1,7 +1,7 @@
 import { View, Pressable, Animated, Dimensions } from 'react-native'
 import React, { useEffect, useRef } from 'react'
-import { useTheme } from '@react-navigation/native'
 import CustomText from '../CustomText'
+import { useTheme } from 'native-base'
 
 const ExpenseTypePicker = ({ setActiveTab, activeTab }) => {
     const { colors } = useTheme()

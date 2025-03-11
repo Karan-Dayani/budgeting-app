@@ -1,11 +1,11 @@
-import { useIsFocused, useTheme } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import { Stack } from "expo-router";
+import { useTheme } from "native-base";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Animated,
-  BackHandler,
   FlatList,
   Modal,
   SafeAreaView,
@@ -27,6 +27,7 @@ import NoDataLoad from "../../screens/NoDataLoad";
 import { incomePercent, Notification } from "../utils";
 
 export default function ExpensesPage() {
+  const { colors } = useTheme();
   const { user } = useUser();
   const isFocused = useIsFocused();
 
@@ -86,7 +87,7 @@ export default function ExpensesPage() {
     category: "",
   });
 
-  const { colors } = useTheme();
+
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -315,23 +316,19 @@ export default function ExpensesPage() {
   };
 
   return (
-    <View className="px-5 flex-1">
+    <View className="px-5 flex-1" style={{
+      backgroundColor: colors.background
+    }}>
       <Stack.Screen
         options={{
           headerShown: false,
-          headerShadowVisible: false,
-          headerTitle: "",
-          headerTitleStyle: { color: colors.text, fontSize: 25 },
-          headerStyle: { backgroundColor: colors.header, height: 50 },
+
         }}
       />
       <SafeAreaView className="h-full">
-
         <>
           <ExpenseAddButton setShowModal={setShowModal} />
         </>
-
-
         <View>
           <ExpenseHeader
             filters={filters}
@@ -417,6 +414,7 @@ export default function ExpensesPage() {
             handleExpenseChange={handleExpenseChange}
             handleSaveExpense={handleSaveExpense}
             setShowModal={setShowModal}
+            colors={colors}
           />
         </Modal>
 

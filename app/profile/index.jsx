@@ -1,4 +1,4 @@
-import { useIsFocused, useTheme } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import { Link, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -22,6 +22,7 @@ import { shareAsync } from "expo-sharing";
 import { numberWithCommas } from "../utils";
 import AlertScreen from "../../screens/AlertScreen";
 import CustomAlert from "../../components/modals/CustomAlert";
+import { useTheme } from "native-base";
 
 const ProfilePage = () => {
   const { colors } = useTheme();
@@ -298,266 +299,270 @@ const ProfilePage = () => {
           </TouchableOpacity>
         </View>
       </View>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showModal === "profileModal"}
-        onRequestClose={() => {
-          setShowModal(null);
-        }}
-      >
-        <View
-          className="h-full justify-center px-10 "
-          style={{ backgroundColor: `${colors.background}dd` }}
-        >
-          <View className="bg-[#191A19] pb-8 justify-center rounded-2xl px-6 shadow-lg">
-            <View className="mt-5">
-              <CustomText className="text-white text-xl font-semibold">
-                Username
-              </CustomText>
-              <TextInput
-                className="rounded-full my-3 text-white p-4 bg-[#31363F] text-lg"
-                placeholderTextColor="white"
-                value={userName}
-                onChangeText={(text) => setUserName(text)}
-              />
-              <CustomText className="text-white text-xl font-semibold">
-                Monthly Income
-              </CustomText>
-              <TextInput
-                className="rounded-full my-3 text-white p-4 bg-[#31363F] text-lg"
-                placeholderTextColor="white"
-                value={String(income)}
-                onChangeText={(text) => setIncome(text)}
-                inputMode="numeric"
-                keyboardType="numeric"
-              />
-            </View>
-            <CustomText className="text-gray-400 text-sm mt-4 text-center">
-              Update your details by removing the old information and entering
-              the new data.
-            </CustomText>
-            <Pressable
-              className="p-4 bg-[#41B3A2] items-center rounded-full mt-6 shadow-md"
-              onPress={() => {
-                if (oldIncome !== income) {
-                  setShowModal("confirmModal");
-                } else {
-                  handleChangeSubmit();
-                }
-              }}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <CustomText className="text-white text-lg">Submit</CustomText>
-              )}
-            </Pressable>
-            <Pressable
-              className="p-4 bg-red-500 items-center rounded-full mt-4 shadow-md"
-              onPress={() => setShowModal(null)}
-            >
-              <CustomText className="text-white text-lg">Cancel</CustomText>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showModal === "confirmModal"}
-        onRequestClose={() => {
-          setShowModal(null);
-        }}
-      >
-        <View
-          className="flex-1 justify-center items-center"
-          style={{ backgroundColor: `${colors.background}dd` }}
+      <View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal === "profileModal"}
+          onRequestClose={() => {
+            setShowModal(null);
+          }}
         >
           <View
-            className="p-6 rounded-2xl w-4/5 shadow-lg"
-            style={{ backgroundColor: colors.inputBg }}
+            className="h-full justify-center px-10 "
+            style={{ backgroundColor: `${colors.background}dd` }}
           >
-            <CustomText
-              className="text-xl mt-4 font-semibold text-center"
-              style={{ color: colors.text }}
-            >
-              This will reset your data
-            </CustomText>
-            <CustomText
-              className="text-xl mb-4 font-semibold text-center"
-              style={{ color: colors.text }}
-            >
-              Are you sure you want to make this change?
-            </CustomText>
-            <View className="flex-row gap-3">
+            <View className="bg-[#191A19] pb-8 justify-center rounded-2xl px-6 shadow-lg">
+              <View className="mt-5">
+                <CustomText className="text-white text-xl font-semibold">
+                  Username
+                </CustomText>
+                <TextInput
+                  className="rounded-full my-3 text-white p-4 bg-[#31363F] text-lg"
+                  placeholderTextColor="white"
+                  value={userName}
+                  onChangeText={(text) => setUserName(text)}
+                />
+                <CustomText className="text-white text-xl font-semibold">
+                  Monthly Income
+                </CustomText>
+                <TextInput
+                  className="rounded-full my-3 text-white p-4 bg-[#31363F] text-lg"
+                  placeholderTextColor="white"
+                  value={String(income)}
+                  onChangeText={(text) => setIncome(text)}
+                  inputMode="numeric"
+                  keyboardType="numeric"
+                />
+              </View>
+              <CustomText className="text-gray-400 text-sm mt-4 text-center">
+                Update your details by removing the old information and entering
+                the new data.
+              </CustomText>
               <Pressable
-                className="flex-1 p-4 bg-red-500 items-center rounded-full shadow-md"
+                className="p-4 bg-[#41B3A2] items-center rounded-full mt-6 shadow-md"
                 onPress={() => {
-                  setShowModal(null);
+                  if (oldIncome !== income) {
+                    setShowModal("confirmModal");
+                  } else {
+                    handleChangeSubmit();
+                  }
                 }}
               >
-                <CustomText className="text-white text-lg">No</CustomText>
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <CustomText className="text-white text-lg">Submit</CustomText>
+                )}
               </Pressable>
               <Pressable
-                className="flex-1 p-4 bg-blue-500 items-center rounded-full shadow-md"
-                onPress={() => handleChangeSubmit()}
-              >
-                <CustomText className="text-white text-lg">Yes</CustomText>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showModal === "datePickerModal"}
-        onRequestClose={() => {
-          setShowModal(null);
-        }}
-      >
-        <View
-          className="flex-1 justify-center items-center bg-opacity-80"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
-        >
-          <View
-            className="rounded-3xl p-4 w-10/12 max-h-1/2"
-            style={{ backgroundColor: colors.expenseForm }}
-          >
-            <CustomText
-              className="text-xl text-center mb-4"
-              style={{ color: colors.text }}
-            >
-              Select Month & Year
-            </CustomText>
-            <View className="flex-row justify-between mb-4">
-              <View className=" gap-x-2 w-full flex-row">
-                <ScrollView
-                  style={{ maxHeight: 300 }}
-                  nestedScrollEnabled={true}
-                >
-                  {months.map((item, i) => (
-                    <View
-                      key={i}
-                      className="my-2 py-4 px-4 rounded-3xl"
-                      style={{
-                        backgroundColor: selectedMY.month === item ? "#41B3A2" : colors.expenseInput,
-                        color: colors.text
-                      }}
-                    >
-                      <Pressable
-                        onPress={() => {
-                          setSelectedMY({
-                            ...selectedMY,
-                            month: item
-                          })
-                        }}
-                      >
-                        <CustomText
-                          className="text-lg"
-                          style={{
-                            backgroundColor: selectedMY.month === item ? "#41B3A2" : colors.expenseInput,
-                            color: colors.text
-                          }}
-                        >
-                          {item}
-                        </CustomText>
-                      </Pressable>
-                    </View>
-                  ))}
-                </ScrollView>
-                <ScrollView
-                  style={{ maxHeight: 300 }}
-                  nestedScrollEnabled={true}
-                >
-                  {years.map((item, i) => (
-                    <View
-                      key={i}
-                      className="my-2 py-4 px-4 rounded-3xl"
-                      style={{
-                        backgroundColor: selectedMY.year === item ? "#41B3A2" : colors.expenseInput,
-                        color: colors.text
-                      }}
-                    >
-                      <Pressable
-                        onPress={() => {
-                          setSelectedMY({
-                            ...selectedMY,
-                            year: item
-                          })
-                        }}
-                      >
-                        <CustomText
-                          className="text-lg"
-                          style={{
-                            backgroundColor: selectedMY.year === item ? "#41B3A2" : colors.expenseInput,
-                            color: colors.text
-                          }}
-                        >
-                          {item}
-                        </CustomText>
-                      </Pressable>
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            </View>
-            <Pressable
-              className="bg-[#41B3A2] rounded-3xl p-4 items-center mt-3"
-              onPress={() => {
-                setShowModal(null)
-                generatePdf()
-              }}
-            >
-              <CustomText className="text-white">Confirm</CustomText>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showModal === "logOut"}
-        onRequestClose={() => {
-          setShowModal(null);
-        }}
-      >
-        <View
-          className="flex-1 justify-center items-center"
-          style={{ backgroundColor: `${colors.background}dd` }}
-        >
-          <View
-            className="p-6 rounded-2xl w-4/5 shadow-lg"
-            style={{ backgroundColor: colors.inputBg }}
-          >
-            <CustomText
-              className="text-xl mb-4 font-semibold text-center"
-              style={{ color: colors.text }}
-            >
-              Are you sure you want to log out?
-            </CustomText>
-            <View className="flex-row gap-3">
-              <Pressable
-                className="flex-1 p-4 bg-red-500 items-center rounded-full shadow-md"
+                className="p-4 bg-red-500 items-center rounded-full mt-4 shadow-md"
                 onPress={() => setShowModal(null)}
               >
-                <CustomText className="text-white text-lg">No</CustomText>
-              </Pressable>
-              <Pressable
-                className="flex-1 p-4 bg-blue-500 items-center rounded-full shadow-md"
-                onPress={handleLogOut}
-              >
-                <CustomText className="text-white text-lg">Yes</CustomText>
+                <CustomText className="text-white text-lg">Cancel</CustomText>
               </Pressable>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      </View>
+      <View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal === "confirmModal"}
+          onRequestClose={() => {
+            setShowModal(null);
+          }}
+        >
+          <View
+            className="flex-1 justify-center items-center"
+            style={{ backgroundColor: `${colors.background}dd` }}
+          >
+            <View
+              className="p-6 rounded-2xl w-4/5 shadow-lg"
+              style={{ backgroundColor: colors.inputBg }}
+            >
+              <CustomText
+                className="text-xl mt-4 font-semibold text-center"
+                style={{ color: colors.text }}
+              >
+                This will reset your data
+              </CustomText>
+              <CustomText
+                className="text-xl mb-4 font-semibold text-center"
+                style={{ color: colors.text }}
+              >
+                Are you sure you want to make this change?
+              </CustomText>
+              <View className="flex-row gap-3">
+                <Pressable
+                  className="flex-1 p-4 bg-red-500 items-center rounded-full shadow-md"
+                  onPress={() => {
+                    setShowModal(null);
+                  }}
+                >
+                  <CustomText className="text-white text-lg">No</CustomText>
+                </Pressable>
+                <Pressable
+                  className="flex-1 p-4 bg-blue-500 items-center rounded-full shadow-md"
+                  onPress={() => handleChangeSubmit()}
+                >
+                  <CustomText className="text-white text-lg">Yes</CustomText>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+      <View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal === "datePickerModal"}
+          onRequestClose={() => {
+            setShowModal(null);
+          }}
+        >
+          <View
+            className="flex-1 justify-center items-center bg-opacity-80"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+          >
+            <View
+              className="rounded-3xl p-4 w-10/12 max-h-1/2"
+              style={{ backgroundColor: colors.expenseForm }}
+            >
+              <CustomText
+                className="text-xl text-center mb-4"
+                style={{ color: colors.text }}
+              >
+                Select Month & Year
+              </CustomText>
+              <View className="flex-row justify-between mb-4">
+                <View className=" gap-x-2 w-full flex-row">
+                  <ScrollView
+                    style={{ maxHeight: 300 }}
+                    nestedScrollEnabled={true}
+                  >
+                    {months.map((item, i) => (
+                      <View
+                        key={i}
+                        className="my-2 py-4 px-4 rounded-3xl"
+                        style={{
+                          backgroundColor: selectedMY.month === item ? "#41B3A2" : colors.expenseInput,
+                          color: colors.text
+                        }}
+                      >
+                        <Pressable
+                          onPress={() => {
+                            setSelectedMY({
+                              ...selectedMY,
+                              month: item
+                            })
+                          }}
+                        >
+                          <CustomText
+                            className="text-lg"
+                            style={{
+                              backgroundColor: selectedMY.month === item ? "#41B3A2" : colors.expenseInput,
+                              color: colors.text
+                            }}
+                          >
+                            {item}
+                          </CustomText>
+                        </Pressable>
+                      </View>
+                    ))}
+                  </ScrollView>
+                  <ScrollView
+                    style={{ maxHeight: 300 }}
+                    nestedScrollEnabled={true}
+                  >
+                    {years.map((item, i) => (
+                      <View
+                        key={i}
+                        className="my-2 py-4 px-4 rounded-3xl"
+                        style={{
+                          backgroundColor: selectedMY.year === item ? "#41B3A2" : colors.expenseInput,
+                          color: colors.text
+                        }}
+                      >
+                        <Pressable
+                          onPress={() => {
+                            setSelectedMY({
+                              ...selectedMY,
+                              year: item
+                            })
+                          }}
+                        >
+                          <CustomText
+                            className="text-lg"
+                            style={{
+                              backgroundColor: selectedMY.year === item ? "#41B3A2" : colors.expenseInput,
+                              color: colors.text
+                            }}
+                          >
+                            {item}
+                          </CustomText>
+                        </Pressable>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+              <Pressable
+                className="bg-[#41B3A2] rounded-3xl p-4 items-center mt-3"
+                onPress={() => {
+                  setShowModal(null)
+                  generatePdf()
+                }}
+              >
+                <CustomText className="text-white">Confirm</CustomText>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+      </View>
+      <View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal === "logOut"}
+          onRequestClose={() => {
+            setShowModal(null);
+          }}
+        >
+          <View
+            className="flex-1 justify-center items-center"
+            style={{ backgroundColor: `${colors.background}dd` }}
+          >
+            <View
+              className="p-6 rounded-2xl w-4/5 shadow-lg"
+              style={{ backgroundColor: colors.inputBg }}
+            >
+              <CustomText
+                className="text-xl mb-4 font-semibold text-center"
+                style={{ color: colors.text }}
+              >
+                Are you sure you want to log out?
+              </CustomText>
+              <View className="flex-row gap-3">
+                <Pressable
+                  className="flex-1 p-4 bg-red-500 items-center rounded-full shadow-md"
+                  onPress={() => setShowModal(null)}
+                >
+                  <CustomText className="text-white text-lg">No</CustomText>
+                </Pressable>
+                <Pressable
+                  className="flex-1 p-4 bg-blue-500 items-center rounded-full shadow-md"
+                  onPress={handleLogOut}
+                >
+                  <CustomText className="text-white text-lg">Yes</CustomText>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
       <View className="flex-1">
         <CustomSuccessAlert
           visible={alertVisible === "profileUpdated"}

@@ -2,7 +2,7 @@ import { View, TouchableOpacity } from 'react-native';
 import React from 'react';
 import CustomText from '../CustomText';
 import { numberWithCommas } from '../../app/utils';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from 'native-base';
 
 const ExpenseItem = ({ handleExpenseDetail, item, isLast }) => {
     const { colors } = useTheme();

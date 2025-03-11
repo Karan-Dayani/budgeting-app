@@ -18,6 +18,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.dark.tint,
         tabBarInactiveTintColor: Colors.dark.icon,
         headerShown: false,
+
       }}
       tabBar={(props) => <TabBar {...props} />}
     >
@@ -32,6 +33,7 @@ export default function TabLayout() {
         name="Expenses"
         options={{
           title: "Expenses",
+
         }}
       />
 

@@ -8,9 +8,8 @@ import {
   Text
 } from "react-native";
 import { supabase } from "../../lib/supabase";
-import { useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { Icon, Input } from "native-base";
+import { Icon, Input, useTheme } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Auth() {

@@ -1,10 +1,9 @@
 import { View, Text, TextInput, Pressable, ActivityIndicator } from 'react-native'
 import React from 'react'
-import { useTheme } from '@react-navigation/native'
 import CustomText from '../CustomText'
 
-const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, loading }) => {
-    const { colors } = useTheme()
+const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, loading, colors }) => {
+
     return (
         <View className="flex-1 justify-end  bg-opacity-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}>
             <CustomText

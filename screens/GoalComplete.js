@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import LottieView from "lottie-react-native";
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "native-base";
 
 const GoalComplete = () => {
   const { colors } = useTheme();

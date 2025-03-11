@@ -1,17 +1,14 @@
-import { Entypo, Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
-import { Link, router } from "expo-router";
-import { Menu } from "native-base";
-import React from "react";
-import { View, Text, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useUser } from "./globalState/UserContext";
-import CustomText from "./CustomText";
+// import { useTheme } from "@react-navigation/native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { Link } from "expo-router";
+import { useTheme } from "native-base";
+import React from "react";
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomText from "./CustomText";
 
-const AnimatedHeader = ({ toggleMenu, handleLogOut, user }) => {
+const AnimatedHeader = ({ user }) => {
   const { colors } = useTheme();
-
   return (
     <SafeAreaView>
       <View className="pt-2 pb-4 px-2 flex-row justify-between items-center">
@@ -27,54 +24,13 @@ const AnimatedHeader = ({ toggleMenu, handleLogOut, user }) => {
           </CustomText>
         </View>
         <View>
-          <View className="">
-            {/* <Ionicons
-                                name="notifications"
-                                size={25}
-                                color={colors.text}
-                            />
-                            <Menu
-                                w="150"
-                                trigger={(triggerProps) => {
-                                    return (
-                                        <Pressable
-                                            accessibilityLabel="More options menu"
-                                            {...triggerProps}
-                                            className="ml-3"
-                                        >
-                                            <Entypo
-                                                name="dots-three-vertical"
-                                                size={25}
-                                                color={colors.text}
-                                            />
-                                        </Pressable>
-                                    );
-                                }}
-                                placement="bottom right"
-                            >
-                                <Menu.Item onPress={() => router.push("/(tabs)/Profile")}>
-                                    Profile
-                                </Menu.Item>
-                                <Menu.Item onPress={() => router.push("/Expenses")}>
-                                    Support
-                                </Menu.Item>
-                                <Menu.Item onPress={handleLogOut}>
-                                    <Text className="text-red-400">Log out</Text>
-                                </Menu.Item>
-                            </Menu> */}
-            {/* <Pressable
-              onPress={() => {
-                router.push("/profile/");
-              }}
-            >
-              <FontAwesome6 name="user-circle" size={32} color={colors.text} />
-            </Pressable> */}
-            <Link href={"/Profile/"}>
-              <FontAwesome6 name="user-circle" size={32} color={colors.text} />
-            </Link>
-          </View>
+
+          <Link href={"/Profile/"}>
+            <FontAwesome6 name="user-circle" size={32} color={colors.text} />
+          </Link>
         </View>
       </View>
+
     </SafeAreaView>
   );
 };

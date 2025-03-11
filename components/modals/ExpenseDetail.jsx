@@ -1,8 +1,8 @@
 import { View, Text, Pressable } from 'react-native'
 import React from 'react'
-import { useTheme } from '@react-navigation/native'
 import CustomText from '../CustomText'
 import { numberWithCommas } from "../../app/utils";
+import { useTheme } from 'native-base';
 
 const ExpenseDetail = ({
     selectedExpense,

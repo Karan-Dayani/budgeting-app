@@ -1,7 +1,8 @@
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import React from 'react';
-import { useTheme } from '@react-navigation/native';
+
 import CustomText from '../CustomText';
+import { useTheme } from 'native-base';
 
 const MonthPicker = ({ setShowModal, setFilters, filters }) => {
     const currentYear = new Date().getFullYear();

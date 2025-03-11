@@ -9,7 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-import { NativeBaseProvider } from "native-base";
+import { extendTheme, NativeBaseProvider } from "native-base";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -48,21 +48,27 @@ export default function RootLayout() {
     return null;
   }
 
+  const theme = colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme;
+
+  const nativeBaseTheme = extendTheme({
+    colors: theme.colors,
+  });
+
   return (
-    <NativeBaseProvider>
+    <NativeBaseProvider theme={nativeBaseTheme}>
       <UserProvider>
-        <ThemeProvider
+        {/* <ThemeProvider
           value={colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme}
-        >
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack>
-        </ThemeProvider>
+        > */}
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack>
+        {/* </ThemeProvider> */}
       </UserProvider>
     </NativeBaseProvider>
   );

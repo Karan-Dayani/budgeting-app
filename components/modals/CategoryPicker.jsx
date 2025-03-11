@@ -1,8 +1,8 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
 import React from "react";
-import { useTheme } from "@react-navigation/native";
 import CustomText from "../CustomText";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useTheme } from "native-base";
 
 const CategoryPicker = ({
   setShowModal,

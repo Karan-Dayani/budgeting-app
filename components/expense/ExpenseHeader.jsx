@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Menu } from "native-base";
+import { Menu, useTheme } from "native-base";
 import React from "react";
 import {
   Animated,
@@ -9,7 +9,6 @@ import {
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { numberWithCommas } from "../../app/utils";
-import { useIsFocused, useTheme } from "@react-navigation/native";
 import ExpenseTypePicker from "./ExpenseTypePicker";
 import CustomText from "../CustomText";
 
@@ -28,7 +27,7 @@ const ExpenseHeader = ({
   const { colors } = useTheme()
 
   return (
-    <Animated.View className="w-full mt-14"
+    <Animated.View className="w-full mt-5"
     >
       <View>
         <View className="flex-row justify-between items-center mb-4">

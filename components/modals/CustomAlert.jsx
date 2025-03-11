@@ -1,7 +1,8 @@
-import { useTheme } from '@react-navigation/native';
+
 import React from 'react';
 import { View, Modal, TouchableOpacity } from 'react-native';
 import CustomText from '../CustomText';
+import { useTheme } from 'native-base';
 
 const CustomAlert = ({ visible, mainMessage, message, onClose, alerts, task, AlertScreen }) => {
     const { colors } = useTheme();

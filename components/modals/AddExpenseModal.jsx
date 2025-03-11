@@ -1,29 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  TextInput,
-  Pressable,
-  Alert,
-  Modal,
-  FlatList,
-  Animated,
-  Dimensions,
-} from "react-native";
 import {
   Entypo,
   FontAwesome5,
-  Ionicons,
-  MaterialIcons,
+  Ionicons
 } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
-import CustomText from "../CustomText";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  Animated,
+  Dimensions,
+  FlatList,
+  Modal,
+  Pressable,
+  TextInput,
+  View,
+} from "react-native";
 import { numberWithCommas } from "../../app/utils";
+import CustomText from "../CustomText";
 
 const AddExpenseModal = ({
   expense,
   handleExpenseChange,
   handleSaveExpense,
   setShowModal,
+  colors
 }) => {
   const PaymentModeData = [
     { label: "Cash", value: "Cash", icon: "cash-outline" },
@@ -43,7 +42,7 @@ const AddExpenseModal = ({
     { label: "Other", value: "Other", icon: "ellipsis-h" },
   ];
 
-  const { colors } = useTheme();
+
   const [amount, setAmount] = useState("");
   const [formType, setFormType] = useState("Non-Recurring");
   const [addExpenseModals, setAddExpenseModals] = useState(null);

@@ -1,8 +1,8 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import LottieView from "lottie-react-native";
-import { useTheme } from "@react-navigation/native";
 import CustomText from "../components/CustomText";
+import { useTheme } from "native-base";
 
 const NoDataLoad = ({ filters }) => {
   const { colors } = useTheme();

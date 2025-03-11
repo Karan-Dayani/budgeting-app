@@ -1,27 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Pressable, Animated, TouchableOpacity, Modal, StyleSheet } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useTheme } from "native-base";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Modal, Pressable, View } from "react-native";
 import { getTotalExpense, numberWithCommas } from "../app/utils";
 import { supabase } from "../lib/supabase";
 import CustomText from "./CustomText";
-import { useTheme } from "@react-navigation/native";
 
 const TotalIncome = ({ user }) => {
-  const expense = numberWithCommas(getTotalExpense(user));
-  const income = numberWithCommas(user[0]?.income);
-  const savings = numberWithCommas(user[0]?.savings);
+  const { colors } = useTheme()
+  const expense = getTotalExpense(user);
+  const income = user[0]?.income;
+  const savings = user[0]?.savings;
   const expensesData = user[0]?.expenses || [];
   const goalsData = user[0]?.goals || [];
-
   const handleExpensesClick = () => {
     router.push("/(tabs)/Expenses");
   };
 
   const [modalVisible, setModalVisible] = useState(false);
-  const scale = useRef(new Animated.Value(0)).current;
 
-  const { colors } = useTheme()
+  const scale = useRef(new Animated.Value(0)).current;
 
   const recurrsionUpdate = async () => {
     const currentDate = new Date();
@@ -116,8 +114,12 @@ const TotalIncome = ({ user }) => {
     recurrsionUpdate();
   }, []);
 
+  const toggleModal = () => {
+    modalVisible.current = !modalVisible.current
+  }
+
   const openModal = () => {
-    setModalVisible(true);
+    setModalVisible(true)
     Animated.spring(scale, {
       toValue: 1,
       useNativeDriver: true,
@@ -167,19 +169,13 @@ const TotalIncome = ({ user }) => {
       <View className="rounded-3xl bg-[#41B3A2] justify-center px-5 py-3 mb-2 flex-2">
         <View className="items-center justify-between flex-row mb-4">
           <CustomText className="text-white text-xl">Monthly Income</CustomText>
-          {/* <AntDesign
-                        name="right"
-                        size={14}
-                        color="white"
-                        style={{ marginRight: 10 }}
-                    /> */}
         </View>
         {income ? (
           <CustomText
             className="text-white text-3xl"
             style={{ fontFamily: "Red_Hat" }}
           >
-            ₹{income}
+            ₹{numberWithCommas(income)}
           </CustomText>
         ) : (
           <CustomText className="text-white text-3xl">Not mentioned</CustomText>
@@ -191,18 +187,12 @@ const TotalIncome = ({ user }) => {
             <View className="flex-row items-center gap-2">
               <CustomText className="text-white text-xl">Savings</CustomText>
             </View>
-            {/* <AntDesign
-                            name="right"
-                            size={14}
-                            color="white"
-                            style={{ marginRight: 10 }}
-                        /> */}
           </View>
           <CustomText
             className="text-white text-3xl"
             style={{ fontFamily: "Red_Hat" }}
           >
-            ₹{savings}
+            ₹{numberWithCommas(savings)}
           </CustomText>
         </Pressable>
         <View
@@ -211,18 +201,12 @@ const TotalIncome = ({ user }) => {
         >
           <View className="items-center justify-between flex-row mb-4">
             <CustomText className="text-white text-xl">Expenses</CustomText>
-            {/* <AntDesign
-                            name="right"
-                            size={14}
-                            color="white"
-                            style={{ marginRight: 10 }}
-                        /> */}
           </View>
           <CustomText
             className="text-white text-3xl"
             style={{ fontFamily: "Red_Hat" }}
           >
-            ₹{expense || 0}
+            ₹{numberWithCommas(expense) || 0}
           </CustomText>
         </View>
       </View>
@@ -237,7 +221,7 @@ const TotalIncome = ({ user }) => {
                 shadowOffset: { width: 0, height: 10 },
                 shadowOpacity: 0.25,
                 shadowRadius: 10,
-                elevation: 5, // For Android shadow
+                elevation: 5,
               },
             ]}
             className="w-[90%] max-w-[400px] rounded-2xl p-6"
