@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Box, HStack, Slide } from "native-base";
+import { Box, HStack } from "native-base";
+import React, { useEffect, useRef } from "react";
+import { Animated } from "react-native";
 import CustomText from "../components/CustomText";
 
 export function numberWithCommas(x) {
@@ -7,7 +9,7 @@ export function numberWithCommas(x) {
 }
 
 export const getTotalExpense = (user) => {
-  if (user[0]?.expenses?.length === 0) return 0;
+  if (!user || !user[0] || !user[0].expenses || user[0].expenses.length === 0) return 0;
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
@@ -34,7 +36,7 @@ export const getTotalExpense = (user) => {
     return { monthIndex, day: parseInt(day), year: parseInt(year) };
   };
 
-  return user[0]?.expenses?.reduce((total, item) => {
+  return user[0].expenses.reduce((total, item) => {
     const { monthIndex, day, year } = parseExpenseDate(item.expenseDate);
 
     if (
@@ -56,8 +58,8 @@ export const getTotalExpense = (user) => {
 };
 
 export const getGoalSavings = (user) => {
-  if (user[0]?.goals?.length === 0) return 0;
-  return user[0]?.goals?.reduce(
+  if (!user || !user[0] || !user[0].goals || user[0].goals.length === 0) return 0;
+  return user[0].goals.reduce(
     (total, item) => total + item?.goalSavedMoney,
     0
   );
@@ -68,24 +70,41 @@ export const incomePercent = (income) => {
 };
 
 export function Notification({ isVisible, text, bgColor }) {
+  const slideAnim = useRef(new Animated.Value(-100)).current;
+
+  useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: isVisible ? 0 : -100,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [isVisible]);
+
   return (
-    <Slide in={isVisible} placement="top">
+    <Animated.View
+      style={{
+        transform: [{ translateY: slideAnim }],
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 9999,
+      }}
+    >
       <Box
         w="100%"
-        position="absolute"
         p="2"
         borderRadius="xs"
         alignItems="center"
         justifyContent="center"
-        safeArea
-        _dark={{ bg: bgColor }}
-        _light={{ bg: bgColor }}
+        safeAreaTop
+        bg={bgColor}
       >
         <HStack space={2}>
           <Ionicons name="checkmark" size={24} color="white" />
           <CustomText className="text-white">{text}</CustomText>
         </HStack>
       </Box>
-    </Slide>
+    </Animated.View>
   );
 }

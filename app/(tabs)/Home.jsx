@@ -1,4 +1,4 @@
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from "expo-router/react-navigation";
 import { Stack } from "expo-router";
 import { Skeleton, useTheme } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
@@ -59,8 +59,10 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (isFocused) getUserRow();
-  }, [isFocused]);
+    if (isFocused && user) {
+      getUserRow();
+    }
+  }, [isFocused, user]);
 
 
   return (

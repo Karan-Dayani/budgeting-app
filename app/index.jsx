@@ -6,43 +6,71 @@ import SplashScreenLoad from "../screens/splashScreenLoad";
 
 const Index = () => {
   const checkUserIncome = async (email) => {
-    const { data, error } = await supabase
-      .from("User Data")
-      .select("income")
-      .eq("email", email);
-    return data && data[0].income;
+    try {
+      const { data, error } = await supabase
+        .from("User Data")
+        .select("income")
+        .eq("email", email);
+      if (error) {
+        console.error("Error checking user income:", error);
+        return null;
+      }
+      return data && data[0] ? data[0].income : null;
+    } catch (err) {
+      console.error("Unexpected error in checkUserIncome:", err);
+      return null;
+    }
   };
-
   useEffect(() => {
+    let subscription = null;
     const delay = setTimeout(() => {
       supabase.auth.getSession().then(async ({ data: { session } }) => {
-        if (session) {
-          const hasIncome = await checkUserIncome(session.user.email);
-          if (hasIncome) {
-            router.replace("/(tabs)/Home");
+        try {
+          if (session) {
+            const hasIncome = await checkUserIncome(session.user.email);
+            if (hasIncome) {
+              router.replace("/(tabs)/Home");
+            } else {
+              router.replace("/UserDetails/");
+            }
           } else {
-            router.replace("/UserDetails/");
+            router.replace("/(auth)/login");
           }
-        } else {
+        } catch (e) {
+          console.error("Error in getSession check:", e);
           router.replace("/(auth)/login");
         }
+      }).catch((err) => {
+        console.error("Failed to get session:", err);
+        router.replace("/(auth)/login");
       });
 
-      supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session) {
-          const hasIncome = await checkUserIncome(session.user.email);
-          if (hasIncome) {
-            router.replace("/(tabs)/Home");
+      const authListener = supabase.auth.onAuthStateChange(async (_event, session) => {
+        try {
+          if (session) {
+            const hasIncome = await checkUserIncome(session.user.email);
+            if (hasIncome) {
+              router.replace("/(tabs)/Home");
+            } else {
+              router.replace("/UserDetails/");
+            }
           } else {
-            router.replace("/UserDetails/");
+            router.replace("/(auth)/login");
           }
-        } else {
+        } catch (e) {
+          console.error("Error in onAuthStateChange check:", e);
           router.replace("/(auth)/login");
         }
       });
+      subscription = authListener.data?.subscription;
     }, 2000);
 
-    return () => clearTimeout(delay);
+    return () => {
+      clearTimeout(delay);
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, []);
 
   return (

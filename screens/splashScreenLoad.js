@@ -1,10 +1,21 @@
 import React from "react";
 import { StyleSheet, StatusBar, View } from "react-native";
-import { Video } from "expo-av";
-import { useTheme } from "@react-navigation/native";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { useEventListener } from "expo";
+import { useTheme } from "expo-router/react-navigation";
 
 const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => {} }) => {
   const { colors } = useTheme();
+
+  const player = useVideoPlayer(require("../assets/videos/CointTrack.mp4"), (playerInstance) => {
+    playerInstance.loop = false;
+    playerInstance.muted = true;
+    playerInstance.play();
+  });
+
+  useEventListener(player, "playToEnd", () => {
+    onAnimationFinish(false);
+  });
 
   return (
     <View style={styles.container}>
@@ -13,20 +24,11 @@ const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => {} }) => {
         backgroundColor="transparent"
         barStyle="light-content"
       />
-      <Video
-        source={require("../assets/videos/CointTrack.mp4")}
+      <VideoView
+        player={player}
         style={styles.video}
         resizeMode="cover"
-        shouldPlay
-        isLooping={false}
-        isMuted={true}
-        useNativeControls={false}
-        progressUpdateIntervalMillis={500}
-        onPlaybackStatusUpdate={(status) => {
-          if (status.didJustFinish) {
-            onAnimationFinish(false);
-          }
-        }}
+        nativeControls={false}
       />
     </View>
   );

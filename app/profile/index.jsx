@@ -1,5 +1,5 @@
-import { useIsFocused } from "@react-navigation/native";
-import { Link, Stack } from "expo-router";
+import { useIsFocused } from "expo-router/react-navigation";
+import { Link, Stack, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,7 +19,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useUser } from "../../components/globalState/UserContext";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
-import { numberWithCommas } from "../utils";
+import { numberWithCommas } from "../../lib/utils";
 import AlertScreen from "../../screens/AlertScreen";
 import CustomAlert from "../../components/modals/CustomAlert";
 import { useTheme } from "native-base";
@@ -99,6 +99,11 @@ const ProfilePage = () => {
 
   const handleLogOut = async () => {
     const { error } = await supabase.auth.signOut();
+    if (!error) {
+      router.replace("/(auth)/login");
+    } else {
+      console.error("Logout error:", error);
+    }
   };
 
   async function fetchData() {
@@ -219,7 +224,7 @@ const ProfilePage = () => {
       <Stack.Screen options={{ headerShown: false }} />
       <View className="flex-row absolute top-10 left-5 z-10 ">
         <Link className="" href={"/(tabs)/Home"}>
-          <AntDesign name="arrowleft" size={26} color="black" />
+          <AntDesign name="arrow-left" size={26} color="black" />
         </Link>
       </View>
       <View className="bg-[#41B3A2] h-36 justify-center mb-5">

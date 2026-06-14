@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { useTheme } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Modal, Pressable, View } from "react-native";
-import { getTotalExpense, numberWithCommas } from "../app/utils";
+import { getTotalExpense, numberWithCommas } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import CustomText from "./CustomText";
 
@@ -16,6 +16,8 @@ const TotalIncome = ({ user }) => {
   const handleExpensesClick = () => {
     router.push("/(tabs)/Expenses");
   };
+
+
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -32,6 +34,11 @@ const TotalIncome = ({ user }) => {
 
     if (error) {
       console.error("Error fetching data:", error);
+      return;
+    }
+
+    if (!data || !data[0]) {
+      console.log("No user data found for recursion update. Skipping...");
       return;
     }
 

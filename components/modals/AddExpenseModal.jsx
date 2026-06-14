@@ -14,7 +14,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { numberWithCommas } from "../../app/utils";
+import { numberWithCommas } from "../../lib/utils";
 import CustomText from "../CustomText";
 
 const AddExpenseModal = ({

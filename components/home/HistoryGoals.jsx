@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import CustomText from "../CustomText";
 import { AntDesign } from "@expo/vector-icons";
-import { numberWithCommas } from "../../app/utils";
+import { numberWithCommas } from "../../lib/utils";
 import CircularProgress from "react-native-circular-progress-indicator";
 
 const HistoryGoals = ({ colors, userData }) => {

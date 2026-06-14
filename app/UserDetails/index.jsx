@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Stack, router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import CustomText from "../../components/CustomText";
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "expo-router/react-navigation";
 
 const Profile = () => {
   const [name, setName] = useState("");
@@ -26,23 +26,39 @@ const Profile = () => {
 
   const addDetails = async () => {
     setLoading(true);
-    if (isNaN(income) || income.trim() === "" || income === "0") {
+    setError("");
+    const incomeStr = String(income);
+    if (isNaN(incomeStr) || incomeStr.trim() === "" || Number(incomeStr) <= 0) {
       setError("Please enter a valid number for income.");
-      return;
+      setLoading(false);
+      return false;
     }
-    const { data, err } = await supabase
+    const incomeNum = Number(incomeStr);
+    const { data, error: err } = await supabase
       .from("User Data")
-      .update({ income: income, username: name, savings: income })
-      .eq("email", user?.user_metadata?.email);
+      .upsert({
+        email: user?.user_metadata?.email,
+        income: incomeNum,
+        username: name,
+        savings: incomeNum,
+        expenses: [],
+        goals: []
+      });
     if (err) {
+      console.error("Failed to update details:", err);
       setError("Failed to update details. Please try again.");
+      setLoading(false);
+      return false;
     }
     setLoading(false);
+    return true;
   };
 
-  const handleSubmit = () => {
-    addDetails();
-    router.replace("/(tabs)/Home");
+  const handleSubmit = async () => {
+    const success = await addDetails();
+    if (success) {
+      router.replace("/(tabs)/Home");
+    }
   };
 
   return (

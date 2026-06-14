@@ -1,4 +1,4 @@
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from "expo-router/react-navigation";
 import React from 'react';
 import { View, Modal, TouchableOpacity } from 'react-native';
 import CustomText from '../CustomText';

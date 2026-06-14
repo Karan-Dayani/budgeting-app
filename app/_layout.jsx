@@ -2,12 +2,17 @@ import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
-} from "@react-navigation/native";
+} from "expo-router/react-navigation";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { LogBox } from "react-native";
 import "react-native-reanimated";
+
+LogBox.ignoreLogs([
+  "[Reanimated] `createAnimatedPropAdapter` is no longer necessary in Reanimated 4 and will be removed in next version. Please remove this call from your code and pass the adapter function directly.",
+]);
 
 import { extendTheme, NativeBaseProvider } from "native-base";
 
@@ -61,6 +66,12 @@ export default function RootLayout() {
           value={colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme}
         > */}
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="index"
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen
             name="(tabs)"
             options={{

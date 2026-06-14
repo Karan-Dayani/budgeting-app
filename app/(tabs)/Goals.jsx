@@ -2,11 +2,11 @@ import {
   Alert,
   Modal,
   Pressable,
-  SafeAreaView,
   TextInput,
   TouchableOpacity,
   View
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   AntDesign,
@@ -15,7 +15,7 @@ import {
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from "expo-router/react-navigation";
 import { Stack } from "expo-router";
 import { NativeBaseProvider, Spinner, useTheme } from "native-base";
 import React, { useEffect, useState } from "react";
@@ -26,7 +26,7 @@ import { useUser } from "../../components/globalState/UserContext";
 import AddGoal from "../../components/modals/AddGoal";
 import { supabase } from "../../lib/supabase";
 import GoalComplete from "../../screens/GoalComplete";
-import { Notification, numberWithCommas } from "../utils";
+import { Notification, numberWithCommas } from "../../lib/utils";
 
 const Goals = () => {
   const isFocused = useIsFocused();

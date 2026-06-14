@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import LottieView from "lottie-react-native";
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "expo-router/react-navigation";
 import CustomText from "../components/CustomText";
 
 const AlertScreen = () => {

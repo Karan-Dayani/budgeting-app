@@ -25,7 +25,7 @@ const AnimatedHeader = ({ user }) => {
         </View>
         <View>
 
-          <Link href={"/Profile/"}>
+          <Link href={"/profile/"}>
             <FontAwesome6 name="user-circle" size={32} color={colors.text} />
           </Link>
         </View>

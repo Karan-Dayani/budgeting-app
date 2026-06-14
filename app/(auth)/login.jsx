@@ -8,7 +8,7 @@ import {
   Text
 } from "react-native";
 import { supabase } from "../../lib/supabase";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { Icon, Input, useTheme } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -20,19 +20,45 @@ export default function Auth() {
 
   const { colors } = useTheme();
 
+  const checkUserIncome = async (userEmail) => {
+    try {
+      const { data, error } = await supabase
+        .from("User Data")
+        .select("income")
+        .eq("email", userEmail);
+      if (error) return null;
+      return data && data[0] ? data[0].income : null;
+    } catch {
+      return null;
+    }
+  };
+
   async function signInWithEmail() {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
+    if (error) {
+      Alert.alert(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      const hasIncome = await checkUserIncome(data.user.email);
+      if (hasIncome) {
+        router.replace("/(tabs)/Home");
+      } else {
+        router.replace("/UserDetails/");
+      }
+    }
     setLoading(false);
-    if (error) Alert.alert(error.message);
   }
 
   async function signUpWithEmail() {
     setLoading(true);
-    const { data: { session }, error } = await supabase.auth.signUp({
+    const { data: { session, user }, error } = await supabase.auth.signUp({
       email: email,
       password: password,
     });
@@ -40,13 +66,21 @@ export default function Auth() {
     const addUser = async () => {
       const { data, err } = await supabase
         .from("User Data")
-        .insert([{ email: email }]);
+        .upsert({ email: email, income: 0, username: email.split("@")[0], savings: 0, expenses: [], goals: [] });
     };
 
-    if (error) Alert.alert(error.message);
+    if (error) {
+      Alert.alert(error.message);
+      setLoading(false);
+      return;
+    }
+
     if (!session) {
-      addUser();
+      await addUser();
       Alert.alert("Please check your inbox for email verification!");
+    } else {
+      await addUser();
+      router.replace("/UserDetails/");
     }
     setLoading(false);
   }

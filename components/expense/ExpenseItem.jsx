@@ -1,7 +1,7 @@
 import { View, TouchableOpacity } from 'react-native';
 import React from 'react';
 import CustomText from '../CustomText';
-import { numberWithCommas } from '../../app/utils';
+import { numberWithCommas } from "../../lib/utils";
 import { useTheme } from 'native-base';
 
 const ExpenseItem = ({ handleExpenseDetail, item, isLast }) => {

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Menu, useTheme } from "native-base";
-import React from "react";
+import { useTheme } from "native-base";
+import React, { useState } from "react";
 import {
   Animated,
   Pressable,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-import { numberWithCommas } from "../../app/utils";
+import { numberWithCommas } from "../../lib/utils";
 import ExpenseTypePicker from "./ExpenseTypePicker";
 import CustomText from "../CustomText";
 
@@ -23,6 +23,7 @@ const ExpenseHeader = ({
   filteredExpenses,
   isDatePickerVisible
 }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const { colors } = useTheme()
 
@@ -57,7 +58,7 @@ const ExpenseHeader = ({
               Total Expense: {numberWithCommas(filteredExpenses?.reduce((sum, expense) => sum + expense.expenseAmount, 0))}
             </CustomText>
           </View>
-          <View className="flex-row gap-x-3">
+          <View className="flex-row gap-x-3" style={{ position: "relative" }}>
             {filters?.date || filters?.month || filters?.category ? (
               <Pressable
                 onPress={() => {
@@ -75,91 +76,82 @@ const ExpenseHeader = ({
                 </CustomText>
               </Pressable>
             ) : (
-              <Menu
-                w="160"
-                marginRight={5}
-                backgroundColor={colors.inputBg}
-                rounded="3xl"
-                trigger={(triggerProps) => {
-                  return (
-                    <>
-                      <Pressable
-                        accessibilityLabel="More options menu"
-                        {...triggerProps}
-
-                      >
-                        <Animated.View
-                          className="flex-row items-center rounded-3xl p-3"
-                          style={{ backgroundColor: colors.inputBg }}
-                        >
-                          <Ionicons
-                            name="filter"
-                            size={20}
-                            color={colors.text}
-                          />
-                          <CustomText
-                            className="text-lg mx-2"
-                            style={{ color: colors.text }}
-                          >
-                            Filter
-                          </CustomText>
-                        </Animated.View>
-                      </Pressable>
-                      {/* <Link
-                            href={"/Test/"}
-                          >
-                            <View
-                              className="flex-row items-center rounded-3xl p-3"
-                              style={{ backgroundColor: colors.inputBg }}
-                            >
-                              <Ionicons
-                                name="filter"
-                                size={20}
-                                color={colors.text}
-                              />
-                              <CustomText
-                                className="text-lg mx-2"
-                                style={{ color: colors.text }}
-                              >
-                                Test
-                              </CustomText>
-                            </View>
-                          </Link> */}
-                    </>
-                  );
-                }}
-              >
-                <Menu.Item
-                  _text={{
-                    color: colors.text,
-                    fontSize: "lg",
-                    paddingBottom: 2,
-                  }}
-                  onPress={() => setDatePickerVisibility(true)}
+              <View>
+                <Pressable
+                  accessibilityLabel="More options menu"
+                  onPress={() => setMenuOpen(!menuOpen)}
                 >
-                  Date
-                </Menu.Item>
-                <Menu.Item
-                  _text={{
-                    color: colors.text,
-                    fontSize: "lg",
-                    paddingBottom: 2,
-                  }}
-                  onPress={() => setShowModal("monthModal")}
-                >
-                  Month
-                </Menu.Item>
-                <Menu.Item
-                  _text={{
-                    color: colors.text,
-                    fontSize: "lg",
-                    paddingBottom: 2,
-                  }}
-                  onPress={() => setShowModal("categoryModal")}
-                >
-                  Category
-                </Menu.Item>
-              </Menu>
+                  <Animated.View
+                    className="flex-row items-center rounded-3xl p-3"
+                    style={{ backgroundColor: colors.inputBg }}
+                  >
+                    <Ionicons
+                      name="filter"
+                      size={20}
+                      color={colors.text}
+                    />
+                    <CustomText
+                      className="text-lg mx-2"
+                      style={{ color: colors.text }}
+                    >
+                      Filter
+                    </CustomText>
+                  </Animated.View>
+                </Pressable>
+                {menuOpen && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 55,
+                      right: 0,
+                      width: 160,
+                      backgroundColor: colors.inputBg,
+                      borderRadius: 16,
+                      padding: 8,
+                      zIndex: 2000,
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.84,
+                      elevation: 5,
+                    }}
+                  >
+                    <Pressable
+                      onPress={() => {
+                        setDatePickerVisibility(true);
+                        setMenuOpen(false);
+                      }}
+                      style={{ padding: 12 }}
+                    >
+                      <CustomText style={{ color: colors.text, fontSize: 16 }}>
+                        Date
+                      </CustomText>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setShowModal("monthModal");
+                        setMenuOpen(false);
+                      }}
+                      style={{ padding: 12 }}
+                    >
+                      <CustomText style={{ color: colors.text, fontSize: 16 }}>
+                        Month
+                      </CustomText>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setShowModal("categoryModal");
+                        setMenuOpen(false);
+                      }}
+                      style={{ padding: 12 }}
+                    >
+                      <CustomText style={{ color: colors.text, fontSize: 16 }}>
+                        Category
+                      </CustomText>
+                    </Pressable>
+                  </View>
+                )}
+              </View>
             )}
           </View>
         </View>
@@ -168,6 +160,7 @@ const ExpenseHeader = ({
           mode="date"
           onConfirm={handleConfirm}
           onCancel={() => setDatePickerVisibility(false)}
+          date={new Date()}
         />
       </View>
       <Animated.View >

@@ -1,4 +1,4 @@
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from "expo-router/react-navigation";
 import { Stack } from "expo-router";
 import { useTheme } from "native-base";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -8,9 +8,9 @@ import {
   Animated,
   FlatList,
   Modal,
-  SafeAreaView,
   View
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import uuid from "react-native-uuid";
 import ExpenseAddButton from "../../components/expense/ExpenseAddButton";
 import ExpenseHeader from "../../components/expense/ExpenseHeader";
@@ -24,7 +24,7 @@ import MonthPicker from "../../components/modals/MonthPicker";
 import { supabase } from "../../lib/supabase";
 import AlertScreen from "../../screens/AlertScreen";
 import NoDataLoad from "../../screens/NoDataLoad";
-import { incomePercent, Notification } from "../utils";
+import { incomePercent, Notification } from "../../lib/utils";
 
 export default function ExpensesPage() {
   const { colors } = useTheme();
