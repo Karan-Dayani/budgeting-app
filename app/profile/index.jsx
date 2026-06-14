@@ -22,7 +22,7 @@ import { shareAsync } from "expo-sharing";
 import { numberWithCommas } from "../../lib/utils";
 import AlertScreen from "../../screens/AlertScreen";
 import CustomAlert from "../../components/modals/CustomAlert";
-import { useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 
 const ProfilePage = () => {
   const { colors } = useTheme();

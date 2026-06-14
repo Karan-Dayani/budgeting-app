@@ -2,7 +2,7 @@ import { View, TouchableOpacity } from 'react-native';
 import React from 'react';
 import CustomText from '../CustomText';
 import { numberWithCommas } from "../../lib/utils";
-import { useTheme } from 'native-base';
+import { useTheme } from "expo-router/react-navigation";
 
 const ExpenseItem = ({ handleExpenseDetail, item, isLast }) => {
     const { colors } = useTheme();

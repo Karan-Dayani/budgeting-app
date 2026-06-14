@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Modal, Pressable, View } from "react-native";
 import { getTotalExpense, numberWithCommas } from "../lib/utils";

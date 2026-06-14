@@ -4,7 +4,8 @@ import {
   Pressable,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  ActivityIndicator
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,7 +18,7 @@ import {
 } from "@expo/vector-icons";
 import { useIsFocused } from "expo-router/react-navigation";
 import { Stack } from "expo-router";
-import { NativeBaseProvider, Spinner, useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useState } from "react";
 import CircularProgress from "react-native-circular-progress-indicator";
 import uuid from "react-native-uuid";
@@ -203,7 +204,6 @@ const Goals = () => {
 
 
   return (
-    <NativeBaseProvider>
       <View className="px-5 flex-1" style={{
         backgroundColor: colors.background
       }}>
@@ -237,7 +237,7 @@ const Goals = () => {
           </CustomText>
           {loading ? (
             <View className="flex-1 justify-center items-center">
-              <Spinner size="lg" color={colors.text} />
+              <ActivityIndicator size="large" color={colors.text} />
             </View>
           ) : (
             <View className="mt-2">
@@ -522,7 +522,6 @@ const Goals = () => {
           bgColor="green.500"
         />
       </View>
-    </NativeBaseProvider>
   );
 };
 

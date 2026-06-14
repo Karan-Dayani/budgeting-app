@@ -2,7 +2,7 @@ import { View, Text, ScrollView, Pressable } from "react-native";
 import React from "react";
 import CustomText from "../CustomText";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 
 const CategoryPicker = ({
   setShowModal,

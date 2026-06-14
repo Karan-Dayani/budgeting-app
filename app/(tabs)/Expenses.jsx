@@ -1,6 +1,6 @@
 import { useIsFocused } from "expo-router/react-navigation";
 import { Stack } from "expo-router";
-import { useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,

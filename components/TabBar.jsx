@@ -2,8 +2,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { AntDesign, Feather } from '@expo/vector-icons';
 import TabBarButton from './TabBarButton';
-import { useTheme } from 'native-base';
-// import { useTheme } from '@react-navigation/native';
+import { useTheme } from "expo-router/react-navigation";
+// import { useTheme } from "expo-router/react-navigation";
 
 const TabBar = ({ state, descriptors, navigation }) => {
 

@@ -1,6 +1,6 @@
 import { useIsFocused } from "expo-router/react-navigation";
 import { Stack } from "expo-router";
-import { Skeleton, useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -15,6 +15,22 @@ import HistoryGoals from "../../components/home/HistoryGoals";
 import MonthChart from "../../components/home/MonthChart";
 import TotalIncome from "../../components/TotalIncome";
 import { supabase } from "../../lib/supabase";
+
+const Skeleton = ({ h, w, my, mb, rounded }) => {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={{
+        height: typeof h === "string" && h.endsWith("px") ? parseInt(h) : h,
+        width: typeof w === "string" && w.endsWith("px") ? parseInt(w) : w || "100%",
+        marginTop: my ? (my === "1" ? 4 : 8) : undefined,
+        marginBottom: mb ? (mb === "1" ? 4 : 8) : my ? (my === "1" ? 4 : 8) : undefined,
+        borderRadius: rounded === "3xl" ? 24 : rounded === "20px" ? 20 : 8,
+        backgroundColor: colors.inputBg || "#E5E7EB",
+      }}
+    />
+  );
+};
 
 export default function Home() {
   const { user } = useUser();

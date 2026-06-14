@@ -5,11 +5,12 @@ import {
   ActivityIndicator,
   Pressable,
   ImageBackground,
-  Text
+  Text,
+  TextInput
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 import { Stack, router } from "expo-router";
-import { Icon, Input, useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Auth() {
@@ -116,27 +117,31 @@ export default function Auth() {
               >
                 Email
               </Text>
-              <Input
-                label="Email"
-                InputLeftElement={
-                  <Icon
-                    as={<MaterialIcons name="person" />}
-                    size={5}
-                    ml="5"
-                    color="muted.400"
-                  />
-                }
-                color={colors.text}
-                onChangeText={(text) => setEmail(text)}
-                value={email}
-                rounded="20px"
-                padding="4"
-                borderWidth="0"
-                backgroundColor={colors.loginInput}
-                placeholder="email@address.com"
-                autoCapitalize={"none"}
-                cursorColor={colors.text}
-              />
+              <View 
+                style={{ 
+                  flexDirection: "row", 
+                  alignItems: "center", 
+                  backgroundColor: colors.loginInput, 
+                  borderRadius: 20, 
+                  paddingHorizontal: 16 
+                }}
+              >
+                <MaterialIcons name="person" size={20} color="#9ca3af" style={{ marginRight: 8 }} />
+                <TextInput
+                  style={{ 
+                    flex: 1, 
+                    color: colors.text, 
+                    paddingVertical: 16,
+                    fontSize: 16
+                  }}
+                  onChangeText={(text) => setEmail(text)}
+                  value={email}
+                  placeholder="email@address.com"
+                  placeholderTextColor="#A0AEC0"
+                  autoCapitalize="none"
+                  cursorColor={colors.text}
+                />
+              </View>
             </View>
             <View>
               <Text
@@ -145,35 +150,40 @@ export default function Auth() {
               >
                 Password
               </Text>
-              <Input
-                label="Password"
-                type={show ? "text" : "password"}
-                InputRightElement={
-                  <Pressable onPress={() => setShow(!show)}>
-                    <Icon
-                      as={
-                        <MaterialIcons
-                          name={show ? "visibility" : "visibility-off"}
-                        />
-                      }
-                      size={5}
-                      mr="5"
-                      color="muted.400"
-                    />
-                  </Pressable>
-                }
-                color={colors.text}
-                rounded="20px"
-                padding="4"
-                onChangeText={(text) => setPassword(text)}
-                value={password}
-                borderWidth="0"
-                backgroundColor={colors.loginInput}
-                placeholder="Password"
-                autoCapitalize={"none"}
-                cursorColor={colors.text}
-                marginBottom={8}
-              />
+              <View 
+                style={{ 
+                  flexDirection: "row", 
+                  alignItems: "center", 
+                  backgroundColor: colors.loginInput, 
+                  borderRadius: 20, 
+                  paddingHorizontal: 16,
+                  marginBottom: 32
+                }}
+              >
+                <TextInput
+                  style={{ 
+                    flex: 1, 
+                    color: colors.text, 
+                    paddingVertical: 16,
+                    fontSize: 16
+                  }}
+                  secureTextEntry={!show}
+                  onChangeText={(text) => setPassword(text)}
+                  value={password}
+                  placeholder="Password"
+                  placeholderTextColor="#A0AEC0"
+                  autoCapitalize="none"
+                  cursorColor={colors.text}
+                />
+                <Pressable onPress={() => setShow(!show)}>
+                  <MaterialIcons
+                    name={show ? "visibility" : "visibility-off"}
+                    size={20}
+                    color="#9ca3af"
+                    style={{ marginLeft: 8 }}
+                  />
+                </Pressable>
+              </View>
             </View>
           </View>
           <View>

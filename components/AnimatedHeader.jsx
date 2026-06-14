@@ -1,7 +1,7 @@
-// import { useTheme } from "@react-navigation/native";
+// import { useTheme } from "expo-router/react-navigation";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Link } from "expo-router";
-import { useTheme } from "native-base";
+import { useTheme } from "expo-router/react-navigation";
 import React from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

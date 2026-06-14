@@ -14,8 +14,6 @@ LogBox.ignoreLogs([
   "[Reanimated] `createAnimatedPropAdapter` is no longer necessary in Reanimated 4 and will be removed in next version. Please remove this call from your code and pass the adapter function directly.",
 ]);
 
-import { extendTheme, NativeBaseProvider } from "native-base";
-
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
@@ -53,18 +51,23 @@ export default function RootLayout() {
     return null;
   }
 
-  const theme = colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme;
-
-  const nativeBaseTheme = extendTheme({
-    colors: theme.colors,
-  });
+  const baseTheme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
+  const customColors = colorScheme === "dark" ? DarkCustomTheme.colors : LightCustomTheme.colors;
+  const theme = {
+    ...baseTheme,
+    colors: {
+      ...baseTheme.colors,
+      ...customColors,
+    },
+  };
 
   return (
-    <NativeBaseProvider theme={nativeBaseTheme}>
+    <ThemeProvider value={theme}>
+
       <UserProvider>
         {/* <ThemeProvider
           value={colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme}
-        > */}
+          > */}
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen
             name="index"
@@ -81,6 +84,6 @@ export default function RootLayout() {
         </Stack>
         {/* </ThemeProvider> */}
       </UserProvider>
-    </NativeBaseProvider>
+    </ThemeProvider>
   );
 }

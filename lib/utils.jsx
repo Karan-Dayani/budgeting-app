@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Box, HStack } from "native-base";
 import React, { useEffect, useRef } from "react";
-import { Animated } from "react-native";
+import { Animated, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CustomText from "../components/CustomText";
 
 export function numberWithCommas(x) {
@@ -71,6 +71,7 @@ export const incomePercent = (income) => {
 
 export function Notification({ isVisible, text, bgColor }) {
   const slideAnim = useRef(new Animated.Value(-100)).current;
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -79,6 +80,8 @@ export function Notification({ isVisible, text, bgColor }) {
       useNativeDriver: true,
     }).start();
   }, [isVisible]);
+
+  const resolvedBgColor = bgColor === "green.500" ? "#22c55e" : (bgColor || "#22c55e");
 
   return (
     <Animated.View
@@ -91,20 +94,22 @@ export function Notification({ isVisible, text, bgColor }) {
         zIndex: 9999,
       }}
     >
-      <Box
-        w="100%"
-        p="2"
-        borderRadius="xs"
-        alignItems="center"
-        justifyContent="center"
-        safeAreaTop
-        bg={bgColor}
+      <View
+        style={{
+          width: "100%",
+          padding: 8,
+          borderRadius: 4,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingTop: insets.top + 8,
+          backgroundColor: resolvedBgColor
+        }}
       >
-        <HStack space={2}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Ionicons name="checkmark" size={24} color="white" />
           <CustomText className="text-white">{text}</CustomText>
-        </HStack>
-      </Box>
+        </View>
+      </View>
     </Animated.View>
   );
 }

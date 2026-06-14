@@ -2,7 +2,7 @@ import { View, Text, Pressable } from 'react-native'
 import React from 'react'
 import CustomText from '../CustomText'
 import { numberWithCommas } from "../../lib/utils";
-import { useTheme } from 'native-base';
+import { useTheme } from "expo-router/react-navigation";
 
 const ExpenseDetail = ({
     selectedExpense,

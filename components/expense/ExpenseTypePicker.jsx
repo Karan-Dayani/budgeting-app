@@ -1,7 +1,7 @@
 import { View, Pressable, Animated, Dimensions } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import CustomText from '../CustomText'
-import { useTheme } from 'native-base'
+import { useTheme } from "expo-router/react-navigation"
 
 const ExpenseTypePicker = ({ setActiveTab, activeTab }) => {
     const { colors } = useTheme()
