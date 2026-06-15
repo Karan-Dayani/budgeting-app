@@ -23,11 +23,13 @@ const CategoryPicker = ({
 
   const { colors } = useTheme();
   return (
-    <View
+    <Pressable
+      onPress={() => setShowModal(null)}
       className="flex-1 justify-center items-center bg-opacity-80"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
     >
-      <View
+      <Pressable
+        onPress={() => { }}
         className="rounded-3xl p-4 w-10/12 max-h-1/2"
         style={{ backgroundColor: colors.chartBg }}
       >
@@ -82,8 +84,8 @@ const CategoryPicker = ({
         >
           <CustomText className="text-white">Close</CustomText>
         </Pressable>
-      </View>
-    </View>
+      </Pressable>
+    </Pressable>
   );
 };
 

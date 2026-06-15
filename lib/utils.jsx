@@ -106,8 +106,8 @@ export function Notification({ isVisible, text, bgColor }) {
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Ionicons name="checkmark" size={24} color="white" />
-          <CustomText className="text-white">{text}</CustomText>
+          <Ionicons name="checkmark" size={24} color="black" />
+          <CustomText style={{ color: "black" }}>{text}</CustomText>
         </View>
       </View>
     </Animated.View>

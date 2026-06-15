@@ -74,9 +74,7 @@ const Index = () => {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#41B3A2" }}>
-      <SplashScreenLoad />
-    </View>
+    <SplashScreenLoad />
   );
 };
 

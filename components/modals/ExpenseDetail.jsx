@@ -13,8 +13,8 @@ const ExpenseDetail = ({
     const { colors } = useTheme()
 
     return (
-        <View className="flex-1 justify-center items-center bg-opacity-80" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-            <View className="rounded-3xl p-8 w-10/12 shadow-lg" style={{ backgroundColor: "#31363F" }}>
+        <Pressable onPress={closeExpenseDetail} className="flex-1 justify-center items-center bg-opacity-80" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+            <Pressable onPress={() => { }} className="rounded-3xl p-8 w-10/12 shadow-lg" style={{ backgroundColor: "#31363F" }}>
                 <CustomText
                     className="text-white text-3xl mb-2"
                 >
@@ -55,8 +55,8 @@ const ExpenseDetail = ({
                         Close
                     </CustomText>
                 </Pressable>
-            </View>
-        </View>
+            </Pressable>
+        </Pressable>
     )
 }
 

@@ -116,7 +116,7 @@ export default function ExpensesPage() {
 
   const handleConfirm = (date) => {
     setFilters({ ...filters, "date": new Date(date).toDateString().slice(4) });
-    hideDatePicker();
+    setDatePickerVisibility(false);
   };
 
   useEffect(() => {
@@ -329,7 +329,7 @@ export default function ExpensesPage() {
         <>
           <ExpenseAddButton setShowModal={setShowModal} />
         </>
-        <View>
+        <View style={{ zIndex: 100, elevation: 10 }}>
           <ExpenseHeader
             filters={filters}
             setFilters={setFilters}
@@ -419,7 +419,7 @@ export default function ExpensesPage() {
         </Modal>
 
         <Modal
-          animationType="slide"
+          animationType="fade"
           transparent={true}
           visible={showModal === "monthModal"}
           onRequestClose={() => setShowModal(null)}
@@ -432,7 +432,7 @@ export default function ExpensesPage() {
         </Modal>
 
         <Modal
-          animationType="slide"
+          animationType="fade"
           transparent={true}
           visible={showModal === "categoryModal"}
           onRequestClose={() => setShowModal(null)}
@@ -458,13 +458,14 @@ export default function ExpensesPage() {
           )}
         </View>
 
-        <Notification
-          isVisible={notify === "Saved" || notify === "Deleted"}
-          text={notify === "Saved" ? "Expense Saved!" : "Expense Deleted!"}
-          bgColor="green.500"
-        />
 
       </SafeAreaView>
+
+      <Notification
+        isVisible={notify === "Saved" || notify === "Deleted"}
+        text={notify === "Saved" ? "Expense Saved!" : "Expense Deleted!"}
+        bgColor="green.500"
+      />
     </View>
   );
 }

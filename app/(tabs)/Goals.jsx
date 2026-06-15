@@ -20,7 +20,7 @@ import { useIsFocused } from "expo-router/react-navigation";
 import { Stack } from "expo-router";
 import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useState } from "react";
-import CircularProgress from "react-native-circular-progress-indicator";
+import CustomCircularProgress from "../../components/CustomCircularProgress";
 import uuid from "react-native-uuid";
 import CustomText from "../../components/CustomText";
 import { useUser } from "../../components/globalState/UserContext";
@@ -76,7 +76,7 @@ const Goals = () => {
   }, [user, isFocused]);
 
   const handleAddGoal = async () => {
-    if (goal.goalName.trim() === "" || goal.goalTargetMoney <= 0) {
+    if (goal.goalName.trim() === "" || Number(goal.goalTargetMoney) <= 0) {
       Alert.alert("Error", "Please fill in all fields correctly.");
       return;
     }
@@ -88,7 +88,12 @@ const Goals = () => {
       .eq("email", user?.user_metadata?.email);
 
     const prevArray = data[0]?.goals || [];
-    const updatedArray = [goal, ...prevArray];
+    const formattedGoal = {
+      ...goal,
+      goalTargetMoney: Number(goal.goalTargetMoney),
+      goalSavedMoney: Number(goal.goalSavedMoney),
+    };
+    const updatedArray = [formattedGoal, ...prevArray];
 
     await supabase
       .from("User Data")
@@ -119,9 +124,9 @@ const Goals = () => {
     setLoading(true);
 
     const remainingAmount =
-      selectedGoal?.goalTargetMoney - selectedGoal?.goalSavedMoney;
+      Number(selectedGoal?.goalTargetMoney) - Number(selectedGoal?.goalSavedMoney);
     if (goalAddInput <= remainingAmount) {
-      const totalSavedMoney = selectedGoal.goalSavedMoney + goalAddInput;
+      const totalSavedMoney = Number(selectedGoal.goalSavedMoney) + goalAddInput;
 
       const { data, err } = await supabase
         .from("User Data")
@@ -259,11 +264,16 @@ const Goals = () => {
                       >
                         <View className="flex-row">
                           <View className="mr-5">
-                            <CircularProgress
-                              value={Math.round(
-                                (item.goalSavedMoney / item.goalTargetMoney) *
-                                100
-                              )}
+                            <CustomCircularProgress
+                              value={
+                                item.goalTargetMoney > 0
+                                  ? Math.round(
+                                      (Number(item.goalSavedMoney) /
+                                        Number(item.goalTargetMoney)) *
+                                        100
+                                    )
+                                  : 0
+                              }
                               radius={35}
                               valueSuffix={"%"}
                               activeStrokeColor={colors.progressCircleColor}
@@ -377,19 +387,24 @@ const Goals = () => {
 
                     <View className="items-center mb-8">
                       <View className="mb-4">
-                        <CircularProgress
-                          value={Math.round(
-                            (selectedGoal.goalSavedMoney /
-                              selectedGoal.goalTargetMoney) *
-                            100
-                          )}
+                        <CustomCircularProgress
+                          key={selectedGoal.goalId}
+                          value={
+                            selectedGoal.goalTargetMoney > 0
+                              ? Math.round(
+                                  (Number(selectedGoal.goalSavedMoney) /
+                                    Number(selectedGoal.goalTargetMoney)) *
+                                    100
+                                )
+                              : 0
+                          }
                           radius={80}
                           valueSuffix={"%"}
                           activeStrokeColor={colors.progressCircleColor}
+                          inActiveStrokeColor={colors.progressInActive}
                           progressValueColor={colors.text}
                           maxValue={100}
                           inActiveStrokeOpacity={0.3}
-
                         />
                       </View>
                       <CustomText

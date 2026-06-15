@@ -92,8 +92,10 @@ export default function Home() {
       />
       <StatusBar backgroundColor={colors.header} />
       <ScrollView
-        className="px-5 py-2"
+        className="px-5 py-4"
+        contentContainerStyle={{ paddingBottom: 60 }}
         scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
       >
         <Animated.View>
           <AnimatedHeader
