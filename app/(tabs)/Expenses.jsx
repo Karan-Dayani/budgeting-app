@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import uuid from "react-native-uuid";
-import ExpenseAddButton from "../../components/expense/ExpenseAddButton";
 import ExpenseHeader from "../../components/expense/ExpenseHeader";
 import ExpenseItem from "../../components/expense/ExpenseItem";
 import { useUser } from "../../components/globalState/UserContext";
@@ -25,6 +24,7 @@ import { supabase } from "../../lib/supabase";
 import AlertScreen from "../../screens/AlertScreen";
 import NoDataLoad from "../../screens/NoDataLoad";
 import { incomePercent, Notification } from "../../lib/utils";
+import FloatingAddButton from "../../components/FloatingAddButton";
 
 export default function ExpensesPage() {
   const { colors } = useTheme();
@@ -336,13 +336,16 @@ export default function ExpensesPage() {
       mainMessage: "Discard data",
       message: "Your Data will be discarded, Are you sure?",
       alerts: false,
-      task: handleInputsField
+      task: handleInputsField,
+      isDanger: true,
+      confirmText: "Yes, Discard",
+      cancelText: "No"
     }
   };
 
   return (
     <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-      <View className="px-5 flex-1" style={{
+      <View className="px-6 flex-1" style={{
         backgroundColor: colors.background
       }}>
         <Stack.Screen
@@ -352,7 +355,7 @@ export default function ExpensesPage() {
         />
         <SafeAreaView className="h-full">
           <>
-            <ExpenseAddButton setShowModal={setShowModal} />
+            <FloatingAddButton onPress={() => setShowModal("addExpense")} />
           </>
           <View style={{ zIndex: 100, elevation: 10 }}>
             <ExpenseHeader
@@ -429,7 +432,7 @@ export default function ExpensesPage() {
           )}
 
           <Modal
-            animationType="slide"
+            animationType="none"
             transparent={true}
             visible={showModal === "addExpense"}
             onRequestClose={handleInputs}
@@ -439,6 +442,7 @@ export default function ExpensesPage() {
               handleExpenseChange={handleExpenseChange}
               handleSaveExpense={handleSaveExpense}
               setShowModal={setShowModal}
+              handleInputs={handleInputs}
               colors={colors}
             />
           </Modal>
@@ -479,6 +483,9 @@ export default function ExpensesPage() {
                 alerts={alertConfig[alertVisible]?.alerts}
                 task={alertConfig[alertVisible]?.task}
                 AlertScreen={alertConfig[alertVisible]?.AlertScreen}
+                isDanger={alertConfig[alertVisible]?.isDanger}
+                confirmText={alertConfig[alertVisible]?.confirmText}
+                cancelText={alertConfig[alertVisible]?.cancelText}
               />
             )}
           </View>
