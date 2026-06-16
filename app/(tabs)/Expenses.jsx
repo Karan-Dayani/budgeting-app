@@ -336,7 +336,10 @@ export default function ExpensesPage() {
       mainMessage: "Discard data",
       message: "Your Data will be discarded, Are you sure?",
       alerts: false,
-      task: handleInputsField
+      task: handleInputsField,
+      isDanger: true,
+      confirmText: "Yes, Discard",
+      cancelText: "No"
     }
   };
 
@@ -480,6 +483,9 @@ export default function ExpensesPage() {
                 alerts={alertConfig[alertVisible]?.alerts}
                 task={alertConfig[alertVisible]?.task}
                 AlertScreen={alertConfig[alertVisible]?.AlertScreen}
+                isDanger={alertConfig[alertVisible]?.isDanger}
+                confirmText={alertConfig[alertVisible]?.confirmText}
+                cancelText={alertConfig[alertVisible]?.cancelText}
               />
             )}
           </View>

@@ -461,28 +461,39 @@ const Goals = () => {
                 </CustomText>
                 <View className="flex-row gap-3">
                   <Pressable
-                    style={({ pressed }) => [
+                    style={
                       {
-                        backgroundColor: pressed ? colors.expenseInput + "CC" : colors.expenseInput,
-                        transform: [{ scale: pressed ? 0.98 : 1 }]
+                        backgroundColor: colors.expenseInput,
+
                       }
-                    ]}
+                    }
                     className="flex-1 p-3.5 items-center rounded-full"
                     onPress={() => setConfirmModal(false)}
                   >
-                    <CustomText className="text-base font-bold" style={{ color: colors.text, fontFamily: "Poppins_Bold" }}>No</CustomText>
+                    <CustomText
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      className="text-sm font-bold"
+                      style={{ color: colors.text, fontFamily: "Poppins_Bold" }}
+                    >
+                      No
+                    </CustomText>
                   </Pressable>
                   <Pressable
-                    style={({ pressed }) => [
-                      {
-                        backgroundColor: pressed ? "#DC2626" : "#EF4444",
-                        transform: [{ scale: pressed ? 0.98 : 1 }]
-                      }
-                    ]}
+                    style={{
+                      backgroundColor: "#EF4444",
+                    }}
                     className="flex-1 p-3.5 items-center rounded-full shadow-md"
                     onPress={() => handleGoalDelete()}
                   >
-                    <CustomText className="text-white text-base font-bold" style={{ fontFamily: "Poppins_Bold" }}>Yes, Delete</CustomText>
+                    <CustomText
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      className="text-white text-sm font-bold"
+                      style={{ fontFamily: "Poppins_Bold" }}
+                    >
+                      Yes, Delete
+                    </CustomText>
                   </Pressable>
                 </View>
               </Pressable>
