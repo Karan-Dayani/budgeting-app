@@ -324,27 +324,27 @@ const AddExpenseModal = ({
   ];
 
   // Initialize local amount state
-  const [amount, setAmount] = useState(expense.expenseAmount > 0 ? String(expense.expenseAmount) : "");
-  const [formType, setFormType] = useState(expense.expenseType || "Non-Recurring");
+  const [amount, setAmount] = useState(expense.amount > 0 ? String(expense.amount) : "");
+  const [formType, setFormType] = useState(expense.expense_type || "Non-Recurring");
   const [addExpenseModals, setAddExpenseModals] = useState(null);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
   // Sync amount when editing/re-opening
   useEffect(() => {
-    setAmount(expense.expenseAmount > 0 ? String(expense.expenseAmount) : "");
-  }, [expense.expenseAmount]);
+    setAmount(expense.amount > 0 ? String(expense.amount) : "");
+  }, [expense.amount]);
 
   // Sync payment mode icon
   useEffect(() => {
-    if (expense.paymentMode) {
-      const mode = PaymentModeData.find(item => item.value === expense.paymentMode);
+    if (expense.payment_mode) {
+      const mode = PaymentModeData.find(item => item.value === expense.payment_mode);
       if (mode) {
         setSelectedPaymentMode(mode.icon);
       }
     } else {
       setSelectedPaymentMode(null);
     }
-  }, [expense.paymentMode]);
+  }, [expense.payment_mode]);
 
   // Main sheet animation values
   const [fadeAnim] = useState(() => new Animated.Value(0));
@@ -387,7 +387,7 @@ const AddExpenseModal = ({
 
   // Main close function (incorporating parent's discard prompt)
   const handleClose = () => {
-    const hasInputs = amount !== "" || expense.expenseName !== "" || expense.expenseCategory !== "" || expense.paymentMode !== "";
+    const hasInputs = amount !== "" || expense.expense_name !== "" || expense.category !== "" || expense.payment_mode !== "";
 
     if (hasInputs && handleInputs) {
       handleInputs();
@@ -411,7 +411,7 @@ const AddExpenseModal = ({
 
   // Main save function (incorporating exit animation snippet)
   const handleSave = () => {
-    if (!amount || !expense.expenseName) {
+    if (!amount || !expense.expense_name) {
       Alert.alert("Error", "Please enter an amount and title");
       return;
     }
@@ -441,14 +441,14 @@ const AddExpenseModal = ({
 
   const handleCategorySelect = (categoryVal, modalClose) => {
     modalClose(() => {
-      handleExpenseChange("expenseCategory", categoryVal);
+      handleExpenseChange("category", categoryVal);
     });
   };
 
   const handlePaymentModeSelect = (mode, modalClose) => {
     modalClose(() => {
       setSelectedPaymentMode(mode.icon);
-      handleExpenseChange("paymentMode", mode.value);
+      handleExpenseChange("payment_mode", mode.value);
     });
   };
 
@@ -517,7 +517,7 @@ const AddExpenseModal = ({
               style={styles.segmentedTab}
               onPress={() => {
                 setFormType("Non-Recurring");
-                handleExpenseChange("expenseType", "Non-Recurring");
+                handleExpenseChange("expense_type", "Non-Recurring");
               }}
             >
               <CustomText
@@ -535,7 +535,7 @@ const AddExpenseModal = ({
               style={styles.segmentedTab}
               onPress={() => {
                 setFormType("Recurring");
-                handleExpenseChange("expenseType", "Recurring");
+                handleExpenseChange("expense_type", "Recurring");
                 handleExpenseChange("times", 1);
               }}
             >
@@ -568,7 +568,7 @@ const AddExpenseModal = ({
                   onChangeText={(text) => {
                     const cleanText = text.replace(/[^0-9.]/g, "");
                     setAmount(cleanText);
-                    handleExpenseChange("expenseAmount", parseFloat(cleanText) || 0);
+                    handleExpenseChange("amount", parseFloat(cleanText) || 0);
                   }}
                   placeholder="0"
                   placeholderTextColor={colors.text + '55'}
@@ -604,8 +604,8 @@ const AddExpenseModal = ({
             <View style={[styles.inputContainer, { backgroundColor: colors.expenseInput, borderColor: colors.inputBg }]}>
               <TextInput
                 placeholder="Enter expense name"
-                value={expense.expenseName}
-                onChangeText={(text) => handleExpenseChange("expenseName", text)}
+                value={expense.expense_name}
+                onChangeText={(text) => handleExpenseChange("expense_name", text)}
                 placeholderTextColor={colors.text + '55'}
                 style={[styles.titleInput, { color: colors.text }]}
               />
@@ -624,10 +624,10 @@ const AddExpenseModal = ({
               <CustomText
                 style={[
                   styles.selectButtonText,
-                  { color: expense.expenseCategory ? colors.text : colors.text + '55' }
+                  { color: expense.category ? colors.text : colors.text + '55' }
                 ]}
               >
-                {expense.expenseCategory || "Select Category"}
+                {expense.category || "Select Category"}
               </CustomText>
               <Ionicons name="chevron-down" size={18} color={colors.text + '80'} />
             </Pressable>
@@ -652,7 +652,7 @@ const AddExpenseModal = ({
         visible={addExpenseModals === "category"}
         onClose={() => setAddExpenseModals(null)}
         onSelect={(categoryVal, modalClose) => handleCategorySelect(categoryVal, modalClose)}
-        selectedValue={expense.expenseCategory}
+        selectedValue={expense.category}
         colors={colors}
         dark={dark}
       />
@@ -662,7 +662,7 @@ const AddExpenseModal = ({
         visible={addExpenseModals === "paymentMode"}
         onClose={() => setAddExpenseModals(null)}
         onSelect={(mode, modalClose) => handlePaymentModeSelect(mode, modalClose)}
-        selectedValue={expense.paymentMode}
+        selectedValue={expense.payment_mode}
         colors={colors}
         dark={dark}
       />

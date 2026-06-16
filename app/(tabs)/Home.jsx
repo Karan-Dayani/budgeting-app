@@ -65,16 +65,53 @@ export default function Home() {
 
   const getUserRow = async () => {
     try {
-      const { data, error } = await supabase
-        .from("User Data")
-        .select("*")
-        .eq("email", user?.user_metadata?.email);
+      const [userResponse, transResponse] = await Promise.all([
+        supabase
+          .from("User Data")
+          .select("*")
+          .eq("email", user?.user_metadata?.email),
+        supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", user?.id)
+          .order("transaction_date", { ascending: false })
+      ]);
 
-      if (error) {
-        console.error("Error fetching user data:", error);
-      } else {
-        setUserData(data);
+      if (userResponse.error) throw userResponse.error;
+      if (transResponse.error) throw transResponse.error;
+
+      const formattedTrans = (transResponse.data || []).map((tx) => {
+        let formattedDate = "";
+        if (tx.transaction_date) {
+          const dateParts = tx.transaction_date.split("-");
+          if (dateParts.length === 3) {
+            const yearInt = parseInt(dateParts[0], 10);
+            const monthInt = parseInt(dateParts[1], 10) - 1;
+            const dayInt = parseInt(dateParts[2], 10);
+            const d = new Date(yearInt, monthInt, dayInt);
+            formattedDate = d.toDateString().slice(4);
+          } else {
+            formattedDate = new Date(tx.transaction_date).toDateString().slice(4);
+          }
+        } else {
+          formattedDate = new Date().toDateString().slice(4);
+        }
+        return {
+          ...tx,
+          expenseId: tx.id,
+          expenseName: tx.expense_name,
+          expenseAmount: tx.amount,
+          paymentMode: tx.payment_mode,
+          expenseDate: formattedDate,
+          expenseCategory: tx.category,
+          expenseType: tx.expense_type,
+        };
+      });
+
+      if (userResponse.data && userResponse.data[0]) {
+        userResponse.data[0].expenses = formattedTrans;
       }
+      setUserData(userResponse.data);
     } catch (err) {
       console.error("Unexpected error:", err);
     } finally {

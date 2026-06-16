@@ -56,19 +56,27 @@ const ProfilePage = () => {
         Alert.alert("Please enter a valid number for income.");
         return;
       } else {
-        const { data, error: updateError } = await supabase
-          .from("User Data")
-          .update({
-            username: userName,
-            income: incomeNumber,
-            savings: incomeNumber,
-            expenses: [],
-            goals: [],
-          })
-          .eq("email", user?.user_metadata?.email)
-          .select();
-        if (updateError) {
-          Alert.alert("Error updating profile", updateError.message);
+        const [updateRes, deleteRes] = await Promise.all([
+          supabase
+            .from("User Data")
+            .update({
+              username: userName,
+              income: incomeNumber,
+              savings: incomeNumber,
+              expenses: [],
+              goals: [],
+            })
+            .eq("email", user?.user_metadata?.email),
+          supabase
+            .from("transactions")
+            .delete()
+            .eq("user_id", user?.id)
+        ]);
+
+        if (updateRes.error) {
+          Alert.alert("Error updating profile", updateRes.error.message);
+        } else if (deleteRes.error) {
+          Alert.alert("Error clearing transactions", deleteRes.error.message);
         } else {
           setAlertVisible("profileUpdated");
         }
@@ -108,20 +116,60 @@ const ProfilePage = () => {
   };
 
   async function fetchData() {
-    const { data, error } = await supabase
-      .from("User Data")
-      .select("username,income,expenses,savings")
-      .eq("email", user?.user_metadata?.email);
+    try {
+      const [userResponse, transResponse] = await Promise.all([
+        supabase
+          .from("User Data")
+          .select("username,income,savings")
+          .eq("email", user?.user_metadata?.email),
+        supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", user?.id)
+          .order("transaction_date", { ascending: false })
+      ]);
 
-    if (error) {
-      console.error(error);
+      if (userResponse.error) throw userResponse.error;
+      if (transResponse.error) throw transResponse.error;
+
+      const userData = userResponse.data[0];
+      setUserName(userData?.username || "");
+      setIncome(userData?.income || 0);
+      setOldIncome(userData?.income || 0);
+      setSavings(userData?.savings || 0);
+
+      const formattedTrans = (transResponse.data || []).map((tx) => {
+        let formattedDate = "";
+        if (tx.transaction_date) {
+          const dateParts = tx.transaction_date.split("-");
+          if (dateParts.length === 3) {
+            const yearInt = parseInt(dateParts[0], 10);
+            const monthInt = parseInt(dateParts[1], 10) - 1;
+            const dayInt = parseInt(dateParts[2], 10);
+            const d = new Date(yearInt, monthInt, dayInt);
+            formattedDate = d.toDateString().slice(4);
+          } else {
+            formattedDate = new Date(tx.transaction_date).toDateString().slice(4);
+          }
+        } else {
+          formattedDate = new Date().toDateString().slice(4);
+        }
+        return {
+          ...tx,
+          expenseId: tx.id,
+          expenseName: tx.expense_name,
+          expenseAmount: tx.amount,
+          paymentMode: tx.payment_mode,
+          expenseDate: formattedDate,
+          expenseCategory: tx.category,
+          expenseType: tx.expense_type,
+        };
+      });
+
+      setExpenses(formattedTrans);
+    } catch (err) {
+      console.error(err);
       Alert.alert("Error fetching data");
-    } else {
-      setUserName(data[0]?.username || "");
-      setIncome(data[0]?.income || 0);
-      setOldIncome(data[0]?.income || 0);
-      setExpenses(data[0]?.expenses || [])
-      setSavings(data[0]?.savings || 0);
     }
   }
 

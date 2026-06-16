@@ -28,83 +28,90 @@ const TotalIncome = ({ user }) => {
     const currentDate = new Date();
     const formattedCurrentDate = currentDate.toISOString().split("T")[0];
 
-    let { data, error } = await supabase
-      .from("User Data")
-      .select("expenses, savings, lastRunDate")
-      .eq("email", user[0]?.email);
+    try {
+      const [userResponse, transResponse] = await Promise.all([
+        supabase
+          .from("User Data")
+          .select("savings, lastRunDate")
+          .eq("email", user[0]?.email),
+        supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_email", user[0]?.email)
+          .eq("expense_type", "Recurring")
+      ]);
 
-    if (error) {
-      console.error("Error fetching data:", error);
-      return;
-    }
+      if (userResponse.error) throw userResponse.error;
+      if (transResponse.error) throw transResponse.error;
 
-    if (!data || !data[0]) {
-      console.log("No user data found for recursion update. Skipping...");
-      return;
-    }
+      const userData = userResponse.data[0];
+      const recurringTrans = transResponse.data || [];
 
-    const lastRunDate = data[0]?.lastRunDate || null;
+      if (!userData) {
+        console.log("No user data found for recursion update. Skipping...");
+        return;
+      }
 
-    if (lastRunDate === formattedCurrentDate) {
-      console.log("Function has already run today. Skipping...");
-      return;
-    }
+      const lastRunDate = userData.lastRunDate || null;
 
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    const currentDay = currentDate.getDate();
+      if (lastRunDate === formattedCurrentDate) {
+        console.log("Function has already run today. Skipping...");
+        return;
+      }
 
-    const parseExpenseDate = (expenseDate) => {
-      const monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      const [month, day, year] = expenseDate.split(" ");
-      const monthIndex = monthNames.indexOf(month);
-      return { monthIndex, day: parseInt(day), year: parseInt(year) };
-    };
+      const parseExpenseDate = (expenseDateStr) => {
+        const parts = expenseDateStr.split("-");
+        if (parts.length === 3) {
+          return {
+            monthIndex: parseInt(parts[1], 10) - 1,
+            day: parseInt(parts[2], 10),
+            year: parseInt(parts[0], 10)
+          };
+        }
+        const today = new Date();
+        return { monthIndex: today.getMonth(), day: today.getDate(), year: today.getFullYear() };
+      };
 
+      let updatedSavings = userData.savings;
+      let transactionsToUpdateDate = [];
 
-    let updatedExpenses = data[0]?.expenses.map((expense) => {
-      const { monthIndex, day, year } = parseExpenseDate(expense.expenseDate);
+      for (let tx of recurringTrans) {
+        const { monthIndex, day, year } = parseExpenseDate(tx.transaction_date);
+        const nextBillingDate = new Date(year, monthIndex + 1, day);
 
+        if (currentDate >= nextBillingDate) {
+          updatedSavings -= tx.amount;
 
-      if (expense.expenseType === "Recurring") {
-        const expenseMonthPassed =
-          currentMonth > monthIndex ||
-          (currentMonth === monthIndex && currentDay >= day);
-        if (expenseMonthPassed) {
-          expense.times++;
-          data[0].savings -= expense.expenseAmount;
+          transactionsToUpdateDate.push(
+            supabase
+              .from("transactions")
+              .update({ transaction_date: nextBillingDate.toISOString().split("T")[0] })
+              .eq("id", tx.id)
+          );
         }
       }
 
-      return expense;
-    });
+      const updateSavingsPromise = supabase
+        .from("User Data")
+        .update({
+          savings: updatedSavings,
+          lastRunDate: formattedCurrentDate,
+        })
+        .eq("email", user[0]?.email);
 
-    let { updateError } = await supabase
-      .from("User Data")
-      .update({
-        expenses: updatedExpenses,
-        savings: data[0]?.savings,
-        lastRunDate: formattedCurrentDate,
-      })
-      .eq("email", user[0]?.email);
+      const results = await Promise.all([
+        updateSavingsPromise,
+        ...transactionsToUpdateDate
+      ]);
 
-    if (updateError) {
-      console.error("Error updating data:", updateError);
-    } else {
-      console.log("Data successfully updated");
+      const hasError = results.some(r => r.error);
+      if (hasError) {
+        console.error("Error updating recursion data");
+      } else {
+        console.log("Data successfully updated");
+      }
+    } catch (error) {
+      console.error("Error running recursion update:", error);
     }
   };
 
