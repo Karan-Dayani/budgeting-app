@@ -14,24 +14,28 @@ const ExpenseDetail = ({
 
     return (
         <Pressable onPress={closeExpenseDetail} className="flex-1 justify-center items-center bg-opacity-80" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-            <Pressable onPress={() => { }} className="rounded-3xl p-8 w-10/12 shadow-lg" style={{ backgroundColor: "#31363F" }}>
+            <Pressable onPress={() => { }} className="rounded-3xl p-8 w-10/12 shadow-lg" style={{ backgroundColor: colors.expenseForm }}>
                 <CustomText
-                    className="text-white text-3xl mb-2"
+                    className="text-3xl mb-2"
+                    style={{ color: colors.text }}
                 >
                     {selectedExpense?.expenseName}
                 </CustomText>
                 <CustomText
-                    className="text-yellow-400 text-2xl mb-2"
+                    className="text-yellow-500 text-2xl mb-2"
+                    style={{ fontWeight: 'bold' }}
                 >
                     ₹{numberWithCommas(selectedExpense?.expenseAmount)}
                 </CustomText>
                 <CustomText
-                    className="text-gray-400 text-xl mb-2"
+                    className="text-xl mb-2"
+                    style={{ color: colors.secondary }}
                 >
                     Date: {selectedExpense?.expenseDate}
                 </CustomText>
                 <CustomText
-                    className="text-gray-400 text-xl mb-4"
+                    className="text-xl mb-4"
+                    style={{ color: colors.secondary }}
                 >
                     Payment Mode: {selectedExpense?.paymentMode}
                 </CustomText>

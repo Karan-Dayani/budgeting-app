@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "expo-router/react-navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Animated,
   Pressable,
-  View
+  View,
+  StyleSheet
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -23,13 +24,58 @@ const ExpenseHeader = ({
   filteredExpenses,
   isDatePickerVisible
 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMenuMounted, setIsMenuMounted] = useState(false);
+  const [menuAnim] = useState(() => new Animated.Value(0));
+  const [pressScale] = useState(() => new Animated.Value(1));
 
-  const { colors } = useTheme()
+  const { colors } = useTheme();
+
+  const toggleMenu = (open) => {
+    if (open) {
+      setIsMenuMounted(true);
+      Animated.spring(menuAnim, {
+        toValue: 1,
+        tension: 60,
+        friction: 8,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(menuAnim, {
+        toValue: 0,
+        duration: 120,
+        useNativeDriver: true,
+      }).start(() => {
+        setIsMenuMounted(false);
+      });
+    }
+  };
+
+  const handlePressIn = () => {
+    Animated.spring(pressScale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(pressScale, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const menuScale = menuAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.9, 1],
+  });
+
+  const menuOpacity = menuAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
 
   return (
-    <Animated.View className="w-full mt-5"
-    >
+    <Animated.View className="w-full mt-5">
       <View>
         <View className="flex-row justify-between items-center mb-4">
           <View>
@@ -45,15 +91,6 @@ const ExpenseHeader = ({
                     ? filters.category
                     : "All Expenses"}
             </CustomText>
-            {/* <CustomText className={`text-xl ml-1`} style={{ color: colors.text }}>
-                  {filters?.date
-                    ? filters.date
-                    : filters?.month
-                      ? filters.month
-                      : filters?.category
-                        ? filters.category
-                        : "All Expenses"}
-                </CustomText> */}
             <CustomText className={`px-1`} style={{ color: colors.text }}>
               Total Expense: {numberWithCommas(filteredExpenses?.reduce((sum, expense) => sum + expense.expenseAmount, 0))}
             </CustomText>
@@ -66,24 +103,31 @@ const ExpenseHeader = ({
                     date: "",
                     month: "",
                     category: "",
-                  })
+                  });
                   setDatePickerVisibility(false);
                 }}
-                className="bg-red-500 px-5 py-3 rounded-3xl justify-center "
+                className="bg-red-500 px-5 py-3 rounded-3xl justify-center"
               >
                 <CustomText className="text-white text-lg mx-2">
                   Reset
                 </CustomText>
               </Pressable>
             ) : (
-              <View>
+              <View style={{ zIndex: 2000 }}>
                 <Pressable
                   accessibilityLabel="More options menu"
-                  onPress={() => setMenuOpen(!menuOpen)}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  onPress={() => toggleMenu(!isMenuMounted)}
                 >
                   <Animated.View
-                    className="flex-row items-center rounded-3xl p-3"
-                    style={{ backgroundColor: colors.inputBg }}
+                    className="flex-row items-center rounded-3xl py-2 px-4"
+                    style={{
+                      backgroundColor: colors.inputBg,
+                      borderWidth: colors.dark ? 0 : 1,
+                      borderColor: "#E5E7EB",
+                      transform: [{ scale: pressScale }],
+                    }}
                   >
                     <Ionicons
                       name="filter"
@@ -98,58 +142,76 @@ const ExpenseHeader = ({
                     </CustomText>
                   </Animated.View>
                 </Pressable>
-                {menuOpen && (
-                  <View
+                {isMenuMounted && (
+                  <Animated.View
                     style={{
                       position: "absolute",
-                      top: 55,
+                      top: 52,
                       right: 0,
-                      width: 160,
-                      backgroundColor: colors.inputBg,
+                      width: 170,
+                      backgroundColor: colors.card,
                       borderRadius: 16,
-                      padding: 8,
+                      padding: 6,
                       zIndex: 2000,
                       shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.84,
-                      elevation: 5,
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.15,
+                      shadowRadius: 12,
+                      elevation: 8,
+                      borderWidth: 1,
+                      borderColor: colors.dark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)",
+                      opacity: menuOpacity,
+                      transform: [{ scale: menuScale }],
                     }}
                   >
                     <Pressable
                       onPress={() => {
                         setDatePickerVisibility(true);
-                        setMenuOpen(false);
+                        toggleMenu(false);
                       }}
-                      style={{ padding: 12 }}
+                      style={({ pressed }) => [
+                        styles.menuItem,
+                        pressed && { backgroundColor: colors.dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }
+                      ]}
                     >
+                      <Ionicons name="calendar-outline" size={18} color={colors.text} style={styles.menuIcon} />
                       <CustomText style={{ color: colors.text, fontSize: 16 }}>
                         Date
                       </CustomText>
                     </Pressable>
+                    <View style={[styles.divider, { backgroundColor: colors.dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)" }]} />
                     <Pressable
                       onPress={() => {
                         setShowModal("monthModal");
-                        setMenuOpen(false);
+                        toggleMenu(false);
                       }}
-                      style={{ padding: 12 }}
+                      style={({ pressed }) => [
+                        styles.menuItem,
+                        pressed && { backgroundColor: colors.dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }
+                      ]}
                     >
+                      <Ionicons name="calendar" size={18} color={colors.text} style={styles.menuIcon} />
                       <CustomText style={{ color: colors.text, fontSize: 16 }}>
                         Month
                       </CustomText>
                     </Pressable>
+                    <View style={[styles.divider, { backgroundColor: colors.dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)" }]} />
                     <Pressable
                       onPress={() => {
                         setShowModal("categoryModal");
-                        setMenuOpen(false);
+                        toggleMenu(false);
                       }}
-                      style={{ padding: 12 }}
+                      style={({ pressed }) => [
+                        styles.menuItem,
+                        pressed && { backgroundColor: colors.dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }
+                      ]}
                     >
+                      <Ionicons name="pricetag-outline" size={18} color={colors.text} style={styles.menuIcon} />
                       <CustomText style={{ color: colors.text, fontSize: 16 }}>
                         Category
                       </CustomText>
                     </Pressable>
-                  </View>
+                  </Animated.View>
                 )}
               </View>
             )}
@@ -173,4 +235,22 @@ const ExpenseHeader = ({
   )
 }
 
-export default ExpenseHeader
+const styles = StyleSheet.create({
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  menuIcon: {
+    marginRight: 10,
+  },
+  divider: {
+    height: 1,
+    marginHorizontal: 8,
+    marginVertical: 4,
+  }
+});
+
+export default ExpenseHeader;
