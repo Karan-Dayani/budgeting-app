@@ -37,6 +37,7 @@ const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => { } }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#000000",
   },
   video: {
     flex: 1,
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+    backgroundColor: "#000000",
   },
 });
 

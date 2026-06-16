@@ -245,7 +245,7 @@ const ProfilePage = () => {
           </View>
         </View>
       </View>
-      <ScrollView 
+      <ScrollView
         className="flex-1 px-6 mt-20"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -365,8 +365,8 @@ const ProfilePage = () => {
           onPress={() => setShowModal(null)}
           className="flex-1 justify-center px-6 bg-black/60"
         >
-          <Pressable 
-            onPress={() => {}} 
+          <Pressable
+            onPress={() => { }}
             className="pb-8 justify-center rounded-3xl px-6 shadow-2xl"
             style={{ backgroundColor: colors.expenseForm }}
           >
@@ -379,8 +379,8 @@ const ProfilePage = () => {
               </CustomText>
               <TextInput
                 className="rounded-2xl p-4 text-base mb-4 border"
-                style={{ 
-                  backgroundColor: colors.expenseInput, 
+                style={{
+                  backgroundColor: colors.expenseInput,
                   color: colors.text,
                   borderColor: colors.inputBg
                 }}
@@ -394,8 +394,8 @@ const ProfilePage = () => {
               </CustomText>
               <TextInput
                 className="rounded-2xl p-4 text-base border"
-                style={{ 
-                  backgroundColor: colors.expenseInput, 
+                style={{
+                  backgroundColor: colors.expenseInput,
                   color: colors.text,
                   borderColor: colors.inputBg
                 }}
@@ -450,7 +450,7 @@ const ProfilePage = () => {
           className="flex-1 justify-center items-center bg-black/60"
         >
           <Pressable
-            onPress={() => {}}
+            onPress={() => { }}
             className="p-6 rounded-3xl w-4/5 shadow-2xl"
             style={{ backgroundColor: colors.expenseForm }}
           >
@@ -611,7 +611,7 @@ const ProfilePage = () => {
           className="flex-1 justify-center items-center bg-black/60"
         >
           <Pressable
-            onPress={() => {}}
+            onPress={() => { }}
             className="p-6 rounded-3xl w-4/5 shadow-2xl"
             style={{ backgroundColor: colors.expenseForm }}
           >

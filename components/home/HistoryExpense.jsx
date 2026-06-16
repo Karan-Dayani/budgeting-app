@@ -1,10 +1,9 @@
-import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, StyleSheet } from "react-native";
 import CustomText from "../CustomText";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 
-const HistoryExpense = ({ colors, userData }) => {
+const HistoryExpense = ({ colors, dark, userData }) => {
     const historyExpense = userData[0]?.expenses?.slice(0, 4);
     const navigation = useNavigation();
 
@@ -32,7 +31,11 @@ const HistoryExpense = ({ colors, userData }) => {
         <View className="mt-4">
             <View
                 className="rounded-[28px] p-5 shadow-sm"
-                style={{ backgroundColor: colors.chartBg }}
+                style={{ 
+                    backgroundColor: colors.chartBg,
+                    borderWidth: dark ? 0 : 1,
+                    borderColor: '#E5E7EB',
+                }}
             >
                 <View className="items-center justify-between flex-row mb-5">
                     <CustomText 
@@ -88,14 +91,66 @@ const HistoryExpense = ({ colors, userData }) => {
                             );
                         })
                     ) : (
-                        <CustomText className="text-sm text-gray-500 text-center italic" style={{ color: colors.text }}>
-                            No expenses recorded yet.
-                        </CustomText>
+                        <View style={styles.emptyContainer}>
+                            <Feather name="info" size={20} color="#78909C" style={{ marginBottom: 6 }} />
+                            <CustomText style={[styles.emptyTitle, { color: colors.text }]}>
+                                No recent expenses
+                            </CustomText>
+                            <CustomText style={styles.emptySubtitle}>
+                                Add your first expense to begin tracking.
+                            </CustomText>
+                            <TouchableOpacity
+                                activeOpacity={0.8}
+                                style={[styles.emptyButton, { backgroundColor: 'rgba(65, 179, 162, 0.11)', borderColor: 'rgba(65, 179, 162, 0.22)' }]}
+                                onPress={() => navigation.navigate("Expenses")}
+                            >
+                                <Feather name="plus" size={13} color="#41B3A2" />
+                                <CustomText style={styles.emptyButtonText}>
+                                    Add Expense
+                                </CustomText>
+                            </TouchableOpacity>
+                        </View>
                     )}
                 </View>
             </View>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    emptyContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 18,
+    },
+    emptyTitle: {
+        fontSize: 13,
+        fontWeight: '700',
+        fontFamily: 'Poppins_SemiBold',
+        marginBottom: 2,
+    },
+    emptySubtitle: {
+        fontSize: 11,
+        color: '#8A9Aad',
+        textAlign: 'center',
+        marginBottom: 12,
+        maxWidth: 220,
+    },
+    emptyButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 5,
+        paddingHorizontal: 14,
+        paddingVertical: 7,
+        borderRadius: 12,
+        borderWidth: 1,
+    },
+    emptyButtonText: {
+        color: '#41B3A2',
+        fontSize: 11,
+        fontWeight: '700',
+    }
+});
 
 export default HistoryExpense;

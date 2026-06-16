@@ -31,6 +31,31 @@ export default function ExpensesPage() {
   const { user } = useUser();
   const isFocused = useIsFocused();
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(10)).current;
+
+  useEffect(() => {
+    if (isFocused) {
+      fadeAnim.setValue(0);
+      slideAnim.setValue(10);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 220,
+          useNativeDriver: true,
+        })
+      ]).start();
+    } else {
+      fadeAnim.setValue(0);
+      slideAnim.setValue(10);
+    }
+  }, [isFocused]);
+
   const [animations, setAnimations] = useState([]);
 
   const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
@@ -316,156 +341,157 @@ export default function ExpensesPage() {
   };
 
   return (
-    <View className="px-5 flex-1" style={{
-      backgroundColor: colors.background
-    }}>
-      <Stack.Screen
-        options={{
-          headerShown: false,
+    <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+      <View className="px-5 flex-1" style={{
+        backgroundColor: colors.background
+      }}>
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+        />
+        <SafeAreaView className="h-full">
+          <>
+            <ExpenseAddButton setShowModal={setShowModal} />
+          </>
+          <View style={{ zIndex: 100, elevation: 10 }}>
+            <ExpenseHeader
+              filters={filters}
+              setFilters={setFilters}
+              setDatePickerVisibility={setDatePickerVisibility}
+              setShowModal={setShowModal}
+              handleConfirm={handleConfirm}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              isDatePickerVisible={isDatePickerVisible}
+              filteredExpenses={filteredExpenses}
+            />
+          </View>
 
-        }}
-      />
-      <SafeAreaView className="h-full">
-        <>
-          <ExpenseAddButton setShowModal={setShowModal} />
-        </>
-        <View style={{ zIndex: 100, elevation: 10 }}>
-          <ExpenseHeader
-            filters={filters}
-            setFilters={setFilters}
-            setDatePickerVisibility={setDatePickerVisibility}
-            setShowModal={setShowModal}
-            handleConfirm={handleConfirm}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            isDatePickerVisible={isDatePickerVisible}
-            filteredExpenses={filteredExpenses}
-          />
-        </View>
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.text}
+              className="justify-center h-96"
+            />
+          ) : (
+            <FlatList
+              data={filteredExpenses}
+              keyExtractor={(item) => item.expenseId}
+              renderItem={({ item, index }) => {
+                const itemAnimation =
+                  index < 7 ? animations[index] || new Animated.Value(1) : new Animated.Value(1);
 
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.text}
-            className="justify-center h-96"
-          />
-        ) : (
-          <FlatList
-            data={filteredExpenses}
-            keyExtractor={(item) => item.expenseId}
-            renderItem={({ item, index }) => {
-              const itemAnimation =
-                index < 7 ? animations[index] || new Animated.Value(1) : new Animated.Value(1);
+                const animatedStyle = index < 7
+                  ? {
+                    opacity: itemAnimation,
+                    transform: [
+                      {
+                        translateY: itemAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [50, 0],
+                        }),
+                      },
+                    ],
+                  }
+                  : {};
 
-              const animatedStyle = index < 7
-                ? {
-                  opacity: itemAnimation,
-                  transform: [
-                    {
-                      translateY: itemAnimation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [50, 0],
-                      }),
-                    },
-                  ],
-                }
-                : {};
+                return (
+                  <Animated.View style={animatedStyle}>
+                    <ExpenseItem
+                      handleExpenseDetail={handleExpenseDetail}
+                      item={item}
+                      isLast={index === filteredExpenses.length - 1}
+                    />
+                  </Animated.View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={<NoDataLoad filters={filters} />}
+              contentContainerStyle={{ paddingBottom: 50 }}
+            />
 
-              return (
-                <Animated.View style={animatedStyle}>
-                  <ExpenseItem
-                    handleExpenseDetail={handleExpenseDetail}
-                    item={item}
-                    isLast={index === filteredExpenses.length - 1}
-                  />
-                </Animated.View>
-              );
-            }}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={<NoDataLoad filters={filters} />}
-            contentContainerStyle={{ paddingBottom: 50 }}
-          />
+          )}
 
-        )}
+          {selectedExpense && (
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={showModal === "expenseDetail"}
+              onRequestClose={closeExpenseDetail}
+            >
+              <ExpenseDetail
+                selectedExpense={selectedExpense}
+                handleDeleteExpense={handleDeleteExpense}
+                closeExpenseDetail={closeExpenseDetail}
+              />
+            </Modal>
+          )}
 
-        {selectedExpense && (
           <Modal
-            animationType="fade"
+            animationType="slide"
             transparent={true}
-            visible={showModal === "expenseDetail"}
-            onRequestClose={closeExpenseDetail}
+            visible={showModal === "addExpense"}
+            onRequestClose={handleInputs}
           >
-            <ExpenseDetail
-              selectedExpense={selectedExpense}
-              handleDeleteExpense={handleDeleteExpense}
-              closeExpenseDetail={closeExpenseDetail}
+            <AddExpenseModal
+              expense={expense}
+              handleExpenseChange={handleExpenseChange}
+              handleSaveExpense={handleSaveExpense}
+              setShowModal={setShowModal}
+              colors={colors}
             />
           </Modal>
-        )}
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={showModal === "addExpense"}
-          onRequestClose={handleInputs}
-        >
-          <AddExpenseModal
-            expense={expense}
-            handleExpenseChange={handleExpenseChange}
-            handleSaveExpense={handleSaveExpense}
-            setShowModal={setShowModal}
-            colors={colors}
-          />
-        </Modal>
-
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={showModal === "monthModal"}
-          onRequestClose={() => setShowModal(null)}
-        >
-          <MonthPicker
-            setShowModal={setShowModal}
-            setFilters={setFilters}
-            filters={filters}
-          />
-        </Modal>
-
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={showModal === "categoryModal"}
-          onRequestClose={() => setShowModal(null)}
-        >
-          <CategoryPicker
-            setShowModal={setShowModal}
-            setFilters={setFilters}
-            filters={filters}
-          />
-        </Modal>
-
-        <View className="flex-1">
-          {alertVisible && (
-            <CustomAlert
-              visible={!!alertVisible}
-              mainMessage={alertConfig[alertVisible]?.mainMessage}
-              message={alertConfig[alertVisible]?.message}
-              onClose={() => setAlertVisible(null)}
-              alerts={alertConfig[alertVisible]?.alerts}
-              task={alertConfig[alertVisible]?.task}
-              AlertScreen={alertConfig[alertVisible]?.AlertScreen}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={showModal === "monthModal"}
+            onRequestClose={() => setShowModal(null)}
+          >
+            <MonthPicker
+              setShowModal={setShowModal}
+              setFilters={setFilters}
+              filters={filters}
             />
-          )}
-        </View>
+          </Modal>
+
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={showModal === "categoryModal"}
+            onRequestClose={() => setShowModal(null)}
+          >
+            <CategoryPicker
+              setShowModal={setShowModal}
+              setFilters={setFilters}
+              filters={filters}
+            />
+          </Modal>
+
+          <View className="flex-1">
+            {alertVisible && (
+              <CustomAlert
+                visible={!!alertVisible}
+                mainMessage={alertConfig[alertVisible]?.mainMessage}
+                message={alertConfig[alertVisible]?.message}
+                onClose={() => setAlertVisible(null)}
+                alerts={alertConfig[alertVisible]?.alerts}
+                task={alertConfig[alertVisible]?.task}
+                AlertScreen={alertConfig[alertVisible]?.AlertScreen}
+              />
+            )}
+          </View>
 
 
-      </SafeAreaView>
+        </SafeAreaView>
 
-      <Notification
-        isVisible={notify === "Saved" || notify === "Deleted"}
-        text={notify === "Saved" ? "Expense Saved!" : "Expense Deleted!"}
-        bgColor="green.500"
-      />
-    </View>
+        <Notification
+          isVisible={notify === "Saved" || notify === "Deleted"}
+          text={notify === "Saved" ? "Expense Saved!" : "Expense Deleted!"}
+          bgColor="green.500"
+        />
+      </View>
+    </Animated.View>
   );
 }

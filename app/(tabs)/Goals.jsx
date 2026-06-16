@@ -5,7 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ActivityIndicator
+  ActivityIndicator,
+  Animated
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -31,6 +32,31 @@ import { Notification, numberWithCommas } from "../../lib/utils";
 
 const Goals = () => {
   const isFocused = useIsFocused();
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const slideAnim = React.useRef(new Animated.Value(10)).current;
+
+  useEffect(() => {
+    if (isFocused) {
+      fadeAnim.setValue(0);
+      slideAnim.setValue(10);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 220,
+          useNativeDriver: true,
+        })
+      ]).start();
+    } else {
+      fadeAnim.setValue(0);
+      slideAnim.setValue(10);
+    }
+  }, [isFocused]);
+
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -51,7 +77,7 @@ const Goals = () => {
   });
   const [goalComplete, setGoalComplete] = useState(false);
 
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
 
   const fetchData = async () => {
     const { data, error } = await supabase
@@ -209,6 +235,7 @@ const Goals = () => {
 
 
   return (
+    <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
       <View className="px-5 flex-1" style={{
         backgroundColor: colors.background
       }}>
@@ -258,8 +285,12 @@ const Goals = () => {
                   .map((item, index) => {
                     return (
                       <View
-                        className="rounded-3xl  p-4 my-2 w-full flex-row justify-between"
-                        style={{ backgroundColor: colors.inputBg }}
+                        className="rounded-3xl  p-4 my-2 w-full flex-row justify-between shadow-sm"
+                        style={{ 
+                          backgroundColor: colors.itemBg,
+                          borderWidth: dark ? 0 : 1,
+                          borderColor: '#E5E7EB',
+                        }}
                         key={index}
                       >
                         <View className="flex-row">
@@ -268,10 +299,10 @@ const Goals = () => {
                               value={
                                 item.goalTargetMoney > 0
                                   ? Math.round(
-                                      (Number(item.goalSavedMoney) /
-                                        Number(item.goalTargetMoney)) *
-                                        100
-                                    )
+                                    (Number(item.goalSavedMoney) /
+                                      Number(item.goalTargetMoney)) *
+                                    100
+                                  )
                                   : 0
                               }
                               radius={35}
@@ -327,7 +358,7 @@ const Goals = () => {
                   className="p-6 rounded-xl mt-5 shadow-lg"
                   style={{ backgroundColor: colors.itemBg }}
                 >
-                  <CustomText className="text-white text-xl mb-3">
+                  <CustomText className="text-xl mb-3" style={{ color: colors.text }}>
                     Set and track your personal goals here.
                   </CustomText>
 
@@ -392,10 +423,10 @@ const Goals = () => {
                           value={
                             selectedGoal.goalTargetMoney > 0
                               ? Math.round(
-                                  (Number(selectedGoal.goalSavedMoney) /
-                                    Number(selectedGoal.goalTargetMoney)) *
-                                    100
-                                )
+                                (Number(selectedGoal.goalSavedMoney) /
+                                  Number(selectedGoal.goalTargetMoney)) *
+                                100
+                              )
                               : 0
                           }
                           radius={80}
@@ -421,11 +452,11 @@ const Goals = () => {
 
                     <TextInput
                       placeholder="Enter Amount"
-                      className=" text-white p-4 mb-4 rounded-3xl w-full"
+                      className="p-4 mb-4 rounded-3xl w-full"
                       placeholderTextColor={"#A0AEC0"}
                       keyboardType="numeric"
                       onChangeText={(text) => setGoalAddInput(Number(text))}
-                      style={{ backgroundColor: colors.expenseInput }}
+                      style={{ backgroundColor: colors.expenseInput, color: colors.text }}
                     />
 
                     <View className="flex-row gap-2">
@@ -537,6 +568,7 @@ const Goals = () => {
           bgColor="green.500"
         />
       </View>
+    </Animated.View>
   );
 };
 

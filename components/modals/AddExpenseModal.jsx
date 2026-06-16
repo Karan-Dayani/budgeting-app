@@ -203,8 +203,8 @@ const AddExpenseModal = ({
                       <Ionicons
                         name={selectedPaymentMode}
                         size={30}
-                        color="white"
-                      /> : <FontAwesome name="rupee" size={30} color="white" />
+                        color={colors.text}
+                      /> : <FontAwesome name="rupee" size={30} color={colors.text} />
                     }
                   </CustomText>
                 </Pressable>

@@ -5,13 +5,17 @@ import { numberWithCommas } from "../../lib/utils";
 import { useTheme } from "expo-router/react-navigation";
 
 const ExpenseItem = ({ handleExpenseDetail, item, isLast }) => {
-    const { colors } = useTheme();
+    const { colors, dark } = useTheme();
 
     return (
         <TouchableOpacity onPress={() => handleExpenseDetail(item)}>
             <View
-                className={`rounded-3xl px-6 py-5 ${isLast ? 'mb-32' : 'mb-3'}`} // Apply mb-32 only if it's the last item
-                style={{ backgroundColor: colors.inputBg }}
+                className={`rounded-[24px] px-6 py-5 ${isLast ? 'mb-32' : 'mb-3'} shadow-sm`} // Apply mb-32 only if it's the last item
+                style={{ 
+                    backgroundColor: colors.itemBg,
+                    borderWidth: dark ? 0 : 1,
+                    borderColor: '#E5E7EB',
+                }}
             >
                 <View className="flex-row justify-between mb-2">
                     <CustomText className="text-xl" style={{ color: colors.text }}>
