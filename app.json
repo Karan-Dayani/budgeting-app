@@ -3,7 +3,7 @@
     "name": "budgeting-app",
     "slug": "budgeting-app",
     "version": "1.0.0",
-    "backgroundColor": "#41B3A2",
+    "backgroundColor": "#000000",
     "orientation": "portrait",
     "icon": "./assets/images/Coin.png",
     "scheme": "myapp",
@@ -32,7 +32,7 @@
         {
           "image": "./assets/images/CointTrack.png",
           "resizeMode": "cover",
-          "backgroundColor": "#41B3A2"
+          "backgroundColor": "#000000"
         }
       ],
       "expo-status-bar",

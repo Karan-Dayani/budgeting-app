@@ -1,10 +1,11 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import { useTheme } from "expo-router/react-navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Animated,
   Pressable,
-  View
+  View,
+  StyleSheet
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -23,67 +24,111 @@ const ExpenseHeader = ({
   filteredExpenses,
   isDatePickerVisible
 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMenuMounted, setIsMenuMounted] = useState(false);
+  const [menuAnim] = useState(() => new Animated.Value(0));
+  const [pressScale] = useState(() => new Animated.Value(1));
 
-  const { colors } = useTheme()
+  const { colors } = useTheme();
+
+  const toggleMenu = (open) => {
+    if (open) {
+      setIsMenuMounted(true);
+      Animated.spring(menuAnim, {
+        toValue: 1,
+        tension: 60,
+        friction: 8,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(menuAnim, {
+        toValue: 0,
+        duration: 120,
+        useNativeDriver: true,
+      }).start(() => {
+        setIsMenuMounted(false);
+      });
+    }
+  };
+
+  const handlePressIn = () => {
+    Animated.spring(pressScale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(pressScale, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const menuScale = menuAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.9, 1],
+  });
+
+  const menuOpacity = menuAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+
+  const totalExpenseSum = filteredExpenses?.reduce((sum, exp) => sum + exp.expenseAmount, 0) || 0;
+
+  const getFilterLabel = () => {
+    if (filters?.date) return filters.date;
+    if (filters?.month) return filters.month;
+    if (filters?.category) return filters.category;
+    return "All Expenses";
+  };
 
   return (
-    <Animated.View className="w-full mt-5"
-    >
-      <View>
-        <View className="flex-row justify-between items-center mb-4">
+    <Animated.View className="w-full mt-4">
+      <View
+        className="rounded-[28px] p-5 mb-4 shadow-sm"
+        style={{ backgroundColor: colors.inputBg, zIndex: 50, elevation: 10 }}
+      >
+        <View className="flex-row justify-between items-start mb-4">
           <View>
-            <CustomText
-              style={{ color: colors.text }}
-              className={`text-xl ml-1`}
-            >
-              {filters?.date
-                ? filters.date
-                : filters?.month
-                  ? filters.month
-                  : filters?.category
-                    ? filters.category
-                    : "All Expenses"}
+            <CustomText className="text-gray-400 text-xs font-semibold uppercase tracking-wider">
+              {getFilterLabel()}
             </CustomText>
-            {/* <CustomText className={`text-xl ml-1`} style={{ color: colors.text }}>
-                  {filters?.date
-                    ? filters.date
-                    : filters?.month
-                      ? filters.month
-                      : filters?.category
-                        ? filters.category
-                        : "All Expenses"}
-                </CustomText> */}
-            <CustomText className={`px-1`} style={{ color: colors.text }}>
-              Total Expense: {numberWithCommas(filteredExpenses?.reduce((sum, expense) => sum + expense.expenseAmount, 0))}
+            <CustomText style={{ color: colors.text }} className="text-sm text-gray-500 mt-0.5">
+              Total Period Spending
             </CustomText>
           </View>
-          <View className="flex-row gap-x-3" style={{ position: "relative" }}>
+
+          <View className="flex-row items-center gap-2" style={{ position: "relative" }}>
             {filters?.date || filters?.month || filters?.category ? (
               <Pressable
                 onPress={() => {
-                  setFilters({
-                    date: "",
-                    month: "",
-                    category: "",
-                  })
+                  setFilters({ date: "", month: "", category: "" });
                   setDatePickerVisibility(false);
                 }}
-                className="bg-red-500 px-5 py-3 rounded-3xl justify-center "
+                className="bg-red-500/10 px-4 py-2 rounded-full justify-center flex-row items-center"
               >
-                <CustomText className="text-white text-lg mx-2">
+                <Feather name="refresh-cw" size={14} color="#EF4444" />
+                <CustomText className="text-red-500 text-sm font-bold ml-1">
                   Reset
                 </CustomText>
               </Pressable>
             ) : (
-              <View>
+              <View style={{ zIndex: 2000 }}>
                 <Pressable
                   accessibilityLabel="More options menu"
-                  onPress={() => setMenuOpen(!menuOpen)}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  onPress={() => toggleMenu(!isMenuMounted)}
                 >
                   <Animated.View
-                    className="flex-row items-center rounded-3xl p-3"
-                    style={{ backgroundColor: colors.inputBg }}
+                    className="flex-row items-center rounded-3xl py-2 px-4"
+                    style={{
+                      backgroundColor: colors.inputBg,
+                      borderWidth: colors.dark ? 0 : 1,
+                      borderColor: "#E5E7EB",
+                      transform: [{ scale: pressScale }],
+                    }}
                   >
                     <Ionicons
                       name="filter"
@@ -98,79 +143,108 @@ const ExpenseHeader = ({
                     </CustomText>
                   </Animated.View>
                 </Pressable>
-                {menuOpen && (
-                  <View
+
+                {isMenuMounted && (
+                  <Animated.View
                     style={{
                       position: "absolute",
-                      top: 55,
+                      top: 40,
                       right: 0,
-                      width: 160,
-                      backgroundColor: colors.inputBg,
-                      borderRadius: 16,
-                      padding: 8,
+                      width: 150,
+                      backgroundColor: colors.expenseForm,
+                      borderRadius: 20,
+                      padding: 6,
                       zIndex: 2000,
                       shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
+                      shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: 0.25,
-                      shadowRadius: 3.84,
-                      elevation: 5,
+                      shadowRadius: 5,
+                      elevation: 8,
+                      borderWidth: 1,
+                      borderColor: colors.background + '15'
                     }}
                   >
                     <Pressable
                       onPress={() => {
                         setDatePickerVisibility(true);
-                        setMenuOpen(false);
+                        toggleMenu(false);
                       }}
-                      style={{ padding: 12 }}
+                      className="flex-row items-center p-3 rounded-xl gap-2"
+                      style={({ pressed }) => [{ backgroundColor: pressed ? colors.background + '22' : 'transparent' }]}
                     >
-                      <CustomText style={{ color: colors.text, fontSize: 16 }}>
-                        Date
-                      </CustomText>
+                      <Feather name="calendar" size={16} color={colors.text} className="mr-2.5" />
+                      <CustomText style={{ color: colors.text }} className="text-sm font-medium">Date</CustomText>
                     </Pressable>
+                    <View style={[styles.divider, { backgroundColor: colors.dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)" }]} />
                     <Pressable
                       onPress={() => {
                         setShowModal("monthModal");
-                        setMenuOpen(false);
+                        toggleMenu(false);
                       }}
-                      style={{ padding: 12 }}
+                      className="flex-row items-center p-3 rounded-xl gap-2"
+                      style={({ pressed }) => [{ backgroundColor: pressed ? colors.background + '22' : 'transparent' }]}
                     >
-                      <CustomText style={{ color: colors.text, fontSize: 16 }}>
-                        Month
-                      </CustomText>
+                      <Feather name="clock" size={16} color={colors.text} className="mr-2.5" />
+                      <CustomText style={{ color: colors.text }} className="text-sm font-medium">Month</CustomText>
                     </Pressable>
+                    <View style={[styles.divider, { backgroundColor: colors.dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)" }]} />
                     <Pressable
                       onPress={() => {
                         setShowModal("categoryModal");
-                        setMenuOpen(false);
+                        toggleMenu(false);
                       }}
-                      style={{ padding: 12 }}
+                      className="flex-row items-center p-3 rounded-xl gap-2"
+                      style={({ pressed }) => [{ backgroundColor: pressed ? colors.background + '22' : 'transparent' }]}
                     >
-                      <CustomText style={{ color: colors.text, fontSize: 16 }}>
-                        Category
-                      </CustomText>
+                      <Feather name="grid" size={16} color={colors.text} className="mr-2.5" />
+                      <CustomText style={{ color: colors.text }} className="text-sm font-medium">Category</CustomText>
                     </Pressable>
-                  </View>
+                  </Animated.View>
                 )}
               </View>
             )}
           </View>
         </View>
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={() => setDatePickerVisibility(false)}
-          date={new Date()}
-        />
+
+        <CustomText className="text-white text-3xl font-bold mt-1" style={{ color: colors.text, fontFamily: "Poppins_Bold" }}>
+          ₹{numberWithCommas(totalExpenseSum)}
+        </CustomText>
       </View>
-      <Animated.View >
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={() => setDatePickerVisibility(false)}
+        date={new Date()}
+      />
+
+      <Animated.View>
         <ExpenseTypePicker
           setActiveTab={setActiveTab}
           activeTab={activeTab}
         />
       </Animated.View>
     </Animated.View>
-  )
+  );
 }
 
-export default ExpenseHeader
+const styles = StyleSheet.create({
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  menuIcon: {
+    marginRight: 10,
+  },
+  divider: {
+    height: 1,
+    marginHorizontal: 8,
+    marginVertical: 4,
+  }
+});
+
+export default ExpenseHeader;

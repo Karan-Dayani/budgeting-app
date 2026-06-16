@@ -4,7 +4,7 @@ import { useVideoPlayer, VideoView } from "expo-video";
 import { useEventListener } from "expo";
 import { useTheme } from "expo-router/react-navigation";
 
-const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => {} }) => {
+const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => { } }) => {
   const { colors } = useTheme();
 
   const player = useVideoPlayer(require("../assets/videos/CointTrack.mp4"), (playerInstance) => {
@@ -27,8 +27,8 @@ const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => {} }) => {
       <VideoView
         player={player}
         style={styles.video}
-        resizeMode="cover"
         nativeControls={false}
+        contentFit="cover"
       />
     </View>
   );
@@ -37,6 +37,7 @@ const SplashScreenLoad = ({ onAnimationFinish = (isCancelled) => {} }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#000000",
   },
   video: {
     flex: 1,
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+    backgroundColor: "#000000",
   },
 });
 

@@ -1,26 +1,26 @@
 export const LightCustomTheme = {
     dark: false,
     colors: {
-        primary: 'rgb(255, 45, 85)', // Primary color
-        secondary: "#4b5563", // Secondary color
-        background: '#EEEEEE', // Dull gray background
-        header: '#F0F0F0', // Same as background
-        text: 'black', // Text color
-        card: '#3D2C8D', // Card color
-        tabBarBgColor: "#191A19", // Bright white tab bar background
-        tabBarBtActive: '#41B3A2', // Light Blue
-        tabBarBtInActive: '#546E7A', // Muted Blue Gray
+        primary: '#41B3A2', // Primary theme color (Teal)
+        secondary: '#6B7280', // Secondary color (Muted Gray)
+        background: '#F3F4F6', // Light gray background
+        header: '#F3F4F6', // Same as background
+        text: '#1F2937', // High-contrast clean dark text
+        card: '#FFFFFF', // Pure white card background
+        tabBarBgColor: "#FFFFFF", // Pure white tab bar background
+        tabBarBtActive: '#41B3A2', // Active tab button (Teal)
+        tabBarBtInActive: '#8A9Aad', // Muted Blue Gray for inactive tabs
         login: "white", // Login background
-        loginInput: "#EEEEEE", // Input field color
+        loginInput: "#F3F4F6", // Input field color
         expenseForm: "white",
-        expenseInput: "#f3f4f6",
-        expenseAmount: "#DDDDDD",
-        inputBg: "#DDDDDD", // Input background color
-        itemBg: "#1E201E", // Expense background color
+        expenseInput: "#F3F4F6",
+        expenseAmount: "#E5E7EB",
+        inputBg: "#E5E7EB", // Input background color
+        itemBg: "#FFFFFF", // White list item cards
         progressCircleColor: "#059212",
-        progressInActive: "#EEEEEE",
+        progressInActive: "#E5E7EB",
         chartBg: "white",
-        homeCardItem: "#EEEEEE"
+        homeCardItem: "#F3F4F6"
     }
 };
 

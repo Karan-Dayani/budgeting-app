@@ -7,7 +7,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { LogBox } from "react-native";
+import { LogBox, StatusBar, View } from "react-native";
 import "react-native-reanimated";
 
 LogBox.ignoreLogs([
@@ -63,26 +63,30 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={theme}>
-
       <UserProvider>
-        {/* <ThemeProvider
-          value={colorScheme === "dark" ? DarkCustomTheme : LightCustomTheme}
-          > */}
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="index"
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-            }}
-          />
-        </Stack>
-        {/* </ThemeProvider> */}
+        <StatusBar
+          barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
+          backgroundColor={customColors.header}
+        />
+        <View style={{ flex: 1, backgroundColor: customColors.background }}>
+          <Stack screenOptions={{ 
+            headerShown: false,
+            contentStyle: { backgroundColor: customColors.background }
+          }}>
+            <Stack.Screen
+              name="index"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+          </Stack>
+        </View>
       </UserProvider>
     </ThemeProvider>
   );

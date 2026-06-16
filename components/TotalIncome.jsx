@@ -1,10 +1,11 @@
 import { router } from "expo-router";
 import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Modal, Pressable, View } from "react-native";
+import { Animated, Modal, Pressable, View, ScrollView } from "react-native";
 import { getTotalExpense, numberWithCommas } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import CustomText from "./CustomText";
+import { Feather } from "@expo/vector-icons";
 
 const TotalIncome = ({ user }) => {
   const { colors } = useTheme()
@@ -172,53 +173,60 @@ const TotalIncome = ({ user }) => {
     ));
   };
   return (
-    <View className="">
-      <View className="rounded-3xl bg-[#41B3A2] justify-center px-5 py-3 mb-2 flex-2">
-        <View className="items-center justify-between flex-row mb-4">
-          <CustomText className="text-white text-xl">Monthly Income</CustomText>
+    <View className="mb-4">
+      {/* Monthly Budget Card */}
+      <View className="rounded-[28px] bg-[#41B3A2] p-5 mb-4 shadow-lg">
+        <View className="flex-row items-center justify-between mb-3">
+          <CustomText className="text-white/80 text-sm font-semibold uppercase tracking-wider">Monthly Budget</CustomText>
+          <View className="bg-white/20 p-2 rounded-full">
+            <Feather name="dollar-sign" size={20} color="white" />
+          </View>
         </View>
-        {income ? (
-          <CustomText
-            className="text-white text-3xl"
-            style={{ fontFamily: "Red_Hat" }}
-          >
-            ₹{numberWithCommas(income)}
-          </CustomText>
-        ) : (
-          <CustomText className="text-white text-3xl">Not mentioned</CustomText>
-        )}
+        <CustomText className="text-white text-4xl font-bold" style={{ fontFamily: "Poppins_Bold" }}>
+          ₹{income ? numberWithCommas(income) : "0"}
+        </CustomText>
       </View>
+
+      {/* Savings & Expenses Grid */}
       <View className="flex-row w-full justify-between">
-        <Pressable className="flex-1 rounded-3xl bg-green-800 p-3 shadow-2xl mr-2" onPress={openModal}>
-          <View className="items-center justify-between flex-row mb-4" >
-            <View className="flex-row items-center gap-2">
-              <CustomText className="text-white text-xl">Savings</CustomText>
-            </View>
+        <Pressable
+          className="flex-1 rounded-[24px] bg-[#0F9D58] p-4 shadow-md mr-2 flex-col justify-between"
+          onPress={openModal}
+          style={{ height: 110 }}
+        >
+          <View className="flex-row items-center justify-between">
+            <CustomText className="text-white/90 text-sm font-medium">Savings</CustomText>
+            <Feather name="trending-up" size={16} color="white" />
           </View>
           <CustomText
-            className="text-white text-3xl"
-            style={{ fontFamily: "Red_Hat" }}
+            className="text-white text-2xl font-bold"
+            style={{ fontFamily: "Poppins_Bold" }}
           >
             ₹{numberWithCommas(savings)}
           </CustomText>
         </Pressable>
-        <View
-          className="flex-1 rounded-3xl bg-red-700 p-3 shadow-2xl ml-0"
-          onStartShouldSetResponder={() => handleExpensesClick()}
+
+        <Pressable
+          className="flex-1 rounded-[24px] bg-[#DB4437] p-4 shadow-md ml-2 flex-col justify-between"
+          onPress={handleExpensesClick}
+          style={{ height: 110 }}
         >
-          <View className="items-center justify-between flex-row mb-4">
-            <CustomText className="text-white text-xl">Expenses</CustomText>
+          <View className="flex-row items-center justify-between">
+            <CustomText className="text-white/90 text-sm font-medium">Expenses</CustomText>
+            <Feather name="trending-down" size={16} color="white" />
           </View>
           <CustomText
-            className="text-white text-3xl"
-            style={{ fontFamily: "Red_Hat" }}
+            className="text-white text-2xl font-bold"
+            style={{ fontFamily: "Poppins_Bold" }}
           >
             ₹{numberWithCommas(expense) || 0}
           </CustomText>
-        </View>
+        </Pressable>
       </View>
-      <Modal transparent visible={modalVisible} animationType="none">
-        <View className="flex-1 justify-center items-center" style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}>
+
+      {/* Savings Detail Modal */}
+      <Modal transparent visible={modalVisible} animationType="none" onRequestClose={closeModal}>
+        <View className="flex-1 justify-center items-center bg-black/60">
           <Animated.View
             style={[
               {
@@ -231,42 +239,59 @@ const TotalIncome = ({ user }) => {
                 elevation: 5,
               },
             ]}
-            className="w-[90%] max-w-[400px] rounded-2xl p-6"
+            className="w-[90%] max-w-[400px] rounded-3xl p-6"
           >
             <View>
-              <CustomText style={{ color: colors.text, fontFamily: "Poppins_SemiBold" }} className="text-2xl ">Savings Detail</CustomText>
-              <CustomText style={{ color: colors.text }} className="text-lg font-medium mt-4">Total Savings: ₹{savings}</CustomText>
+              <CustomText style={{ color: colors.text, fontFamily: "Poppins_SemiBold" }} className="text-2xl mb-4">Savings Detail</CustomText>
 
-              <View className="mt-4">
-                <CustomText style={{ color: colors.text }} className="text-lg font-medium">Expenses: ₹{expense}</CustomText>
-                <View className="mt-2 space-y-2">
-                  {renderExpensesSummary().map((item, index) => (
-                    <View key={index} className=" p-4 rounded-xl shadow-md" style={{ backgroundColor: colors.expenseInput }}>
-                      <CustomText style={{ color: colors.text }} className="text-md">{item}</CustomText>
-                    </View>
-                  ))}
-                </View>
+              <View className="flex-row justify-between items-center py-3 border-b mb-4" style={{ borderBottomColor: colors.background + '22' }}>
+                <CustomText style={{ color: colors.text }} className="text-base font-semibold">Total Savings</CustomText>
+                <CustomText style={{ color: "#0F9D58" }} className="text-lg font-bold">₹{numberWithCommas(savings)}</CustomText>
               </View>
 
-              <View className="mt-4">
-                <CustomText style={{ color: colors.text }} className="text-lg font-medium">Goals:</CustomText>
-                <View className="mt-2 space-y-2">
-                  {renderGoals().map((item, index) => (
-                    <View key={index} className=" p-4 rounded-xl shadow-md" style={{ backgroundColor: colors.expenseInput }}>
-                      <CustomText style={{ color: colors.text }} className="text-md">{item}</CustomText>
-                    </View>
-                  ))}
+              <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
+                <View className="mb-4">
+                  <CustomText style={{ color: colors.text }} className="text-base font-bold mb-2">Expenses: ₹{numberWithCommas(expense)}</CustomText>
+                  <View className="gap-2">
+                    {expensesData.length > 0 ? (
+                      Object.entries(totalExpensesByCategory).map(([category, amount]) => (
+                        <View key={category} className="p-3 rounded-2xl flex-row justify-between items-center" style={{ backgroundColor: colors.expenseInput }}>
+                          <CustomText style={{ color: colors.text }} className="text-sm font-medium">{category}</CustomText>
+                          <CustomText style={{ color: colors.text }} className="text-sm font-bold">₹{numberWithCommas(amount)}</CustomText>
+                        </View>
+                      ))
+                    ) : (
+                      <CustomText className="text-sm text-gray-500 italic">No expenses yet</CustomText>
+                    )}
+                  </View>
                 </View>
-              </View>
+
+                <View className="mt-2">
+                  <CustomText style={{ color: colors.text }} className="text-base font-bold mb-2">Goals Progress</CustomText>
+                  <View className="gap-2">
+                    {goalsData.length > 0 ? (
+                      goalsData.map((goal) => (
+                        <View key={goal.goalId} className="p-3 rounded-2xl flex-row justify-between items-center" style={{ backgroundColor: colors.expenseInput }}>
+                          <CustomText style={{ color: colors.text }} className="text-sm font-medium">{goal.goalName}</CustomText>
+                          <CustomText style={{ color: colors.text }} className="text-sm font-bold">
+                            ₹{numberWithCommas(goal.goalSavedMoney)} / ₹{numberWithCommas(goal.goalTargetMoney)}
+                          </CustomText>
+                        </View>
+                      ))
+                    ) : (
+                      <CustomText className="text-sm text-gray-500 italic">No goals active</CustomText>
+                    )}
+                  </View>
+                </View>
+              </ScrollView>
             </View>
 
-            <Pressable onPress={closeModal} className="mt-6 p-3 bg-[#41B3A2] rounded-full">
-              <CustomText className="text-white text-lg text-center font-semibold">Close</CustomText>
+            <Pressable onPress={closeModal} className="mt-6 p-4 bg-[#41B3A2] rounded-full shadow-md">
+              <CustomText className="text-white text-base text-center font-bold">Close</CustomText>
             </Pressable>
           </Animated.View>
         </View>
       </Modal>
-
     </View>
   );
 };
