@@ -90,7 +90,7 @@ export default function Home() {
 
 
   return (
-    <View className="flex-1" style={{
+    <View className="flex-1 mb-5" style={{
       backgroundColor: colors.background
     }}>
       <Stack.Screen
