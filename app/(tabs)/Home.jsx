@@ -37,23 +37,31 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState([]);
   const isFocused = useIsFocused();
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const fadeInOpacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(50)).current;
+  const translateY = useRef(new Animated.Value(10)).current;
 
   useEffect(() => {
-    Animated.timing(fadeInOpacity, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-
-    Animated.timing(translateY, {
-      toValue: 0,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, []);
+    if (isFocused) {
+      fadeInOpacity.setValue(0);
+      translateY.setValue(10);
+      Animated.parallel([
+        Animated.timing(fadeInOpacity, {
+          toValue: 1,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 220,
+          useNativeDriver: true,
+        })
+      ]).start();
+    } else {
+      fadeInOpacity.setValue(0);
+      translateY.setValue(10);
+    }
+  }, [isFocused]);
 
   const getUserRow = async () => {
     try {
@@ -82,7 +90,7 @@ export default function Home() {
 
 
   return (
-    <View className="flex-1" style={{
+    <View className="flex-1 mb-5" style={{
       backgroundColor: colors.background
     }}>
       <Stack.Screen
@@ -90,10 +98,15 @@ export default function Home() {
           headerShown: false,
         }}
       />
-      <StatusBar backgroundColor={colors.header} />
+      <StatusBar
+        barStyle={dark ? "light-content" : "dark-content"}
+        backgroundColor={colors.header}
+      />
       <ScrollView
-        className="px-5 py-2"
+        className="px-5 py-4"
+        contentContainerStyle={{ paddingBottom: 60 }}
         scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
       >
         <Animated.View>
           <AnimatedHeader
@@ -156,7 +169,7 @@ export default function Home() {
             />
           ) : (
             <>
-              <MonthChart colors={colors} userData={userData} />
+               <MonthChart colors={colors} dark={dark} userData={userData} />
             </>
           )}
 
@@ -178,6 +191,7 @@ export default function Home() {
           ) : (
             <HistoryExpense
               colors={colors}
+              dark={dark}
               userData={userData}
             />
           )}
@@ -192,6 +206,7 @@ export default function Home() {
           ) : (
             <HistoryGoals
               colors={colors}
+              dark={dark}
               userData={userData}
             />
           )}

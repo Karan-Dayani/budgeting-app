@@ -1,80 +1,270 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
-import React from 'react';
+import { View, Pressable, Animated, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useTheme } from "expo-router/react-navigation";
+import { Ionicons } from "@expo/vector-icons";
 
 import CustomText from '../CustomText';
-import { useTheme } from "expo-router/react-navigation";
 
-const MonthPicker = ({ setShowModal, setFilters, filters }) => {
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-    // List of months
-    const months = Array.from({ length: 12 }, (_, i) =>
-        new Date(-1, i).toLocaleString("default", { month: "long" })
-    );
+const MonthGridItem = ({ item, isSelected, colors, onPress }) => {
+    const [scale] = useState(() => new Animated.Value(1));
 
-    const { colors } = useTheme();
+    const handlePressIn = () => {
+        Animated.spring(scale, {
+            toValue: 0.93,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.spring(scale, {
+            toValue: 1,
+            friction: 4,
+            tension: 50,
+            useNativeDriver: true,
+        }).start();
+    };
 
     return (
-        <View
-            className="flex-1 justify-center items-center bg-opacity-80"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+        <Pressable
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={onPress}
+            style={styles.gridItemWrapper}
         >
-            <View
-                className="rounded-3xl p-4 w-10/12 max-h-1/2"
-                style={{ backgroundColor: colors.chartBg }}
+            <Animated.View
+                style={[
+                    styles.gridItem,
+                    {
+                        backgroundColor: isSelected
+                            ? (colors.tabBarBtActive || "#41B3A2")
+                            : colors.inputBg,
+                        borderColor: "transparent",
+                        transform: [{ scale }]
+                    }
+                ]}
             >
                 <CustomText
-                    className="text-xl text-center mb-4"
-                    style={{ color: colors.text }}
+                    style={[
+                        styles.gridItemText,
+                        {
+                            color: isSelected ? "#FFFFFF" : colors.text,
+                            fontWeight: isSelected ? "700" : "500",
+                        }
+                    ]}
                 >
-                    Select Month
+                    {item.slice(0, 3)}
                 </CustomText>
-                <View className="flex-row justify-between mb-4">
-                    <View className="w-full">
-                        <ScrollView
-                            style={{ maxHeight: 300 }}
-                            nestedScrollEnabled={true}
-                        >
-                            {months.map((item, i) => (
-                                <View
-                                    key={i}
-                                    className="my-2 py-4 px-4 rounded-3xl"
-                                    style={{
-                                        backgroundColor:
-                                            filters.month === item ? "blue" : colors.homeCardItem,
-                                    }}
-                                >
-                                    <Pressable
-                                        onPress={() => {
-                                            setFilters({ ...filters, month: item });
-                                            setShowModal(null); // Close the modal after selection
-                                        }}
-                                    >
-                                        <CustomText
-                                            className="text-lg"
-                                            style={{
-                                                color:
-                                                    filters.month === item ? "white" : colors.text,
-                                            }}
-                                        >
-                                            {item}
-                                        </CustomText>
-                                    </Pressable>
-                                </View>
-                            ))}
-                        </ScrollView>
+                {isSelected && (
+                    <View style={styles.checkmarkBadge}>
+                        <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
                     </View>
+                )}
+            </Animated.View>
+        </Pressable>
+    );
+};
+
+const MonthPicker = ({ setShowModal, setFilters, filters }) => {
+    const { colors, dark } = useTheme();
+
+    // Months list
+    const months = Array.from({ length: 12 }, (_, i) =>
+        new Date(2000, i).toLocaleString("default", { month: "long" })
+    );
+
+    // Animation values
+    const [fadeAnim] = useState(() => new Animated.Value(0));
+    const [slideAnim] = useState(() => new Animated.Value(SCREEN_HEIGHT * 0.4));
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 220,
+                useNativeDriver: true,
+            }),
+            Animated.spring(slideAnim, {
+                toValue: 0,
+                tension: 65,
+                friction: 11,
+                useNativeDriver: true,
+            })
+        ]).start();
+    }, []);
+
+    const handleClose = () => {
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 180,
+                useNativeDriver: true,
+            }),
+            Animated.timing(slideAnim, {
+                toValue: SCREEN_HEIGHT * 0.4,
+                duration: 180,
+                useNativeDriver: true,
+            })
+        ]).start(() => {
+            setShowModal(null);
+        });
+    };
+
+    return (
+        <View style={styles.modalOverlay}>
+            {/* Absolute Backdrop Pressable covering the full screen */}
+            <Pressable
+                style={styles.backdropPressable}
+                onPress={handleClose}
+            >
+                <Animated.View
+                    style={[
+                        styles.backdrop,
+                        {
+                            opacity: fadeAnim,
+                        }
+                    ]}
+                />
+            </Pressable>
+
+            {/* Bottom Sheet Container */}
+            <Animated.View
+                style={[
+                    styles.bottomSheet,
+                    {
+                        backgroundColor: colors.card,
+                        transform: [{ translateY: slideAnim }],
+                    }
+                ]}
+            >
+                {/* Visual Grab Handle */}
+                <View
+                    style={[
+                        styles.grabHandle,
+                        {
+                            backgroundColor: dark
+                                ? "rgba(255, 255, 255, 0.15)"
+                                : "rgba(0, 0, 0, 0.15)",
+                        }
+                    ]}
+                />
+
+                {/* Header Row */}
+                <View style={styles.header}>
+                    <CustomText
+                        style={[styles.headerTitle, { color: colors.text }]}
+                    >
+                        Select Month
+                    </CustomText>
+                    <Pressable
+                        onPress={handleClose}
+                        style={({ pressed }) => [
+                            styles.closeBtn,
+                            pressed && { opacity: 0.7 }
+                        ]}
+                    >
+                        <Ionicons name="close" size={24} color={colors.text} />
+                    </Pressable>
                 </View>
-                <Pressable
-                    className="bg-red-500 rounded-3xl p-4 items-center mt-3"
-                    onPress={() => setShowModal(null)}
-                >
-                    <CustomText className="text-white">Close</CustomText>
-                </Pressable>
-            </View>
+
+                {/* Grid Wrapper */}
+                <View style={styles.gridContainer}>
+                    {months.map((item, i) => (
+                        <MonthGridItem
+                            key={i}
+                            item={item}
+                            isSelected={filters.month === item}
+                            colors={colors}
+                            onPress={() => {
+                                setFilters({ ...filters, month: item });
+                                handleClose();
+                            }}
+                        />
+                    ))}
+                </View>
+            </Animated.View>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    modalOverlay: {
+        flex: 1,
+        justifyContent: "flex-end",
+        backgroundColor: "transparent",
+    },
+    backdropPressable: {
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+    },
+    backdrop: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    bottomSheet: {
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        paddingTop: 8,
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
+        elevation: 24,
+    },
+    grabHandle: {
+        width: 38,
+        height: 5,
+        borderRadius: 3,
+        alignSelf: "center",
+        marginVertical: 10,
+    },
+    header: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 10,
+        paddingVertical: 4,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: "700",
+    },
+    closeBtn: {
+        padding: 4,
+    },
+    gridContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+        paddingVertical: 6,
+    },
+    gridItemWrapper: {
+        width: "31%",
+        marginVertical: 6,
+    },
+    gridItem: {
+        width: "100%",
+        aspectRatio: 1.35,
+        borderRadius: 18,
+        alignItems: "center",
+        justifyContent: "center",
+        borderWidth: 1,
+        position: "relative",
+    },
+    gridItemText: {
+        fontSize: 16,
+    },
+    checkmarkBadge: {
+        position: "absolute",
+        top: 6,
+        right: 6,
+    }
+});
 
 export default MonthPicker;

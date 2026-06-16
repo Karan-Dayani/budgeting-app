@@ -3,7 +3,7 @@ import { Dimensions, View } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import CustomText from "../CustomText";
 
-const MonthChart = ({ colors, userData }) => {
+const MonthChart = ({ colors, dark, userData }) => {
     const [monthlyExpenses, setMonthlyExpenses] = useState([]);
 
     const processExpenses = (expenses) => {
@@ -90,11 +90,19 @@ const MonthChart = ({ colors, userData }) => {
 
     return (
         <View>
-            <View className="w-full p-5 rounded-3xl mt-3 h-[22rem]" style={{ backgroundColor: colors.chartBg }}>
-                <CustomText className="text-2xl mb-8" style={{ color: colors.text }}>
+            <View 
+                className="w-full p-5 rounded-[28px] mt-3 shadow-sm" 
+                style={{ 
+                    backgroundColor: colors.chartBg,
+                    borderWidth: dark ? 0 : 1,
+                    borderColor: '#E5E7EB',
+                    height: 350,
+                }}
+            >
+                <CustomText className="text-xl font-bold mb-4" style={{ color: colors.text }}>
                     Monthly Expense Chart
                 </CustomText>
-                <View className={`${checkDataLength > 0 ? "items-center justify-center" : "justify-center"}`}>
+                <View className={`${checkDataLength > 0 ? "items-center justify-center" : "justify-center"} flex-1`}>
                     {checkDataLength ? (
                         <BarChart
                             data={data}
@@ -107,8 +115,8 @@ const MonthChart = ({ colors, userData }) => {
                             fromZero
                         />
                     ) : (
-                        <CustomText className="text-xl" style={{ color: colors.text }}>
-                            No Expense added till yet
+                        <CustomText className="text-sm text-gray-500 text-center italic" style={{ color: colors.text }}>
+                            No month recorded yet.
                         </CustomText>
                     )}
                 </View>
