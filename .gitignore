@@ -21,3 +21,4 @@ web-build/
 expo-env.d.ts
 # @end expo-cli
 android/
+scripts/add_dummy_expenses.js
