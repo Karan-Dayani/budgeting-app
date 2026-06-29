@@ -81,17 +81,39 @@ const Goals = () => {
   const { colors, dark } = useTheme();
 
   const fetchData = async () => {
-    const { data, error } = await supabase
+    const { data: userData, error: userError } = await supabase
       .from("User Data")
-      .select("goals, savings")
+      .select("savings")
       .eq("email", user?.user_metadata?.email);
 
-    if (error) {
-      console.error(error);
+    if (userError) {
+      console.error(userError);
       Alert.alert("Error fetching data");
+      setLoading(false);
+      return;
+    }
+    
+    setSavings(userData[0]?.savings || 0);
+
+    const { data: goalsData, error: goalsError } = await supabase
+      .from("goals")
+      .select("*")
+      .eq("user_id", user?.id)
+      .order("created_at", { ascending: false });
+
+    if (goalsError) {
+      console.error(goalsError);
+      Alert.alert("Error fetching goals");
     } else {
-      setUserGoals(data[0]?.goals || []);
-      setSavings(data[0]?.savings || 0);
+      const mappedGoals = (goalsData || []).map((g) => ({
+        goalId: g.id,
+        goalName: g.goal_name,
+        goalTargetMoney: Number(g.target_amount),
+        goalSavedMoney: Number(g.saved_amount),
+        deadline: g.deadline,
+        createdAt: g.created_at,
+      }));
+      setUserGoals(mappedGoals);
     }
     setLoading(false);
   };
@@ -109,23 +131,23 @@ const Goals = () => {
     }
 
     setLoading(true);
-    const { data, err } = await supabase
-      .from("User Data")
-      .select("goals")
-      .eq("email", user?.user_metadata?.email);
 
-    const prevArray = data[0]?.goals || [];
-    const formattedGoal = {
-      ...goal,
-      goalTargetMoney: Number(goal.goalTargetMoney),
-      goalSavedMoney: Number(goal.goalSavedMoney),
-    };
-    const updatedArray = [formattedGoal, ...prevArray];
+    const { data, error } = await supabase
+      .from("goals")
+      .insert({
+        user_id: user?.id,
+        goal_name: goal.goalName.trim(),
+        target_amount: Number(goal.goalTargetMoney),
+        saved_amount: Number(goal.goalSavedMoney) || 0,
+      })
+      .select();
 
-    await supabase
-      .from("User Data")
-      .update({ goals: updatedArray })
-      .eq("email", user?.user_metadata?.email);
+    if (error) {
+      console.error("Error adding goal:", error);
+      Alert.alert("Error adding goal");
+      setLoading(false);
+      return;
+    }
 
     setGoal({
       goalId: uuid.v4(),
@@ -155,23 +177,31 @@ const Goals = () => {
     if (amount <= remainingAmount) {
       const totalSavedMoney = Number(selectedGoal.goalSavedMoney) + amount;
 
-      const { data, err } = await supabase
-        .from("User Data")
-        .select("goals")
-        .eq("email", user?.user_metadata?.email);
+      const { error: goalUpdateError } = await supabase
+        .from("goals")
+        .update({ saved_amount: totalSavedMoney })
+        .eq("id", selectedGoal.goalId);
 
-      const updatedData = data[0].goals.map((goal) => {
-        if (goal.goalId === selectedGoal.goalId) {
-          return { ...goal, goalSavedMoney: totalSavedMoney };
-        }
-        return goal;
-      });
+      if (goalUpdateError) {
+        console.error("Error updating goal amount:", goalUpdateError);
+        Alert.alert("Error updating goal");
+        setLoading(false);
+        return;
+      }
+
       const updatedSavings = savings - amount;
 
-      await supabase
+      const { error: userUpdateError } = await supabase
         .from("User Data")
-        .update({ goals: updatedData, savings: updatedSavings })
+        .update({ savings: updatedSavings })
         .eq("email", user?.user_metadata?.email);
+
+      if (userUpdateError) {
+        console.error("Error updating user savings:", userUpdateError);
+        Alert.alert("Error updating savings");
+        setLoading(false);
+        return;
+      }
 
       if (Number(totalSavedMoney) === Number(selectedGoal.goalTargetMoney)) {
         console.log("Goal Complete!");
@@ -201,28 +231,36 @@ const Goals = () => {
   };
 
   const handleGoalDelete = async (item) => {
-    const prevArray = userGoals || [];
+    setLoading(true);
+    const targetGoal = item || selectedGoal;
+    if (!targetGoal) {
+      setLoading(false);
+      return;
+    }
 
-    if (item) {
-      const updatedArray = prevArray.filter(
-        (goal) => goal.goalId !== item.goalId
-      );
-      const updatedSavings = savings + item.goalSavedMoney;
-      await supabase
-        .from("User Data")
-        .update({ goals: updatedArray, savings: updatedSavings })
-        .eq("email", user?.user_metadata?.email);
-      setUserGoals(updatedArray);
-    } else {
-      const updatedArray = prevArray.filter(
-        (goal) => goal.goalId !== selectedGoal.goalId
-      );
-      const updatedSavings = savings + selectedGoal.goalSavedMoney;
-      await supabase
-        .from("User Data")
-        .update({ goals: updatedArray, savings: updatedSavings })
-        .eq("email", user?.user_metadata?.email);
-      setUserGoals(updatedArray);
+    const { error: deleteError } = await supabase
+      .from("goals")
+      .delete()
+      .eq("id", targetGoal.goalId);
+
+    if (deleteError) {
+      console.error("Error deleting goal:", deleteError);
+      Alert.alert("Error deleting goal");
+      setLoading(false);
+      return;
+    }
+
+    const updatedSavings = savings + targetGoal.goalSavedMoney;
+    const { error: userUpdateError } = await supabase
+      .from("User Data")
+      .update({ savings: updatedSavings })
+      .eq("email", user?.user_metadata?.email);
+
+    if (userUpdateError) {
+      console.error("Error updating user savings after delete:", userUpdateError);
+      Alert.alert("Error updating savings");
+      setLoading(false);
+      return;
     }
 
     setConfirmModal(false);
@@ -231,6 +269,9 @@ const Goals = () => {
     setTimeout(() => {
       setIsDeleted(false);
     }, 2500);
+
+    await fetchData();
+    setLoading(false);
   };
 
 

@@ -69,9 +69,30 @@ export default function Auth() {
     });
 
     const addUser = async () => {
-      const { data, err } = await supabase
-        .from("User Data")
-        .upsert({ email: email, income: 0, username: email.split("@")[0], savings: 0, expenses: [], goals: [] });
+      try {
+        const { data: existing, error: checkError } = await supabase
+          .from("User Data")
+          .select("email")
+          .eq("email", email);
+
+        if (checkError) {
+          console.error("Check user data error:", checkError);
+        }
+
+        if (existing && existing.length > 0) {
+          console.log("User Data record already exists for email:", email);
+          return;
+        }
+
+        const { error: insertError } = await supabase
+          .from("User Data")
+          .insert({ email: email, income: 0, username: email.split("@")[0], savings: 0, expenses: [], goals: [] });
+        if (insertError) {
+          console.error("Failed to insert user details:", insertError);
+        }
+      } catch (e) {
+        console.error("Exception in addUser:", e);
+      }
     };
 
     if (error) {

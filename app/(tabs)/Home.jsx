@@ -65,7 +65,7 @@ export default function Home() {
 
   const getUserRow = async () => {
     try {
-      const [userResponse, transResponse] = await Promise.all([
+      const [userResponse, transResponse, goalsResponse] = await Promise.all([
         supabase
           .from("User Data")
           .select("*")
@@ -74,11 +74,17 @@ export default function Home() {
           .from("transactions")
           .select("*")
           .eq("user_id", user?.id)
-          .order("transaction_date", { ascending: false })
+          .order("transaction_date", { ascending: false }),
+        supabase
+          .from("goals")
+          .select("*")
+          .eq("user_id", user?.id)
+          .order("created_at", { ascending: false })
       ]);
 
       if (userResponse.error) throw userResponse.error;
       if (transResponse.error) throw transResponse.error;
+      if (goalsResponse.error) throw goalsResponse.error;
 
       const formattedTrans = (transResponse.data || []).map((tx) => {
         let formattedDate = "";
@@ -108,8 +114,18 @@ export default function Home() {
         };
       });
 
+      const formattedGoals = (goalsResponse.data || []).map((g) => ({
+        goalId: g.id,
+        goalName: g.goal_name,
+        goalTargetMoney: Number(g.target_amount),
+        goalSavedMoney: Number(g.saved_amount),
+        deadline: g.deadline,
+        createdAt: g.created_at,
+      }));
+
       if (userResponse.data && userResponse.data[0]) {
         userResponse.data[0].expenses = formattedTrans;
+        userResponse.data[0].goals = formattedGoals;
       }
       setUserData(userResponse.data);
     } catch (err) {

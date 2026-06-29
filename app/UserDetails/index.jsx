@@ -35,24 +35,67 @@ const Profile = () => {
       return false;
     }
     const incomeNum = Number(incomeStr);
-    const { data, error: err } = await supabase
-      .from("User Data")
-      .upsert({
-        email: user?.user_metadata?.email,
-        income: incomeNum,
-        username: name,
-        savings: incomeNum,
-        expenses: [],
-        goals: []
-      });
-    if (err) {
-      console.error("Failed to update details:", err);
-      setError("Failed to update details. Please try again.");
+    const email = user?.user_metadata?.email;
+
+    if (!email) {
+      setError("User email not found.");
       setLoading(false);
       return false;
     }
-    setLoading(false);
-    return true;
+
+    try {
+      // Check if the record already exists
+      const { data: existing, error: checkError } = await supabase
+        .from("User Data")
+        .select("email")
+        .eq("email", email);
+
+      if (checkError) {
+        console.error("Check user data error:", checkError);
+      }
+
+      let res;
+      if (existing && existing.length > 0) {
+        // Record exists, update it
+        res = await supabase
+          .from("User Data")
+          .update({
+            income: incomeNum,
+            username: name,
+            savings: incomeNum,
+            expenses: [],
+            goals: []
+          })
+          .eq("email", email);
+      } else {
+        // Record doesn't exist, insert it
+        res = await supabase
+          .from("User Data")
+          .insert({
+            email: email,
+            income: incomeNum,
+            username: name,
+            savings: incomeNum,
+            expenses: [],
+            goals: []
+          });
+      }
+
+      if (res.error) {
+        console.error("Failed to update details:", res.error);
+        setError("Failed to update details. Please try again.");
+        setLoading(false);
+        return false;
+      }
+
+      setLoading(false);
+      return true;
+    } catch (e) {
+      console.error("Exception in addDetails:", e);
+      setError("An unexpected error occurred. Please try again.");
+      setLoading(false);
+      return false;
+    }
   };
 
   const handleSubmit = async () => {
@@ -85,7 +128,7 @@ const Profile = () => {
                 />
               </View>
               <View>
-                <CustomText className=" text-xl" style={{ color: colors.text }}>
+                <CustomText className="text-xl" style={{ color: colors.text }}>
                   Username
                 </CustomText>
                 <TextInput

@@ -24,6 +24,7 @@ import AlertScreen from "../../screens/AlertScreen";
 import CustomAlert from "../../components/modals/CustomAlert";
 import { useTheme } from "expo-router/react-navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const ProfilePage = () => {
   const { colors } = useTheme();
@@ -56,7 +57,7 @@ const ProfilePage = () => {
         Alert.alert("Please enter a valid number for income.");
         return;
       } else {
-        const [updateRes, deleteRes] = await Promise.all([
+        const [updateRes, deleteRes, deleteGoalsRes] = await Promise.all([
           supabase
             .from("User Data")
             .update({
@@ -70,6 +71,10 @@ const ProfilePage = () => {
           supabase
             .from("transactions")
             .delete()
+            .eq("user_id", user?.id),
+          supabase
+            .from("goals")
+            .delete()
             .eq("user_id", user?.id)
         ]);
 
@@ -77,6 +82,8 @@ const ProfilePage = () => {
           Alert.alert("Error updating profile", updateRes.error.message);
         } else if (deleteRes.error) {
           Alert.alert("Error clearing transactions", deleteRes.error.message);
+        } else if (deleteGoalsRes.error) {
+          Alert.alert("Error clearing goals", deleteGoalsRes.error.message);
         } else {
           setAlertVisible("profileUpdated");
         }
@@ -112,6 +119,46 @@ const ProfilePage = () => {
       router.replace("/(auth)/login");
     } else {
       console.error("Logout error:", error);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setLoading(true);
+    try {
+      const email = user?.user_metadata?.email;
+      const userId = user?.id;
+
+      if (!email || !userId) {
+        throw new Error("User information is missing.");
+      }
+
+      // 1. Delete user-specific data from public tables
+      const [resUserData, resTransactions, resGoals] = await Promise.all([
+        supabase.from("User Data").delete().eq("email", email),
+        supabase.from("transactions").delete().eq("user_id", userId),
+        supabase.from("goals").delete().eq("user_id", userId),
+      ]);
+
+      if (resUserData.error) throw new Error(`Failed to delete User Data: ${resUserData.error.message}`);
+      if (resTransactions.error) throw new Error(`Failed to delete transactions: ${resTransactions.error.message}`);
+      if (resGoals.error) throw new Error(`Failed to delete goals: ${resGoals.error.message}`);
+
+      // 2. Call the RPC to delete from auth.users
+      const { error: rpcError } = await supabase.rpc("delete_user_account");
+      if (rpcError) {
+        console.warn("RPC delete_user_account failed:", rpcError);
+        throw new Error(`Failed to delete auth account: ${rpcError.message}`);
+      }
+
+      // 3. Clear local session & redirect
+      await supabase.auth.signOut();
+      setShowModal(null);
+      router.replace("/(auth)/login");
+    } catch (error) {
+      console.error("Delete account error:", error);
+      Alert.alert("Error Deleting Account", error.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -338,6 +385,19 @@ const ProfilePage = () => {
           </View>
         )}
         <View className="rounded-3xl p-1 mb-6 shadow-sm" style={{ backgroundColor: colors.inputBg }}>
+          <Link href={"/profile/accounts"} asChild>
+            <TouchableOpacity className="flex-row justify-between items-center p-4">
+              <View className="flex-row items-center">
+                <View className="p-2 rounded-xl bg-[#41B3A2]/10 mr-3">
+                  <FontAwesome name="bank" size={18} color="#41B3A2" />
+                </View>
+                <CustomText className="text-base font-medium" style={{ color: colors.text }}>
+                  Accounts
+                </CustomText>
+              </View>
+              <Feather name="chevron-right" size={18} color={colors.text + '55'} />
+            </TouchableOpacity>
+          </Link>
           <TouchableOpacity
             className="flex-row justify-between items-center p-4 border-b"
             style={{ borderBottomColor: colors.background + '22' }}
@@ -386,7 +446,7 @@ const ProfilePage = () => {
           </Link>
         </View>
         <TouchableOpacity
-          className="rounded-3xl p-4 flex-row justify-between items-center shadow-sm mb-6"
+          className="rounded-3xl p-4 flex-row justify-between items-center shadow-sm mb-4"
           style={{ backgroundColor: colors.inputBg }}
           onPress={() => setShowModal("logOut")}
         >
@@ -396,6 +456,22 @@ const ProfilePage = () => {
             </View>
             <CustomText className="text-base font-semibold text-red-500">
               Log Out
+            </CustomText>
+          </View>
+          <Feather name="chevron-right" size={18} color="#EF4444" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="rounded-3xl p-4 flex-row justify-between items-center shadow-sm mb-6"
+          style={{ backgroundColor: colors.inputBg }}
+          onPress={() => setShowModal("deleteAccount")}
+        >
+          <View className="flex-row items-center">
+            <View className="p-2 rounded-xl bg-red-500/10 mr-3">
+              <Feather name="trash-2" size={18} color="#EF4444" />
+            </View>
+            <CustomText className="text-base font-semibold text-red-500">
+              Delete Account
             </CustomText>
           </View>
           <Feather name="chevron-right" size={18} color="#EF4444" />
@@ -692,6 +768,61 @@ const ProfilePage = () => {
                 onPress={handleLogOut}
               >
                 <CustomText className="text-white text-base font-bold">Yes</CustomText>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showModal === "deleteAccount"}
+        onRequestClose={() => {
+          setShowModal(null);
+        }}
+      >
+        <Pressable
+          onPress={() => setShowModal(null)}
+          className="flex-1 justify-center items-center bg-black/60"
+        >
+          <Pressable
+            onPress={() => { }}
+            className="p-6 rounded-3xl w-4/5 shadow-2xl"
+            style={{ backgroundColor: colors.expenseForm }}
+          >
+            <View className="items-center mb-4">
+              <View className="p-3 bg-red-500/10 rounded-full mb-3">
+                <Feather name="trash-2" size={28} color="#EF4444" />
+              </View>
+              <CustomText
+                className="text-lg font-bold text-center"
+                style={{ color: colors.text, fontFamily: "Poppins_SemiBold" }}
+              >
+                Delete Account
+              </CustomText>
+            </View>
+            <CustomText
+              className="text-sm text-center mb-6 text-gray-500"
+              style={{ fontFamily: "Jost" }}
+            >
+              Are you sure you want to permanently delete your account? This action is irreversible and will remove all your data, transactions, and goals.
+            </CustomText>
+            <View className="flex-row gap-3">
+              <Pressable
+                className="flex-1 p-3.5 bg-gray-500 items-center rounded-full shadow-md"
+                onPress={() => setShowModal(null)}
+              >
+                <CustomText className="text-white text-base font-bold">Cancel</CustomText>
+              </Pressable>
+              <Pressable
+                className="flex-1 p-3.5 bg-red-500 items-center rounded-full shadow-md"
+                onPress={handleDeleteAccount}
+              >
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <CustomText className="text-white text-base font-bold">Delete</CustomText>
+                )}
               </Pressable>
             </View>
           </Pressable>
