@@ -28,7 +28,7 @@ export const LightCustomTheme = {
 export const DarkCustomTheme = {
     dark: true,
     colors: {
-        primary: '#42A5F5', // Light Blue
+        primary: '#41B3A2', // Primary theme color (Teal)
         secondary: '#78909C', // Muted Blue Gray
         background: '#121212', // Pure Black
         header: '#121212', // Dark Charcoal

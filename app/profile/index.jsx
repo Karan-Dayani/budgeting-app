@@ -16,7 +16,8 @@ import CustomText from "../../components/CustomText";
 import CustomSuccessAlert from "../../components/modals/CustomSuccessAlert";
 import { supabase } from "../../lib/supabase";
 import { AntDesign, Feather } from "@expo/vector-icons";
-import { useUser } from "../../components/globalState/UserContext";
+import { useAuthStore } from "../../components/globalState/authStore";
+import { useBudgetStore } from "../../components/globalState/budgetStore";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
 import { numberWithCommas } from "../../lib/utils";
@@ -28,7 +29,18 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const ProfilePage = () => {
   const { colors } = useTheme();
-  const { user } = useUser()
+  const { user, signOut } = useAuthStore();
+  const {
+    username: storeUsername,
+    income: storeIncome,
+    savings: storeSavings,
+    expenses: storeExpenses,
+    updateProfile,
+    fetchBudget,
+    reset: resetBudget,
+    submitting,
+  } = useBudgetStore();
+
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
   const [oldIncome, setOldIncome] = useState(0);
@@ -36,11 +48,11 @@ const ProfilePage = () => {
   const [savings, setSavings] = useState(0);
   const [expenses, setExpenses] = useState([]);
   const [alertVisible, setAlertVisible] = useState(false);
-  const [showModal, setShowModal] = useState()
+  const [showModal, setShowModal] = useState();
   const [selectedMY, setSelectedMY] = useState({
     month: "",
     year: ""
-  })
+  });
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
@@ -49,75 +61,61 @@ const ProfilePage = () => {
     new Date(-1, i).toLocaleString("default", { month: "long" })
   );
 
+  const isFocused = useIsFocused();
+
+  // Load store data into local states for editing/rendering
+  useEffect(() => {
+    setUserName(storeUsername);
+    setIncome(storeIncome);
+    setOldIncome(storeIncome);
+    setSavings(storeSavings);
+    setExpenses(storeExpenses);
+  }, [storeUsername, storeIncome, storeSavings, storeExpenses]);
+
+  // Sync store data on screen focus
+  useEffect(() => {
+    if (isFocused && user) {
+      const email = user.email || user.user_metadata?.email;
+      if (email) {
+        fetchBudget(email, user.id).then(() => {
+          setLoading(false);
+        });
+      }
+    }
+  }, [isFocused, user]);
+
   const handleChangeSubmit = async () => {
     const incomeNumber = Number(income);
 
-    if (oldIncome !== income) {
-      if (isNaN(incomeNumber) || incomeNumber <= 0) {
-        Alert.alert("Please enter a valid number for income.");
-        return;
-      } else {
-        const [updateRes, deleteRes, deleteGoalsRes] = await Promise.all([
-          supabase
-            .from("User Data")
-            .update({
-              username: userName,
-              income: incomeNumber,
-              savings: incomeNumber,
-              expenses: [],
-              goals: [],
-            })
-            .eq("email", user?.user_metadata?.email),
-          supabase
-            .from("transactions")
-            .delete()
-            .eq("user_id", user?.id),
-          supabase
-            .from("goals")
-            .delete()
-            .eq("user_id", user?.id)
-        ]);
-
-        if (updateRes.error) {
-          Alert.alert("Error updating profile", updateRes.error.message);
-        } else if (deleteRes.error) {
-          Alert.alert("Error clearing transactions", deleteRes.error.message);
-        } else if (deleteGoalsRes.error) {
-          Alert.alert("Error clearing goals", deleteGoalsRes.error.message);
-        } else {
-          setAlertVisible("profileUpdated");
-        }
-        setShowModal(null);
-        setLoading(true);
-      }
-    } else {
-      if (isNaN(incomeNumber) || incomeNumber <= 0) {
-        Alert.alert("Please enter a valid number for income.");
-        return;
-      } else {
-        const { data, error: updateError } = await supabase
-          .from("User Data")
-          .update({ username: userName })
-          .eq("email", user?.user_metadata?.email)
-          .select();
-        if (updateError) {
-          Alert.alert("Error updating profile", updateError.message);
-        } else {
-          setAlertVisible("profileUpdated");
-        }
-        setShowModal(null);
-        setLoading(true);
-      }
+    if (isNaN(incomeNumber) || incomeNumber <= 0) {
+      Alert.alert("Please enter a valid number for income.");
+      return;
     }
 
-    setLoading(false);
+    const email = user?.email || user?.user_metadata?.email;
+    if (!email || !user?.id) {
+      Alert.alert("Error", "User session email or id not found.");
+      return;
+    }
+
+    const isIncomeChanged = oldIncome !== income;
+    const success = await updateProfile(email, user.id, userName, incomeNumber, isIncomeChanged);
+
+    if (success) {
+      setAlertVisible("profileUpdated");
+      setOldIncome(income);
+    } else {
+      Alert.alert("Error updating profile");
+    }
+    setShowModal(null);
   };
 
   const handleLogOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
+    try {
+      await signOut();
+      resetBudget();
       router.replace("/(auth)/login");
-    } else {
+    } catch (error) {
       console.error("Logout error:", error);
     }
   };
@@ -125,7 +123,7 @@ const ProfilePage = () => {
   const handleDeleteAccount = async () => {
     setLoading(true);
     try {
-      const email = user?.user_metadata?.email;
+      const email = user?.email || user?.user_metadata?.email;
       const userId = user?.id;
 
       if (!email || !userId) {
@@ -151,7 +149,8 @@ const ProfilePage = () => {
       }
 
       // 3. Clear local session & redirect
-      await supabase.auth.signOut();
+      await signOut();
+      resetBudget();
       setShowModal(null);
       router.replace("/(auth)/login");
     } catch (error) {
@@ -161,73 +160,6 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
-
-  async function fetchData() {
-    try {
-      const [userResponse, transResponse] = await Promise.all([
-        supabase
-          .from("User Data")
-          .select("username,income,savings")
-          .eq("email", user?.user_metadata?.email),
-        supabase
-          .from("transactions")
-          .select("*")
-          .eq("user_id", user?.id)
-          .order("transaction_date", { ascending: false })
-      ]);
-
-      if (userResponse.error) throw userResponse.error;
-      if (transResponse.error) throw transResponse.error;
-
-      const userData = userResponse.data[0];
-      setUserName(userData?.username || "");
-      setIncome(userData?.income || 0);
-      setOldIncome(userData?.income || 0);
-      setSavings(userData?.savings || 0);
-
-      const formattedTrans = (transResponse.data || []).map((tx) => {
-        let formattedDate = "";
-        if (tx.transaction_date) {
-          const dateParts = tx.transaction_date.split("-");
-          if (dateParts.length === 3) {
-            const yearInt = parseInt(dateParts[0], 10);
-            const monthInt = parseInt(dateParts[1], 10) - 1;
-            const dayInt = parseInt(dateParts[2], 10);
-            const d = new Date(yearInt, monthInt, dayInt);
-            formattedDate = d.toDateString().slice(4);
-          } else {
-            formattedDate = new Date(tx.transaction_date).toDateString().slice(4);
-          }
-        } else {
-          formattedDate = new Date().toDateString().slice(4);
-        }
-        return {
-          ...tx,
-          expenseId: tx.id,
-          expenseName: tx.expense_name,
-          expenseAmount: tx.amount,
-          paymentMode: tx.payment_mode,
-          expenseDate: formattedDate,
-          expenseCategory: tx.category,
-          expenseType: tx.expense_type,
-        };
-      });
-
-      setExpenses(formattedTrans);
-    } catch (err) {
-      console.error(err);
-      Alert.alert("Error fetching data");
-    }
-  }
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, [user]);
 
   const filterdExpensePDF = expenses?.filter((expense) => (
     expense.expenseDate.slice(0, 3) === selectedMY.month.slice(0, 3) && Number(expense.expenseDate.slice(7, 11)) === selectedMY.year
@@ -403,7 +335,8 @@ const ProfilePage = () => {
             style={{ borderBottomColor: colors.background + '22' }}
             onPress={() => {
               setShowModal("profileModal");
-              fetchData();
+              setUserName(storeUsername);
+              setIncome(storeIncome);
             }}
           >
             <View className="flex-row items-center">
@@ -551,7 +484,7 @@ const ProfilePage = () => {
                   }
                 }}
               >
-                {loading ? (
+                {submitting ? (
                   <ActivityIndicator color="white" />
                 ) : (
                   <CustomText className="text-white text-base font-bold">Submit</CustomText>
@@ -818,7 +751,7 @@ const ProfilePage = () => {
                 className="flex-1 p-3.5 bg-red-500 items-center rounded-full shadow-md"
                 onPress={handleDeleteAccount}
               >
-                {loading ? (
+                {submitting ? (
                   <ActivityIndicator color="white" />
                 ) : (
                   <CustomText className="text-white text-base font-bold">Delete</CustomText>

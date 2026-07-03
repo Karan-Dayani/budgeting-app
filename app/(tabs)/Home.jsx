@@ -1,20 +1,24 @@
 import { useIsFocused } from "expo-router/react-navigation";
-import { Stack } from "expo-router";
+import { Stack, Link } from "expo-router";
 import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   ScrollView,
   StatusBar,
-  View
+  View,
+  TouchableOpacity,
 } from "react-native";
 import AnimatedHeader from "../../components/AnimatedHeader";
-import { useUser } from "../../components/globalState/UserContext";
+import { useAuthStore } from "../../components/globalState/authStore";
+import { useBudgetStore } from "../../components/globalState/budgetStore";
 import HistoryExpense from "../../components/home/HistoryExpense";
 import HistoryGoals from "../../components/home/HistoryGoals";
 import MonthChart from "../../components/home/MonthChart";
 import TotalIncome from "../../components/TotalIncome";
-import { supabase } from "../../lib/supabase";
+import CustomText from "../../components/CustomText";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { AntDesign, Feather } from "@expo/vector-icons";
 
 const Skeleton = ({ h, w, my, mb, rounded }) => {
   const { colors } = useTheme();
@@ -33,9 +37,18 @@ const Skeleton = ({ h, w, my, mb, rounded }) => {
 };
 
 export default function Home() {
-  const { user } = useUser();
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState([]);
+  const { user } = useAuthStore();
+  const {
+    username,
+    income,
+    savings,
+    expenses,
+    goals,
+    accounts,
+    loading,
+    fetchBudget
+  } = useBudgetStore();
+
   const isFocused = useIsFocused();
   const { colors, dark } = useTheme();
   const fadeInOpacity = useRef(new Animated.Value(0)).current;
@@ -63,83 +76,30 @@ export default function Home() {
     }
   }, [isFocused]);
 
-  const getUserRow = async () => {
-    try {
-      const [userResponse, transResponse, goalsResponse] = await Promise.all([
-        supabase
-          .from("User Data")
-          .select("*")
-          .eq("email", user?.user_metadata?.email),
-        supabase
-          .from("transactions")
-          .select("*")
-          .eq("user_id", user?.id)
-          .order("transaction_date", { ascending: false }),
-        supabase
-          .from("goals")
-          .select("*")
-          .eq("user_id", user?.id)
-          .order("created_at", { ascending: false })
-      ]);
-
-      if (userResponse.error) throw userResponse.error;
-      if (transResponse.error) throw transResponse.error;
-      if (goalsResponse.error) throw goalsResponse.error;
-
-      const formattedTrans = (transResponse.data || []).map((tx) => {
-        let formattedDate = "";
-        if (tx.transaction_date) {
-          const dateParts = tx.transaction_date.split("-");
-          if (dateParts.length === 3) {
-            const yearInt = parseInt(dateParts[0], 10);
-            const monthInt = parseInt(dateParts[1], 10) - 1;
-            const dayInt = parseInt(dateParts[2], 10);
-            const d = new Date(yearInt, monthInt, dayInt);
-            formattedDate = d.toDateString().slice(4);
-          } else {
-            formattedDate = new Date(tx.transaction_date).toDateString().slice(4);
-          }
-        } else {
-          formattedDate = new Date().toDateString().slice(4);
-        }
-        return {
-          ...tx,
-          expenseId: tx.id,
-          expenseName: tx.expense_name,
-          expenseAmount: tx.amount,
-          paymentMode: tx.payment_mode,
-          expenseDate: formattedDate,
-          expenseCategory: tx.category,
-          expenseType: tx.expense_type,
-        };
-      });
-
-      const formattedGoals = (goalsResponse.data || []).map((g) => ({
-        goalId: g.id,
-        goalName: g.goal_name,
-        goalTargetMoney: Number(g.target_amount),
-        goalSavedMoney: Number(g.saved_amount),
-        deadline: g.deadline,
-        createdAt: g.created_at,
-      }));
-
-      if (userResponse.data && userResponse.data[0]) {
-        userResponse.data[0].expenses = formattedTrans;
-        userResponse.data[0].goals = formattedGoals;
-      }
-      setUserData(userResponse.data);
-    } catch (err) {
-      console.error("Unexpected error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Unified budget fetch from store
   useEffect(() => {
     if (isFocused && user) {
-      getUserRow();
+      const email = user.email || user.user_metadata?.email;
+      if (email) {
+        fetchBudget(email, user.id);
+      }
     }
   }, [isFocused, user]);
+
+  // Re-construct the userData array in the exact shape children components expect
+  const userData = React.useMemo(() => {
+    return [
+      {
+        username,
+        income,
+        savings,
+        expenses,
+        goals,
+        accounts,
+        email: user?.email || user?.user_metadata?.email || "",
+      }
+    ];
+  }, [username, income, savings, expenses, goals, accounts, user]);
 
 
   return (
@@ -201,6 +161,202 @@ export default function Home() {
             <>
               <Animated.View className="w-full">
                 <TotalIncome user={userData} />
+              </Animated.View>
+
+              {/* Accounts Card List */}
+              <Animated.View style={{ marginTop: 8, marginBottom: 16 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <CustomText style={{ fontFamily: "Poppins_Bold", fontSize: 18, color: colors.text }}>
+                    My Accounts
+                  </CustomText>
+                  <Link href={"/profile/accounts"} asChild>
+                    <TouchableOpacity>
+                      <CustomText style={{ color: "#41B3A2", fontFamily: "Poppins_SemiBold", fontSize: 14 }}>
+                        Manage
+                      </CustomText>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
+
+                {accounts && accounts.length > 0 ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingRight: 20 }}
+                  >
+                    {accounts.map((acc) => {
+                      // Visual customization based on account type
+                      let cardBg = "#4F46E5"; // Indigo default
+                      let cardAccentCircle = "rgba(255, 255, 255, 0.08)";
+                      if (acc.type === "Digital Wallet") {
+                        cardBg = "#10B981"; // Emerald Green
+                      } else if (acc.type === "Cash") {
+                        cardBg = "#F59E0B"; // Amber Gold
+                      } else if (acc.type === "Credit Card") {
+                        cardBg = "#EC4899"; // Pink
+                      }
+
+                      return (
+                        <View
+                          key={acc.id}
+                          style={{
+                            width: 220,
+                            height: 130,
+                            backgroundColor: cardBg,
+                            borderRadius: 24,
+                            padding: 16,
+                            marginRight: 14,
+                            position: "relative",
+                            overflow: "hidden",
+                            justifyContent: "space-between",
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 6 },
+                            shadowOpacity: 0.12,
+                            shadowRadius: 8,
+                            elevation: 4,
+                          }}
+                        >
+                          {/* Translucent background circles for depth */}
+                          <View
+                            style={{
+                              position: "absolute",
+                              right: -25,
+                              top: -25,
+                              width: 100,
+                              height: 100,
+                              borderRadius: 50,
+                              backgroundColor: cardAccentCircle,
+                            }}
+                          />
+                          <View
+                            style={{
+                              position: "absolute",
+                              left: -20,
+                              bottom: -40,
+                              width: 80,
+                              height: 80,
+                              borderRadius: 40,
+                              backgroundColor: "rgba(255, 255, 255, 0.04)",
+                            }}
+                          />
+
+                          {/* Card Top Header */}
+                          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", zIndex: 1 }}>
+                            <View
+                              style={{
+                                width: 34,
+                                height: 34,
+                                borderRadius: 17,
+                                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              {acc.type === "Bank" ? (
+                                <FontAwesome name="bank" size={14} color="#FFFFFF" />
+                              ) : acc.type === "Cash" ? (
+                                <FontAwesome name="money" size={14} color="#FFFFFF" />
+                              ) : acc.type === "Credit Card" ? (
+                                <FontAwesome name="credit-card" size={14} color="#FFFFFF" />
+                              ) : (
+                                <FontAwesome name="google-wallet" size={14} color="#FFFFFF" />
+                              )}
+                            </View>
+                            {/* Mock microchip */}
+                            <View
+                              style={{
+                                width: 30,
+                                height: 22,
+                                borderRadius: 4,
+                                backgroundColor: "#ECC94B",
+                                opacity: 0.85,
+                              }}
+                            />
+                          </View>
+
+                          {/* Card Balance */}
+                          <View style={{ zIndex: 1, marginTop: 4 }}>
+                            <CustomText
+                              style={{
+                                fontSize: 18,
+                                fontWeight: "bold",
+                                color: "#FFFFFF",
+                                fontFamily: "Poppins_Bold",
+                              }}
+                            >
+                              ₹{acc.balance.toLocaleString("en-IN")}
+                            </CustomText>
+                          </View>
+
+                          {/* Card Footer Info */}
+                          <View style={{ zIndex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
+                            <View style={{ flex: 1, marginRight: 8 }}>
+                              <CustomText
+                                numberOfLines={1}
+                                style={{
+                                  fontSize: 13,
+                                  fontFamily: "Poppins_SemiBold",
+                                  color: "#FFFFFF",
+                                }}
+                              >
+                                {acc.name}
+                              </CustomText>
+                            </View>
+                            <CustomText
+                              style={{
+                                fontSize: 10,
+                                fontFamily: "Poppins_Medium",
+                                color: "rgba(255, 255, 255, 0.8)",
+                              }}
+                            >
+                              {acc.type === "Credit Card" ? "CARD" : acc.type === "Digital Wallet" ? "WALLET" : acc.type.toUpperCase()}
+                            </CustomText>
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </ScrollView>
+                ) : (
+                  <View
+                    style={{
+                      padding: 24,
+                      borderRadius: 24,
+                      backgroundColor: colors.inputBg,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderWidth: dark ? 0 : 1,
+                      borderColor: '#E5E7EB',
+                    }}
+                  >
+                    <Feather name="info" size={24} color="#78909C" style={{ marginBottom: 8 }} />
+                    <CustomText style={{ fontSize: 14, fontFamily: "Poppins_SemiBold", color: colors.text }}>
+                      No accounts configured
+                    </CustomText>
+                    <CustomText style={{ fontSize: 12, color: "#8A9Aad", textAlign: "center", marginTop: 2, marginBottom: 12 }}>
+                      Add your accounts to display them here.
+                    </CustomText>
+                    <Link href={"/profile/accounts"} asChild>
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          backgroundColor: `${colors.primary}15`,
+                          paddingHorizontal: 16,
+                          paddingVertical: 8,
+                          borderRadius: 14,
+                          borderWidth: 1.2,
+                          borderColor: `${colors.primary}30`,
+                        }}
+                      >
+                        <Feather name="plus" size={14} color="#41B3A2" style={{ marginRight: 6 }} />
+                        <CustomText style={{ color: "#41B3A2", fontSize: 12, fontFamily: "Poppins_Bold" }}>
+                          Add Account
+                        </CustomText>
+                      </TouchableOpacity>
+                    </Link>
+                  </View>
+                )}
               </Animated.View>
             </>
           )}

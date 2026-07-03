@@ -4,6 +4,8 @@ import { router } from "expo-router";
 import { useTheme } from "expo-router/react-navigation";
 import { supabase } from "../lib/supabase";
 import SplashScreenLoad from "../screens/splashScreenLoad";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuthStore } from "../components/globalState/authStore";
 
 const Index = () => {
   const { colors } = useTheme();
@@ -11,6 +13,8 @@ const Index = () => {
   const [isVideoFinished, setIsVideoFinished] = useState(false);
   const [isSessionLoaded, setIsSessionLoaded] = useState(false);
   const [targetRoute, setTargetRoute] = useState(null);
+
+  const { user, loading: authLoading } = useAuthStore();
 
   const checkUserIncome = async (email) => {
     try {
@@ -29,28 +33,33 @@ const Index = () => {
     }
   };
 
-  // Perform session check immediately on mount
   useEffect(() => {
     let active = true;
 
     const performAuthCheck = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!active) return;
+      if (authLoading) return;
 
-        if (session) {
-          const hasIncome = await checkUserIncome(session.user.email);
+      try {
+        if (user) {
+          const hasIncome = await checkUserIncome(user.email);
+          if (!active) return;
           if (hasIncome) {
             setTargetRoute("/(tabs)/Home");
           } else {
-            setTargetRoute("/UserDetails/");
+            setTargetRoute("/UserDetails");
           }
         } else {
-          setTargetRoute("/(auth)/login");
+          const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding");
+          if (!active) return;
+          if (hasSeenOnboarding === "true") {
+            setTargetRoute("/(auth)/login");
+          } else {
+            setTargetRoute("/onboarding");
+          }
         }
       } catch (e) {
         console.error("Error in auth check:", e);
-        setTargetRoute("/(auth)/login");
+        if (active) setTargetRoute("/(auth)/login");
       } finally {
         if (active) {
           setIsSessionLoaded(true);
@@ -59,26 +68,6 @@ const Index = () => {
     };
 
     performAuthCheck();
-
-    // Setup listener for real-time auth changes
-    const authListener = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (!active) return;
-      try {
-        if (session) {
-          const hasIncome = await checkUserIncome(session.user.email);
-          if (hasIncome) {
-            setTargetRoute("/(tabs)/Home");
-          } else {
-            setTargetRoute("/UserDetails/");
-          }
-        } else {
-          setTargetRoute("/(auth)/login");
-        }
-      } catch (e) {
-        console.error("Error in onAuthStateChange check:", e);
-        setTargetRoute("/(auth)/login");
-      }
-    });
 
     // Safety timeout: force progress after 3 seconds in case video listener fails
     const safetyTimeout = setTimeout(() => {
@@ -90,11 +79,8 @@ const Index = () => {
     return () => {
       active = false;
       clearTimeout(safetyTimeout);
-      if (authListener.data?.subscription) {
-        authListener.data.subscription.unsubscribe();
-      }
     };
-  }, []);
+  }, [user, authLoading]);
 
   // Trigger smooth transition when both the video is finished and auth status is resolved
   useEffect(() => {
@@ -110,9 +96,7 @@ const Index = () => {
   }, [isSessionLoaded, isVideoFinished, targetRoute]);
 
   // Determine root background color to match the landing page (prevents flashbang)
-  const rootBg = targetRoute === "/(auth)/login"
-    ? "#FFFFFF" // Login screen background color
-    : colors.background || "#121212"; // Home screen theme background color
+  const rootBg = colors.background || "#121212";
 
   const initialBg = colors.background || "#121212";
 

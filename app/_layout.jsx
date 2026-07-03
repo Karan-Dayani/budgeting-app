@@ -18,14 +18,15 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
 import { DarkCustomTheme, LightCustomTheme } from "../constants/Theme";
-
-import { UserProvider } from "../components/globalState/UserContext";
+import { useAuthStore } from "../components/globalState/authStore";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+  
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Nunito: require("../assets/fonts/Nunito-Medium.ttf"),
@@ -47,6 +48,13 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  useEffect(() => {
+    const unsubscribe = initializeAuth();
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   if (!loaded) {
     return null;
   }
@@ -63,31 +71,35 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={theme}>
-      <UserProvider>
-        <StatusBar
-          barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
-          backgroundColor={customColors.header}
-        />
-        <View style={{ flex: 1, backgroundColor: customColors.background }}>
-          <Stack screenOptions={{ 
-            headerShown: false,
-            contentStyle: { backgroundColor: customColors.background }
-          }}>
-            <Stack.Screen
-              name="index"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack>
-        </View>
-      </UserProvider>
+      <StatusBar
+        barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
+        backgroundColor={customColors.header}
+      />
+      <View style={{ flex: 1, backgroundColor: customColors.background }}>
+        <Stack screenOptions={{ 
+          headerShown: false,
+          contentStyle: { backgroundColor: customColors.background }
+        }}>
+          <Stack.Screen
+            name="index"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="onboarding"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack>
+      </View>
     </ThemeProvider>
   );
 }

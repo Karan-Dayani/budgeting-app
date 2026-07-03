@@ -24,10 +24,10 @@ import React, { useEffect, useState } from "react";
 import CustomCircularProgress from "../../components/CustomCircularProgress";
 import uuid from "react-native-uuid";
 import CustomText from "../../components/CustomText";
-import { useUser } from "../../components/globalState/UserContext";
+import { useAuthStore } from "../../components/globalState/authStore";
+import { useBudgetStore } from "../../components/globalState/budgetStore";
 import AddGoal from "../../components/modals/AddGoal";
 import GoalDetail from "../../components/modals/GoalDetail";
-import { supabase } from "../../lib/supabase";
 import GoalComplete from "../../screens/GoalComplete";
 import { Notification, numberWithCommas } from "../../lib/utils";
 import FloatingAddButton from "../../components/FloatingAddButton";
@@ -61,12 +61,21 @@ const Goals = () => {
 
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
-  const { user } = useUser();
-  const [userGoals, setUserGoals] = useState([]);
-  const [savings, setSavings] = useState(0);
+  
+  const { user } = useAuthStore();
+  const {
+    savings,
+    goals: userGoals,
+    loading,
+    submitting,
+    fetchBudget,
+    addGoal,
+    contributeToGoal,
+    deleteGoal
+  } = useBudgetStore();
+
   const [goalDetailModal, setGoalDetailModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState();
 
@@ -80,47 +89,13 @@ const Goals = () => {
 
   const { colors, dark } = useTheme();
 
-  const fetchData = async () => {
-    const { data: userData, error: userError } = await supabase
-      .from("User Data")
-      .select("savings")
-      .eq("email", user?.user_metadata?.email);
-
-    if (userError) {
-      console.error(userError);
-      Alert.alert("Error fetching data");
-      setLoading(false);
-      return;
-    }
-    
-    setSavings(userData[0]?.savings || 0);
-
-    const { data: goalsData, error: goalsError } = await supabase
-      .from("goals")
-      .select("*")
-      .eq("user_id", user?.id)
-      .order("created_at", { ascending: false });
-
-    if (goalsError) {
-      console.error(goalsError);
-      Alert.alert("Error fetching goals");
-    } else {
-      const mappedGoals = (goalsData || []).map((g) => ({
-        goalId: g.id,
-        goalName: g.goal_name,
-        goalTargetMoney: Number(g.target_amount),
-        goalSavedMoney: Number(g.saved_amount),
-        deadline: g.deadline,
-        createdAt: g.created_at,
-      }));
-      setUserGoals(mappedGoals);
-    }
-    setLoading(false);
-  };
-
+  // Unified budget fetch from store
   useEffect(() => {
-    if (user) {
-      fetchData();
+    if (isFocused && user) {
+      const email = user.email || user.user_metadata?.email;
+      if (email) {
+        fetchBudget(email, user.id);
+      }
     }
   }, [user, isFocused]);
 
@@ -130,38 +105,28 @@ const Goals = () => {
       return;
     }
 
-    setLoading(true);
-
-    const { data, error } = await supabase
-      .from("goals")
-      .insert({
-        user_id: user?.id,
-        goal_name: goal.goalName.trim(),
-        target_amount: Number(goal.goalTargetMoney),
-        saved_amount: Number(goal.goalSavedMoney) || 0,
-      })
-      .select();
-
-    if (error) {
-      console.error("Error adding goal:", error);
-      Alert.alert("Error adding goal");
-      setLoading(false);
+    if (!user?.id) {
+      Alert.alert("Error", "User session id not found.");
       return;
     }
 
-    setGoal({
-      goalId: uuid.v4(),
-      goalName: "",
-      goalTargetMoney: 0,
-      goalSavedMoney: 0,
-    });
-    setModalVisible(false);
-    await fetchData();
-    setLoading(false);
-    setIsSaved(!isSaved);
-    setTimeout(() => {
-      setIsSaved(false);
-    }, 2500);
+    const success = await addGoal(user.id, goal.goalName, Number(goal.goalTargetMoney));
+
+    if (success) {
+      setGoal({
+        goalId: uuid.v4(),
+        goalName: "",
+        goalTargetMoney: 0,
+        goalSavedMoney: 0,
+      });
+      setModalVisible(false);
+      setIsSaved(!isSaved);
+      setTimeout(() => {
+        setIsSaved(false);
+      }, 2500);
+    } else {
+      Alert.alert("Error adding goal");
+    }
   };
 
   const handleGoalAmountAdd = async (amount, onSuccess) => {
@@ -170,52 +135,31 @@ const Goals = () => {
       return;
     }
 
-    setLoading(true);
-
     const remainingAmount =
       Number(selectedGoal?.goalTargetMoney) - Number(selectedGoal?.goalSavedMoney);
-    if (amount <= remainingAmount) {
-      const totalSavedMoney = Number(selectedGoal.goalSavedMoney) + amount;
-
-      const { error: goalUpdateError } = await supabase
-        .from("goals")
-        .update({ saved_amount: totalSavedMoney })
-        .eq("id", selectedGoal.goalId);
-
-      if (goalUpdateError) {
-        console.error("Error updating goal amount:", goalUpdateError);
-        Alert.alert("Error updating goal");
-        setLoading(false);
-        return;
-      }
-
-      const updatedSavings = savings - amount;
-
-      const { error: userUpdateError } = await supabase
-        .from("User Data")
-        .update({ savings: updatedSavings })
-        .eq("email", user?.user_metadata?.email);
-
-      if (userUpdateError) {
-        console.error("Error updating user savings:", userUpdateError);
-        Alert.alert("Error updating savings");
-        setLoading(false);
-        return;
-      }
-
-      if (Number(totalSavedMoney) === Number(selectedGoal.goalTargetMoney)) {
-        console.log("Goal Complete!");
-        setGoalComplete(true);
-        if (onSuccess) onSuccess();
-        await fetchData();
-      } else {
-        if (onSuccess) onSuccess();
-        await fetchData();
-      }
-    } else {
+    
+    if (amount > remainingAmount) {
       Alert.alert("Error", "Amount exceeds target.");
+      return;
     }
-    setLoading(false);
+
+    const email = user?.email || user?.user_metadata?.email;
+    if (!email) {
+      Alert.alert("Error", "User email session not found.");
+      return;
+    }
+
+    const totalSavedMoney = Number(selectedGoal?.goalSavedMoney || 0) + amount;
+    const success = await contributeToGoal(email, selectedGoal?.goalId, amount, Number(selectedGoal?.goalSavedMoney || 0));
+
+    if (success) {
+      if (Number(totalSavedMoney) === Number(selectedGoal?.goalTargetMoney)) {
+        setGoalComplete(true);
+      }
+      if (onSuccess) onSuccess();
+    } else {
+      Alert.alert("Error updating savings goal");
+    }
   };
 
   const handleGoalDetailOpen = (item) => {
@@ -231,47 +175,29 @@ const Goals = () => {
   };
 
   const handleGoalDelete = async (item) => {
-    setLoading(true);
     const targetGoal = item || selectedGoal;
     if (!targetGoal) {
-      setLoading(false);
       return;
     }
 
-    const { error: deleteError } = await supabase
-      .from("goals")
-      .delete()
-      .eq("id", targetGoal.goalId);
+    const email = user?.email || user?.user_metadata?.email;
+    if (!email) {
+      Alert.alert("Error", "User session email not found.");
+      return;
+    }
 
-    if (deleteError) {
-      console.error("Error deleting goal:", deleteError);
+    const success = await deleteGoal(email, targetGoal.goalId, targetGoal.goalSavedMoney);
+
+    if (success) {
+      setConfirmModal(false);
+      setSelectedGoal(null);
+      setIsDeleted(!isDeleted);
+      setTimeout(() => {
+        setIsDeleted(false);
+      }, 2500);
+    } else {
       Alert.alert("Error deleting goal");
-      setLoading(false);
-      return;
     }
-
-    const updatedSavings = savings + targetGoal.goalSavedMoney;
-    const { error: userUpdateError } = await supabase
-      .from("User Data")
-      .update({ savings: updatedSavings })
-      .eq("email", user?.user_metadata?.email);
-
-    if (userUpdateError) {
-      console.error("Error updating user savings after delete:", userUpdateError);
-      Alert.alert("Error updating savings");
-      setLoading(false);
-      return;
-    }
-
-    setConfirmModal(false);
-    setSelectedGoal(null);
-    setIsDeleted(!isDeleted);
-    setTimeout(() => {
-      setIsDeleted(false);
-    }, 2500);
-
-    await fetchData();
-    setLoading(false);
   };
 
 
@@ -444,7 +370,7 @@ const Goals = () => {
                 setGoalDetailModal={setGoalDetailModal}
                 setConfirmModal={setConfirmModal}
                 handleGoalAmountAdd={handleGoalAmountAdd}
-                loading={loading}
+                loading={submitting}
               />
             </Modal>
           )}
@@ -460,7 +386,7 @@ const Goals = () => {
             <AddGoal
               handleAddGoalChange={handleAddGoalChange}
               setModalVisible={setModalVisible}
-              loading={loading}
+              loading={submitting}
               goal={goal}
               colors={colors}
               handleAddGoal={handleAddGoal}

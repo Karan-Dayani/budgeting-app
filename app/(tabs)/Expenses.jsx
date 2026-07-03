@@ -14,13 +14,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import uuid from "react-native-uuid";
 import ExpenseHeader from "../../components/expense/ExpenseHeader";
 import ExpenseItem from "../../components/expense/ExpenseItem";
-import { useUser } from "../../components/globalState/UserContext";
+import { useAuthStore } from "../../components/globalState/authStore";
+import { useBudgetStore } from "../../components/globalState/budgetStore";
 import AddExpenseModal from "../../components/modals/AddExpenseModal";
 import CategoryPicker from "../../components/modals/CategoryPicker";
 import CustomAlert from "../../components/modals/CustomAlert";
 import ExpenseDetail from "../../components/modals/ExpenseDetail";
 import MonthPicker from "../../components/modals/MonthPicker";
-import { supabase } from "../../lib/supabase";
 import AlertScreen from "../../screens/AlertScreen";
 import NoDataLoad from "../../screens/NoDataLoad";
 import { incomePercent, Notification } from "../../lib/utils";
@@ -28,7 +28,18 @@ import FloatingAddButton from "../../components/FloatingAddButton";
 
 export default function ExpensesPage() {
   const { colors } = useTheme();
-  const { user } = useUser();
+  const { user } = useAuthStore();
+  const {
+    income,
+    savings,
+    expenses,
+    loading,
+    accounts,
+    fetchBudget,
+    addExpense,
+    deleteExpense,
+  } = useBudgetStore();
+
   const isFocused = useIsFocused();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -61,9 +72,8 @@ export default function ExpensesPage() {
   const isCurrentMonth = new Date().toDateString().slice(4).split(" ");
   const [month, date, year] = isCurrentMonth;
 
-  const [loading, setLoading] = useState(true);
   const [notify, setNotify] = useState();
-  const [showModal, setShowModal] = useState()
+  const [showModal, setShowModal] = useState();
 
   const [expense, setExpense] = useState({
     user_id: user?.id,
@@ -75,31 +85,27 @@ export default function ExpensesPage() {
     expense_type: "Non-Recurring",
   });
 
-  const [userExpenses, setUserExpenses] = useState([]);
-  const [income, setIncome] = useState(0);
-  const [savings, setSavings] = useState(0);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [activeTab, setActiveTab] = useState("Non-Recurring");
   const [alertVisible, setAlertVisible] = useState();
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      setExpense((prev) => ({ ...prev, user_id: user.id }));
+    }
+  }, [user]);
+
   const handleInputs = () => {
     if (expense.expense_name || expense.amount || expense.payment_mode || expense.category) {
-      setAlertVisible("discardInputs")
+      setAlertVisible("discardInputs");
     } else {
-      setShowModal(null)
+      setShowModal(null);
     }
-  }
+  };
 
   const handleInputsField = () => {
     setExpense({
-      // expenseId: uuid.v4(),
-      // expenseName: "",
-      // expenseAmount: 0,
-      // paymentMode: "",
-      // expenseDate: new Date().toDateString().slice(4),
-      // expenseCategory: "",
-      // expenseType: "Non-Recurring",
       user_id: user?.id,
       expense_name: "",
       amount: 0,
@@ -108,18 +114,15 @@ export default function ExpensesPage() {
       expense_type: "Non-Recurring",
       transaction_date: new Date().toISOString().split("T")[0],
     });
-    setShowModal(null)
-    setAlertVisible(null)
-  }
-
+    setShowModal(null);
+    setAlertVisible(null);
+  };
 
   const [filters, setFilters] = useState({
     date: "",
     month: "",
     category: "",
   });
-
-
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -145,49 +148,20 @@ export default function ExpensesPage() {
     }
   }, [loading, filteredExpenses]);
 
-
   const handleConfirm = (date) => {
     setFilters({ ...filters, "date": new Date(date).toDateString().slice(4) });
     setDatePickerVisibility(false);
   };
 
+  // Unified budget fetch from store
   useEffect(() => {
-    const fetchData = async () => {
-      if (!user) return;
-
-      try {
-        const [userResponse, transResponse] = await Promise.all([
-          supabase
-            .from("User Data")
-            .select("savings, income")
-            .eq("email", user?.user_metadata?.email),
-          supabase
-            .from("transactions")
-            .select("*")
-            .eq("user_id", user?.id)
-            .order("transaction_date", { ascending: false })
-        ]);
-
-        if (userResponse.error) throw userResponse.error;
-        if (transResponse.error) throw transResponse.error;
-
-        setSavings(userResponse.data[0]?.savings || 0);
-        setIncome(userResponse.data[0]?.income || 0);
-        setUserExpenses(transResponse.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        Alert.alert("Error fetching data");
-      } finally {
-        setLoading(false);
+    if (isFocused && user) {
+      const email = user.email || user.user_metadata?.email;
+      if (email) {
+        fetchBudget(email, user.id);
       }
-    };
-
-    if (isFocused) {
-      setLoading(true);
-      fetchData();
     }
   }, [user, isFocused]);
-
 
   const firstRenderRef = useRef(true);
 
@@ -217,7 +191,6 @@ export default function ExpensesPage() {
   };
 
   const handleSaveExpense = async () => {
-
     if (savings <= Number(incomePercent(income)) && !hasShownSavingsAlert) {
       setAlertVisible("lowSavings");
       setHasShownSavingsAlert(true);
@@ -233,36 +206,23 @@ export default function ExpensesPage() {
       return;
     }
 
-    try {
-      const { data, error } = await supabase
-        .from("transactions")
-        .insert({
-          user_id: user?.id,
-          user_email: user?.user_metadata?.email,
-          expense_name: expense.expense_name,
-          amount: expense.amount,
-          payment_mode: expense.payment_mode,
-          category: expense.category,
-          expense_type: expense.expense_type,
-          transaction_date: new Date().toISOString().split("T")[0],
-        })
-        .select();
+    const email = user?.email || user?.user_metadata?.email;
+    if (!email || !user?.id) {
+      Alert.alert("Error", "User session email or id not found.");
+      return;
+    }
 
-      if (error) throw error;
+    const success = await addExpense(
+      user.id,
+      email,
+      expense.expense_name,
+      expense.amount,
+      expense.payment_mode,
+      expense.category,
+      expense.expense_type
+    );
 
-      const updatedSavings = savings - expense.amount;
-      const { error: updateError } = await supabase
-        .from("User Data")
-        .update({ savings: updatedSavings })
-        .eq("email", user?.user_metadata?.email);
-
-      if (updateError) throw updateError;
-
-      if (data && data.length > 0) {
-        setUserExpenses((prev) => [data[0], ...prev]);
-      }
-      setSavings(updatedSavings);
-
+    if (success) {
       setExpense({
         user_id: user?.id,
         expense_name: "",
@@ -276,79 +236,32 @@ export default function ExpensesPage() {
       setShowModal(null);
       setNotify("Saved");
       setTimeout(() => setNotify(null), 2500);
-    } catch (error) {
-      console.error("Error saving expense:", error);
+    } else {
       Alert.alert("Error saving expense");
     }
   };
 
-
   const handleDeleteExpense = async () => {
-    try {
-      const { error: deleteError } = await supabase
-        .from("transactions")
-        .delete()
-        .eq("id", selectedExpense.expenseId);
+    const email = user?.email || user?.user_metadata?.email;
+    if (!email) {
+      Alert.alert("Error", "User session email not found.");
+      return;
+    }
 
-      if (deleteError) throw deleteError;
+    const success = await deleteExpense(email, selectedExpense.expenseId, selectedExpense.expenseAmount);
 
-      const updatedSavings = savings + selectedExpense.expenseAmount;
-
-      const { error: updateError } = await supabase
-        .from("User Data")
-        .update({ savings: updatedSavings })
-        .eq("email", user?.user_metadata?.email);
-
-      if (updateError) throw updateError;
-
-      setUserExpenses((prev) => prev.filter((tx) => tx.id !== selectedExpense.expenseId));
-      setSavings(updatedSavings);
-
-
+    if (success) {
       setShowModal(null);
       setSelectedExpense(null);
-
       setNotify("Deleted");
       setTimeout(() => setNotify(null), 2500);
-    } catch (error) {
-      console.error("Error deleting expense:", error);
+    } else {
       Alert.alert("Error deleting expense");
     }
   };
 
-  const formattedExpenses = useMemo(() => {
-    return userExpenses.map((tx) => {
-      let formattedDate = "";
-      if (tx.transaction_date) {
-        const dateParts = tx.transaction_date.split("-");
-        if (dateParts.length === 3) {
-          const yearInt = parseInt(dateParts[0], 10);
-          const monthInt = parseInt(dateParts[1], 10) - 1;
-          const dayInt = parseInt(dateParts[2], 10);
-          const d = new Date(yearInt, monthInt, dayInt);
-          formattedDate = d.toDateString().slice(4);
-        } else {
-          formattedDate = new Date(tx.transaction_date).toDateString().slice(4);
-        }
-      } else {
-        formattedDate = new Date().toDateString().slice(4);
-      }
-      return {
-        ...tx,
-        expenseId: tx.id,
-        expenseName: tx.expense_name,
-        expenseAmount: tx.amount,
-        paymentMode: tx.payment_mode,
-        expenseDate: formattedDate,
-        expenseCategory: tx.category,
-        expenseType: tx.expense_type,
-      };
-    });
-  }, [userExpenses]);
-
   const filteredExpenses = useMemo(() => {
-    return formattedExpenses.filter((expense) => {
-
+    return expenses.filter((expense) => {
       if (activeTab === "Non-Recurring") {
         return (
           ((filters.date === "" && filters.month === "" && filters.category === "" && expense.expenseDate.includes(month) && expense.expenseDate.includes(year)) ||
@@ -371,7 +284,7 @@ export default function ExpensesPage() {
 
       return false;
     });
-  }, [formattedExpenses, filters, activeTab, month, year]);
+  }, [expenses, filters, activeTab, month, year]);
 
   const alertConfig = {
     lowSavings: {
@@ -498,6 +411,7 @@ export default function ExpensesPage() {
               setShowModal={setShowModal}
               handleInputs={handleInputs}
               colors={colors}
+              accounts={accounts}
             />
           </Modal>
 

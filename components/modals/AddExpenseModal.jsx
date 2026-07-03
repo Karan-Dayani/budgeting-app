@@ -14,9 +14,11 @@ import {
   StyleSheet,
   TextInput,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { useTheme } from "expo-router/react-navigation";
 import CustomText from "../CustomText";
+import { useBudgetStore } from "../globalState/budgetStore";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -118,7 +120,7 @@ const CategoryGridItem = ({ item, isSelected, colors, onPress }) => {
 };
 
 // Payment Mode Grid Item Component
-const PaymentModeGridItem = ({ item, isSelected, colors, onPress }) => {
+const PaymentModeGridItem = ({ item, isSelected, colors, onPress, itemCount }) => {
   const [scale] = useState(() => new Animated.Value(1));
   const themeInfo = paymentThemes[item.label] || { primary: "#41B3A2", tint: "rgba(65, 179, 162, 0.12)" };
 
@@ -138,12 +140,14 @@ const PaymentModeGridItem = ({ item, isSelected, colors, onPress }) => {
     }).start();
   };
 
+  const wrapperWidth = itemCount <= 2 ? "48%" : "31%";
+
   return (
     <Pressable
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={onPress}
-      style={styles.gridItemWrapper}
+      style={[styles.gridItemWrapper, { width: wrapperWidth }]}
     >
       <Animated.View
         style={[
@@ -164,7 +168,7 @@ const PaymentModeGridItem = ({ item, isSelected, colors, onPress }) => {
             }
           ]}
         >
-          <Ionicons
+          <FontAwesome
             name={item.icon}
             size={20}
             color={isSelected ? "#FFFFFF" : themeInfo.primary}
@@ -300,16 +304,34 @@ const AddExpenseModal = ({
   handleSaveExpense,
   setShowModal,
   handleInputs,
-  colors: propColors
+  colors: propColors,
+  accounts
 }) => {
   // Resolve theme colors directly
   const { colors, dark } = useTheme();
+  const { submitting } = useBudgetStore();
 
-  const PaymentModeData = [
-    { label: "Cash", value: "Cash", icon: "cash-outline" },
-    { label: "Online", value: "Online", icon: "globe-outline" },
-    { label: "Card", value: "Card", icon: "card-outline" },
-  ];
+  // const PaymentModeData = [
+  //   { label: "Cash", value: "Cash", icon: "cash-outline" },
+  //   { label: "Online", value: "Online", icon: "globe-outline" },
+  //   { label: "Card", value: "Card", icon: "card-outline" },
+  // ];
+
+  const PaymentModeData = accounts.map((acc) => {
+    return {
+      label: acc.name,
+      value: acc.name,
+      icon:
+        acc.type === "Bank"
+          ? "bank"
+          : acc.type === "Cash"
+          ? "money"
+          : acc.type === "Credit Card"
+          ? "credit-card"
+          : "globe",
+    };
+  });
+
 
   const CategoryData = [
     { label: "Food", value: "Food", icon: "utensils" },
@@ -588,7 +610,7 @@ const AddExpenseModal = ({
                 style={[styles.modeButton, { backgroundColor: colors.expenseInput, borderColor: colors.inputBg }]}
               >
                 {selectedPaymentMode ? (
-                  <Ionicons name={selectedPaymentMode} size={24} color={colors.text} />
+                  <FontAwesome name={selectedPaymentMode} size={24} color={colors.text} />
                 ) : (
                   <FontAwesome name="rupee" size={22} color={colors.text} />
                 )}
@@ -636,12 +658,17 @@ const AddExpenseModal = ({
           {/* Save Button */}
           <Animated.View style={{ transform: [{ scale: saveBtnScale }] }}>
             <Pressable
-              onPress={handleSave}
-              style={[styles.saveButton, { backgroundColor: "#57A6A1" }]}
+              onPress={submitting ? null : handleSave}
+              style={[styles.saveButton, { backgroundColor: "#57A6A1", opacity: submitting ? 0.75 : 1 }]}
+              disabled={submitting}
             >
-              <CustomText style={styles.saveButtonText}>
-                Save Expense
-              </CustomText>
+              {submitting ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <CustomText style={styles.saveButtonText}>
+                  Save Expense
+                </CustomText>
+              )}
             </Pressable>
           </Animated.View>
         </ScrollView>
@@ -665,6 +692,7 @@ const AddExpenseModal = ({
         selectedValue={expense.payment_mode}
         colors={colors}
         dark={dark}
+        accounts={accounts}
       />
     </View>
   );
@@ -710,12 +738,27 @@ const CategoryPickerModal = ({ visible, onClose, onSelect, selectedValue, colors
 };
 
 // Payment Mode Picker Bottom Sheet Wrapper
-const PaymentModePickerModal = ({ visible, onClose, onSelect, selectedValue, colors, dark }) => {
-  const PaymentModeData = [
-    { label: "Cash", value: "Cash", icon: "cash-outline" },
-    { label: "Online", value: "Online", icon: "globe-outline" },
-    { label: "Card", value: "Card", icon: "card-outline" },
-  ];
+const PaymentModePickerModal = ({ visible, onClose, onSelect, selectedValue, colors, dark, accounts }) => {
+  // const PaymentModeData = [
+  //   { label: "Cash", value: "Cash", icon: "cash-outline" },
+  //   { label: "Online", value: "Online", icon: "globe-outline" },
+  //   { label: "Card", value: "Card", icon: "card-outline" },
+  // ];
+
+  const PaymentModeData = accounts.map((acc) => {
+    return {
+      label: acc.name,
+      value: acc.name,
+      icon:
+        acc.type === "Bank"
+          ? "bank"
+          : acc.type === "Cash"
+          ? "money"
+          : acc.type === "Credit Card"
+          ? "credit-card"
+          : "globe",
+    };
+  });
 
   return (
     <ThemedPickerModal
@@ -734,6 +777,7 @@ const PaymentModePickerModal = ({ visible, onClose, onSelect, selectedValue, col
               isSelected={selectedValue === item.value}
               colors={colors}
               onPress={() => onSelect(item, modalClose)}
+              itemCount={PaymentModeData.length}
             />
           ))}
         </View>
