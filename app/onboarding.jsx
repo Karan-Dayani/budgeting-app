@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 15,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
     textAlign: "center",
     lineHeight: 22,
     paddingHorizontal: 12,

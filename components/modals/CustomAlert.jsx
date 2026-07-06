@@ -49,7 +49,7 @@ const CustomAlert = ({
                             </View>
                             <CustomText
                                 className="text-sm text-center mb-6 text-gray-500"
-                                style={{ fontFamily: "Jost" }}
+                                style={{ fontFamily: "Poppins_Medium" }}
                             >
                                 {message}
                             </CustomText>

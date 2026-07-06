@@ -32,6 +32,14 @@ export interface Goal {
   createdAt?: string;
 }
 
+export interface Budget {
+  budgetId: string;
+  budgetCategory: string;
+  budgetAmount: number;
+  budgetMonth: string;
+  budgetYear: string;
+}
+
 interface BudgetState {
   username: string;
   income: number;
@@ -39,6 +47,7 @@ interface BudgetState {
   expenses: Expense[];
   goals: Goal[];
   accounts: LocalAccount[];
+  budgets: Budget[];
   loading: boolean;
   submitting: boolean;
 
@@ -50,6 +59,7 @@ interface BudgetState {
   setLoading: (loading: boolean) => void;
   setSubmitting: (submitting: boolean) => void;
   setAccounts: (accounts: LocalAccount[]) => void;
+  setBudgets: (budgets: Budget[]) => void;
 
   reset: () => void;
   fetchBudget: (email: string, userId: string) => Promise<void>;
@@ -110,6 +120,23 @@ interface BudgetState {
     type: "Bank" | "Digital Wallet" | "Cash" | "Credit Card",
     balance: number,
   ) => Promise<boolean>;
+  addBudget: (
+    userId: string,
+    category: string,
+    amount: number,
+    month: string,
+    year: string,
+  ) => Promise<boolean>;
+  updateBudget: (
+    budgetId: string,
+    category: string,
+    amount: number,
+    month: string,
+    year: string,
+  ) => Promise<boolean>;
+  deleteBudget: (
+    budgetId: string,
+  ) => Promise<boolean>;
 }
 
 export const useBudgetStore = create<BudgetState>((set, get) => ({
@@ -119,6 +146,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   expenses: [],
   goals: [],
   accounts: [],
+  budgets: [],
   loading: true,
   submitting: false,
 
@@ -130,6 +158,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   setLoading: (loading) => set({ loading }),
   setSubmitting: (submitting) => set({ submitting }),
   setAccounts: (accounts) => set({ accounts }),
+  setBudgets: (budgets) => set({ budgets }),
 
   reset: () =>
     set({
@@ -139,6 +168,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       expenses: [],
       goals: [],
       accounts: [],
+      budgets: [],
       loading: false,
       submitting: false,
     }),
@@ -180,7 +210,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       set({ loading: true });
     }
     try {
-      const [userResponse, transResponse, goalsResponse, accountsResponse] =
+      const [userResponse, transResponse, goalsResponse, accountsResponse, budgetResponse] =
         await Promise.all([
           supabase.from("User Data").select("*").eq("email", email),
           supabase
@@ -194,12 +224,14 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
             .eq("user_id", userId)
             .order("created_at", { ascending: false }),
           supabase.from("accounts").select("*").eq("user_id", userId),
+          supabase.from("budgets").select("*").eq("user_id", userId),
         ]);
 
       if (userResponse.error) throw userResponse.error;
       if (transResponse.error) throw transResponse.error;
       if (goalsResponse.error) throw goalsResponse.error;
       if (accountsResponse.error) throw accountsResponse.error;
+      if (budgetResponse.error) throw budgetResponse.error;
 
       // Format transactions to custom UI keys
       const formattedTrans = (transResponse.data || []).map((tx) => {
@@ -254,6 +286,24 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
         balance: Number(row.balance),
       }));
 
+      // Format budgets to custom UI keys
+      const formattedBudgets: Budget[] = (
+        budgetResponse.data || []
+      ).map((row) => {
+        const monthNames = [
+          "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+        const monthStr = monthNames[Number(row.month)] || "Jan";
+        return {
+          budgetId: row.id,
+          budgetCategory: row.category,
+          budgetAmount: Number(row.budget_amount),
+          budgetMonth: monthStr,
+          budgetYear: String(row.year),
+        };
+      });
+
       const userProfile = userResponse.data?.[0];
       set({
         username: userProfile?.username || "",
@@ -262,6 +312,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
         expenses: formattedTrans,
         goals: formattedGoals,
         accounts: formattedAccounts,
+        budgets: formattedBudgets,
         loading: false,
       });
     } catch (err) {
@@ -671,10 +722,13 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       const nextAccounts = get().accounts.map((a) =>
         a.id === id
           ? { ...a, name: name.trim(), type: type, balance: balance }
-          : a
+          : a,
       );
 
-      const updatedSavings = nextAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+      const updatedSavings = nextAccounts.reduce(
+        (sum, acc) => sum + acc.balance,
+        0,
+      );
       const { error: userUpdateError } = await supabase
         .from("User Data")
         .update({ savings: updatedSavings })
@@ -690,6 +744,121 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       return true;
     } catch (err) {
       console.error("updateAccount error in store:", err);
+      set({ submitting: false });
+      return false;
+    }
+  },
+
+  addBudget: async (userId, category, amount, month, year) => {
+    set({ submitting: true });
+    try {
+      const monthMap: { [key: string]: number } = {
+        Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+        Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
+      };
+      const monthInt = monthMap[month] || 1;
+      const yearInt = parseInt(year, 10) || new Date().getFullYear();
+
+      const { data, error } = await supabase
+        .from("budgets")
+        .insert({
+          user_id: userId,
+          category,
+          budget_amount: amount,
+          month: monthInt,
+          year: yearInt,
+        })
+        .select();
+
+      if (error) throw error;
+
+      const monthNames = [
+        "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      ];
+      const returnedMonthStr = monthNames[Number(data[0].month)] || month;
+
+      const newBudget: Budget = {
+        budgetId: data[0].id,
+        budgetCategory: data[0].category,
+        budgetAmount: Number(data[0].budget_amount),
+        budgetMonth: returnedMonthStr,
+        budgetYear: String(data[0].year),
+      };
+
+      set({
+        budgets: [newBudget, ...get().budgets],
+        submitting: false,
+      });
+      return true;
+    } catch (err) {
+      console.error("addBudget error in store:", err);
+      set({ submitting: false });
+      return false;
+    }
+  },
+
+  updateBudget: async (budgetId, category, amount, month, year) => {
+    set({ submitting: true });
+    try {
+      const monthMap: { [key: string]: number } = {
+        Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+        Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
+      };
+      const monthInt = monthMap[month] || 1;
+      const yearInt = parseInt(year, 10) || new Date().getFullYear();
+
+      const { error } = await supabase
+        .from("budgets")
+        .update({
+          category,
+          budget_amount: amount,
+          month: monthInt,
+          year: yearInt,
+        })
+        .eq("id", budgetId);
+
+      if (error) throw error;
+
+      set({
+        budgets: get().budgets.map((b) =>
+          b.budgetId === budgetId
+            ? {
+                ...b,
+                budgetCategory: category,
+                budgetAmount: amount,
+                budgetMonth: month,
+                budgetYear: year,
+              }
+            : b,
+        ),
+        submitting: false,
+      });
+      return true;
+    } catch (err) {
+      console.error("updateBudget error in store:", err);
+      set({ submitting: false });
+      return false;
+    }
+  },
+
+  deleteBudget: async (budgetId) => {
+    set({ submitting: true });
+    try {
+      const { error } = await supabase
+        .from("budgets")
+        .delete()
+        .eq("id", budgetId);
+
+      if (error) throw error;
+
+      set({
+        budgets: get().budgets.filter((b) => b.budgetId !== budgetId),
+        submitting: false,
+      });
+      return true;
+    } catch (err) {
+      console.error("deleteBudget error in store:", err);
       set({ submitting: false });
       return false;
     }

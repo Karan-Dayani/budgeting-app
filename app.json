@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "budgeting-app",
-    "slug": "budgeting-app",
+    "name": "CoinTrack",
+    "slug": "cointrack",
     "version": "1.0.0",
     "backgroundColor": "#000000",
     "orientation": "portrait",
-    "icon": "./assets/images/Coin.png",
+    "icon": "./assets/images/cointrack_logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png"
+        "foregroundImage": "./assets/images/cointrack_logo.png"
       },
       "package": "com.evilzeus.budgetingapp"
     },

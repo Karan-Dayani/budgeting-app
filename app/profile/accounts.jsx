@@ -46,6 +46,15 @@ const ProfileAccounts = () => {
   const [newAccountName, setNewAccountName] = useState("");
   const [newAccountType, setNewAccountType] = useState("Bank");
   const [newAccountBalance, setNewAccountBalance] = useState("");
+  
+  // Quick top-up modal states
+  const [isTopUpVisible, setIsTopUpVisible] = useState(false);
+  const [topUpAccount, setTopUpAccount] = useState(null);
+  const [topUpValue, setTopUpValue] = useState("");
+
+  // Options action sheet states
+  const [isActionsVisible, setIsActionsVisible] = useState(false);
+  const [selectedActionAccount, setSelectedActionAccount] = useState(null);
 
   const [isNewNameFocused, setIsNewNameFocused] = useState(false);
   const [isNewBalanceFocused, setIsNewBalanceFocused] = useState(false);
@@ -109,6 +118,57 @@ const ProfileAccounts = () => {
     } else {
       Alert.alert("Error", `Failed to ${editingAccount ? "update" : "add"} account. Please try again.`);
     }
+  };
+
+  const handleTriggerTopUp = (account) => {
+    setTopUpAccount(account);
+    setTopUpValue("");
+    setIsTopUpVisible(true);
+  };
+
+  const handleQuickTopUp = async () => {
+    const val = parseFloat(topUpValue);
+    if (isNaN(val) || val <= 0) {
+      Alert.alert("Invalid Input", "Please enter a valid positive amount to add.");
+      return;
+    }
+
+    const updatedBalance = topUpAccount.balance + val;
+    const success = await updateAccount(
+      user?.email || "",
+      topUpAccount.id,
+      topUpAccount.name,
+      topUpAccount.type,
+      updatedBalance
+    );
+
+    if (success) {
+      setIsTopUpVisible(false);
+      setTopUpAccount(null);
+      setTopUpValue("");
+    } else {
+      Alert.alert("Error", "Failed to update account balance. Please try again.");
+    }
+  };
+
+  const handleShowAccountActions = (account) => {
+    setSelectedActionAccount(account);
+    setIsActionsVisible(true);
+  };
+
+  const handleActionAddMoney = () => {
+    setIsActionsVisible(false);
+    handleTriggerTopUp(selectedActionAccount);
+  };
+
+  const handleActionEdit = () => {
+    setIsActionsVisible(false);
+    handleEditAccount(selectedActionAccount);
+  };
+
+  const handleActionDelete = () => {
+    setIsActionsVisible(false);
+    handleDeleteAccount(selectedActionAccount);
   };
 
   const handleEditAccount = (account) => {
@@ -212,8 +272,10 @@ const ProfileAccounts = () => {
             </View>
           ) : (
             accounts.map((item, index) => (
-              <View
+              <TouchableOpacity
                 key={item.id}
+                onPress={() => handleShowAccountActions(item)}
+                activeOpacity={0.65}
                 style={[
                   styles.accountRow,
                   index < accounts.length - 1 && styles.borderBottom,
@@ -238,32 +300,14 @@ const ProfileAccounts = () => {
                   <Text style={[styles.balanceText, { color: colors.text }]}>
                     ₹{item.balance.toLocaleString("en-IN")}
                   </Text>
-                  <View style={styles.actionButtonsRow}>
-                    <TouchableOpacity
-                      onPress={() => handleEditAccount(item)}
-                      style={styles.actionButton}
-                      activeOpacity={0.7}
-                    >
-                      <Feather
-                        name="edit-2"
-                        size={16}
-                        color="#41B3A2"
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleDeleteAccount(item)}
-                      style={styles.actionButton}
-                      activeOpacity={0.7}
-                    >
-                      <Ionicons
-                        name="trash-outline"
-                        size={18}
-                        color="#EF4444"
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <Feather
+                    name="more-vertical"
+                    size={18}
+                    color={colors.text + '66'}
+                    style={{ marginLeft: 4 }}
+                  />
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </View>
@@ -356,9 +400,9 @@ const ProfileAccounts = () => {
               })}
             </View>
 
-            {/* Starting Balance */}
+            {/* Starting/Current Balance */}
             <CustomText style={[styles.modalInputLabel, { color: colors.text + 'aa', marginTop: 14 }]}>
-              Starting Balance (₹)
+              {editingAccount ? "Current Balance (₹)" : "Starting Balance (₹)"}
             </CustomText>
             <TextInput
               style={[
@@ -399,6 +443,186 @@ const ProfileAccounts = () => {
                 )}
               </Pressable>
             </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Quick Top-up Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isTopUpVisible}
+        onRequestClose={() => {
+          setIsTopUpVisible(false);
+          setTopUpAccount(null);
+          setTopUpValue("");
+        }}
+      >
+        <Pressable
+          onPress={() => {
+            setIsTopUpVisible(false);
+            setTopUpAccount(null);
+            setTopUpValue("");
+          }}
+          style={styles.modalOverlay}
+        >
+          <Pressable
+            onPress={() => { }}
+            style={[styles.modalContentCard, { backgroundColor: colors.expenseForm }]}
+          >
+            <CustomText style={[styles.modalTitle, { color: colors.text }]}>
+              Add Money
+            </CustomText>
+            {topUpAccount && (
+              <CustomText style={{ fontSize: 13, fontFamily: "Poppins_Medium", color: colors.text + '88', textAlign: "center", marginTop: -14, marginBottom: 20 }}>
+                To Account: {topUpAccount.name}
+              </CustomText>
+            )}
+
+            <CustomText style={[styles.modalInputLabel, { color: colors.text + 'aa' }]}>
+              Amount to Add (₹)
+            </CustomText>
+            <TextInput
+              style={[
+                styles.modalTextInput,
+                {
+                  backgroundColor: colors.expenseInput,
+                  color: colors.text,
+                  borderColor: "#41B3A2"
+                },
+              ]}
+              value={topUpValue}
+              onChangeText={setTopUpValue}
+              placeholder="e.g. 1000"
+              placeholderTextColor={colors.text + '66'}
+              inputMode="numeric"
+              keyboardType="numeric"
+              autoFocus
+            />
+
+            <View style={styles.modalActionsRow}>
+              <Pressable
+                style={styles.modalCancelBtn}
+                onPress={() => {
+                  setIsTopUpVisible(false);
+                  setTopUpAccount(null);
+                  setTopUpValue("");
+                }}
+              >
+                <CustomText style={styles.modalCancelBtnText}>Cancel</CustomText>
+              </Pressable>
+              <Pressable
+                style={[styles.modalSubmitBtn, submitting && { opacity: 0.6 }]}
+                onPress={submitting ? null : handleQuickTopUp}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <CustomText style={styles.modalSubmitBtnText}>Add Balance</CustomText>
+                )}
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Account Actions Sheet Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isActionsVisible}
+        onRequestClose={() => {
+          setIsActionsVisible(false);
+          setSelectedActionAccount(null);
+        }}
+      >
+        <Pressable
+          onPress={() => {
+            setIsActionsVisible(false);
+            setSelectedActionAccount(null);
+          }}
+          style={styles.actionSheetOverlay}
+        >
+          <Pressable
+            onPress={() => { }}
+            style={[
+              styles.actionSheetContainer,
+              { 
+                backgroundColor: colors.expenseForm || colors.card,
+                borderTopColor: colors.background + '15' 
+              }
+            ]}
+          >
+            {/* Grab handle */}
+            <View style={[styles.grabHandle, { backgroundColor: dark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.15)" }]} />
+
+            {selectedActionAccount && (
+              <>
+                <View style={styles.actionSheetHeader}>
+                  <CustomText style={[styles.actionSheetTitle, { color: colors.text }]}>
+                    {selectedActionAccount.name}
+                  </CustomText>
+                  <CustomText style={styles.actionSheetSubtitle}>
+                    {selectedActionAccount.type} • Current Balance: ₹{selectedActionAccount.balance.toLocaleString("en-IN")}
+                  </CustomText>
+                </View>
+
+                {/* Large Touchable Action Rows */}
+                <TouchableOpacity
+                  style={[styles.actionRowBtn, { borderBottomColor: colors.background + '15' }]}
+                  onPress={handleActionAddMoney}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.actionIconBg, { backgroundColor: "rgba(65, 179, 162, 0.1)" }]}>
+                    <Ionicons name="add-circle" size={22} color="#41B3A2" />
+                  </View>
+                  <CustomText style={[styles.actionText, { color: colors.text }]}>
+                    Add Money (Top-up)
+                  </CustomText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.actionRowBtn, { borderBottomColor: colors.background + '15' }]}
+                  onPress={handleActionEdit}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.actionIconBg, { backgroundColor: "rgba(65, 179, 162, 0.1)" }]}>
+                    <Feather name="edit-2" size={18} color="#41B3A2" />
+                  </View>
+                  <CustomText style={[styles.actionText, { color: colors.text }]}>
+                    Edit Account Details
+                  </CustomText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.actionRowBtn}
+                  onPress={handleActionDelete}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.actionIconBg, { backgroundColor: "rgba(239, 68, 68, 0.1)" }]}>
+                    <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                  </View>
+                  <CustomText style={[styles.actionText, { color: "#EF4444" }]}>
+                    Delete Account
+                  </CustomText>
+                </TouchableOpacity>
+              </>
+            )}
+
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={[styles.actionCancelBtn, { backgroundColor: dark ? "rgba(255, 255, 255, 0.08)" : "#F3F4F6" }]}
+              onPress={() => {
+                setIsActionsVisible(false);
+                setSelectedActionAccount(null);
+              }}
+              activeOpacity={0.7}
+            >
+              <CustomText style={[styles.actionCancelText, { color: colors.text }]}>
+                Close
+              </CustomText>
+            </TouchableOpacity>
           </Pressable>
         </Pressable>
       </Modal>
@@ -592,11 +816,11 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
-    px: 6,
+    alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.6)",
-    paddingHorizontal: 24,
   },
   modalContentCard: {
+    width: width - 48,
     pb: 8,
     borderRadius: 24,
     padding: 24,
@@ -605,6 +829,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 15,
     elevation: 8,
+  },
+  actionSheetOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   modalTitle: {
     fontSize: 18,
@@ -622,7 +851,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 14,
     fontSize: 15,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
     borderWidth: 1,
     marginBottom: 14,
   },
@@ -694,6 +923,70 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontFamily: "Poppins_SemiBold",
     marginTop: 10,
+  },
+  grabHandle: {
+    width: 40,
+    height: 5,
+    borderRadius: 2.5,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  actionSheetContainer: {
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 24,
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    elevation: 20,
+    paddingBottom: Platform.OS === "ios" ? 40 : 28,
+  },
+  actionSheetHeader: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  actionSheetTitle: {
+    fontSize: 20,
+    fontFamily: "Poppins_Bold",
+    marginBottom: 4,
+  },
+  actionSheetSubtitle: {
+    fontSize: 12,
+    color: "#6b7280",
+    fontFamily: "Poppins_Medium",
+  },
+  actionRowBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+  },
+  actionIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  actionText: {
+    fontSize: 15,
+    fontFamily: "Poppins_SemiBold",
+  },
+  actionCancelBtn: {
+    height: 50,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 24,
+  },
+  actionCancelText: {
+    fontSize: 15,
+    fontFamily: "Poppins_SemiBold",
   },
 });
 

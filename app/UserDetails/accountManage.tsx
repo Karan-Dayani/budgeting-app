@@ -614,7 +614,7 @@ const styles: any = StyleSheet.create({
   },
   infoCalloutText: {
     fontSize: 12,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
     flex: 1,
     lineHeight: 16,
   },
@@ -654,7 +654,7 @@ const styles: any = StyleSheet.create({
     flex: 1,
     height: "100%",
     fontSize: 15,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
   },
   chipsContainer: {
     flexDirection: "row",
@@ -695,7 +695,7 @@ const styles: any = StyleSheet.create({
   },
   emptyText: {
     fontSize: 12,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
     textAlign: "center",
   },
   accountsList: {
@@ -728,7 +728,7 @@ const styles: any = StyleSheet.create({
   },
   accountListTypeText: {
     fontSize: 11,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
   },
   accountListItemRight: {
     flexDirection: "row",
@@ -809,7 +809,7 @@ const styles: any = StyleSheet.create({
     paddingHorizontal: 14,
     height: 48,
     fontSize: 14,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
   },
   modalChipsContainer: {
     flexDirection: "row",

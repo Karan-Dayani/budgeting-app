@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Pressable,
   ImageBackground,
+  Image,
   Text,
   TextInput,
   ScrollView,
@@ -98,9 +99,11 @@ export default function Login() {
                 
                 {/* Header/Branding Area */}
                 <View style={styles.headerArea}>
-                  <View style={[styles.logoIconBg, { backgroundColor: colors.primary }]}>
-                    <Ionicons name="pie-chart" size={32} color="#FFFFFF" />
-                  </View>
+                  <Image
+                    source={require("../../assets/images/cointrack_logo.png")}
+                    style={{ width: 80, height: 80, borderRadius: 20, marginBottom: 12 }}
+                    resizeMode="contain"
+                  />
                   <Text style={[styles.brandTitle, { color: colors.text }]}>
                     CoinTrack
                   </Text>
@@ -288,7 +291,7 @@ const styles = StyleSheet.create({
   },
   brandSubtitle: {
     fontSize: 14,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
     textAlign: "center",
     marginTop: 4,
     paddingHorizontal: 20,
@@ -330,7 +333,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     fontSize: 16,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
   },
   buttonPrimary: {
     height: 56,
@@ -357,7 +360,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 15,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
   },
   footerLink: {
     fontSize: 15,

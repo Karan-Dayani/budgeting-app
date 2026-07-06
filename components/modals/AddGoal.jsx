@@ -120,7 +120,7 @@ const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, lo
                             backgroundColor: colors.expenseInput,
                             color: colors.text,
                             borderColor: colors.inputBg,
-                            fontFamily: "Jost"
+                            fontFamily: "Poppins_Medium"
                         }}
                     />
                 </View>
@@ -141,7 +141,7 @@ const AddGoal = ({ handleAddGoalChange, setModalVisible, goal, handleAddGoal, lo
                             backgroundColor: colors.expenseInput,
                             color: colors.text,
                             borderColor: colors.inputBg,
-                            fontFamily: "Jost"
+                            fontFamily: "Poppins_Medium"
                         }}
                     />
                 </View>

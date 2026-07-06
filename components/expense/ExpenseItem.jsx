@@ -60,7 +60,7 @@ const ExpenseItem = ({ handleExpenseDetail, item, isLast }) => {
 
                 <CustomText
                     className="text-red-500 font-bold text-base ml-2"
-                    style={{ fontFamily: "Red_Hat" }}
+                    style={{ fontFamily: "Poppins_Bold" }}
                 >
                     -₹{numberWithCommas(Number(item?.expenseAmount))}
                 </CustomText>

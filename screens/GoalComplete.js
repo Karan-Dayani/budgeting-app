@@ -45,7 +45,7 @@ const GoalComplete = () => {
             <Text
               style={{
                 color: colors.text,
-                fontFamily: "Jost",
+                fontFamily: "Poppins_Bold",
                 fontSize: 30,
               }}
             >

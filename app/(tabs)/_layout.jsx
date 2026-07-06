@@ -43,6 +43,13 @@ export default function TabLayout() {
           title: "Goals",
         }}
       />
+
+      <Tabs.Screen
+        name="Budget"
+        options={{
+          title: "Budget",
+        }}
+      />
     </Tabs>
   );
 }

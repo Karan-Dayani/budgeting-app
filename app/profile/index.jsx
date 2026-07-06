@@ -289,7 +289,7 @@ const ProfilePage = () => {
             >
               {userName}
             </CustomText>
-            <CustomText className="text-sm text-gray-500 mt-1" style={{ fontFamily: "Jost" }}>
+            <CustomText className="text-sm text-gray-500 mt-1" style={{ fontFamily: "Poppins_Medium" }}>
               {user?.user_metadata?.email}
             </CustomText>
           </View>
@@ -301,7 +301,7 @@ const ProfilePage = () => {
                 <Feather name="trending-up" size={14} color="#41B3A2" />
                 <CustomText className="text-[11px] text-gray-500 ml-1 font-medium">Monthly Income</CustomText>
               </View>
-              <CustomText className="text-base font-bold" style={{ color: colors.text, fontFamily: "Red_Hat" }}>
+              <CustomText className="text-base font-bold" style={{ color: colors.text, fontFamily: "Poppins_Bold" }}>
                 ₹{numberWithCommas(income)}
               </CustomText>
             </View>
@@ -310,7 +310,7 @@ const ProfilePage = () => {
                 <Feather name="credit-card" size={14} color="#41B3A2" />
                 <CustomText className="text-[11px] text-gray-500 ml-1 font-medium">Savings</CustomText>
               </View>
-              <CustomText className="text-base font-bold" style={{ color: colors.text, fontFamily: "Red_Hat" }}>
+              <CustomText className="text-base font-bold" style={{ color: colors.text, fontFamily: "Poppins_Bold" }}>
                 ₹{numberWithCommas(savings)}
               </CustomText>
             </View>
@@ -524,7 +524,7 @@ const ProfilePage = () => {
             </View>
             <CustomText
               className="text-sm text-center mb-6 text-gray-500"
-              style={{ fontFamily: "Jost" }}
+              style={{ fontFamily: "Poppins_Medium" }}
             >
               This change will update your Monthly Income and reset all savings, expenses, and goals. Are you sure you want to proceed?
             </CustomText>
@@ -685,7 +685,7 @@ const ProfilePage = () => {
             </View>
             <CustomText
               className="text-sm text-center mb-6 text-gray-500"
-              style={{ fontFamily: "Jost" }}
+              style={{ fontFamily: "Poppins_Medium" }}
             >
               Are you sure you want to log out of your account?
             </CustomText>
@@ -736,7 +736,7 @@ const ProfilePage = () => {
             </View>
             <CustomText
               className="text-sm text-center mb-6 text-gray-500"
-              style={{ fontFamily: "Jost" }}
+              style={{ fontFamily: "Poppins_Medium" }}
             >
               Are you sure you want to permanently delete your account? This action is irreversible and will remove all your data, transactions, and goals.
             </CustomText>

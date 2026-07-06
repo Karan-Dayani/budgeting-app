@@ -60,7 +60,7 @@ const HistoryGoals = ({ colors, dark, userData }) => {
                                         </CustomText>
                                         <CustomText
                                             className="text-xs text-gray-400 mt-1"
-                                            style={{ fontFamily: "Red_Hat" }}
+                                            style={{ fontFamily: "Poppins_SemiBold" }}
                                         >
                                             ₹{numberWithCommas(Number(item.goalSavedMoney))} saved of ₹{numberWithCommas(Number(item.goalTargetMoney))}
                                         </CustomText>

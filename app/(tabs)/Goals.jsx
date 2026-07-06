@@ -281,7 +281,7 @@ const Goals = () => {
                             </CustomText>
                             <CustomText
                               className="text-sm mt-1 text-gray-500"
-                              style={{ fontFamily: "Jost" }}
+                              style={{ fontFamily: "Poppins_Medium" }}
                             >
                               <CustomText style={{ color: "#41B3A2", fontFamily: "Poppins_SemiBold" }}>
                                 ₹{numberWithCommas(Number(item.goalSavedMoney))}
@@ -329,7 +329,7 @@ const Goals = () => {
                   </CustomText>
                   <CustomText
                     className="text-sm text-center mb-6 text-gray-500 px-4"
-                    style={{ fontFamily: "Jost" }}
+                    style={{ fontFamily: "Poppins_Medium" }}
                   >
                     Set and track your personal savings targets here to stay on budget.
                   </CustomText>
@@ -422,7 +422,7 @@ const Goals = () => {
                 </View>
                 <CustomText
                   className="text-sm text-center mb-6 text-gray-500"
-                  style={{ fontFamily: "Jost" }}
+                  style={{ fontFamily: "Poppins_Medium" }}
                 >
                   Are you sure you want to delete this savings goal? This action cannot be undone.
                 </CustomText>

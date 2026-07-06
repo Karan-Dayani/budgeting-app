@@ -201,11 +201,6 @@ export default function ExpensesPage() {
       return;
     }
 
-    if (savings < expense.amount) {
-      setAlertVisible("exceedAmount");
-      return;
-    }
-
     const email = user?.email || user?.user_metadata?.email;
     if (!email || !user?.id) {
       Alert.alert("Error", "User session email or id not found.");

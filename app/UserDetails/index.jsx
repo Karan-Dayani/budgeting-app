@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   },
   cardSubheader: {
     fontSize: 14,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
     textAlign: "center",
     marginBottom: 20,
     marginTop: 2,
@@ -279,11 +279,11 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     fontSize: 16,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
   },
   helpText: {
     fontSize: 13,
-    fontFamily: "Nunito",
+    fontFamily: "Poppins_Medium",
     marginTop: 8,
     lineHeight: 18,
   },

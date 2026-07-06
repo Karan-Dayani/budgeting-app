@@ -84,7 +84,7 @@ const HistoryExpense = ({ colors, dark, userData }) => {
                                         </View>
                                     </View>
                                     
-                                    <CustomText className="text-red-500 font-bold text-base" style={{ fontFamily: "Red_Hat" }}>
+                                    <CustomText className="text-red-500 font-bold text-base" style={{ fontFamily: "Poppins_Bold" }}>
                                         -₹{item.expenseAmount}
                                     </CustomText>
                                 </View>

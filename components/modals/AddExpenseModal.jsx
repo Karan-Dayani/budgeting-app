@@ -351,6 +351,9 @@ const AddExpenseModal = ({
   const [addExpenseModals, setAddExpenseModals] = useState(null);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
+  // Find the selected account object from props
+  const selectedAccount = accounts.find((acc) => acc.name === expense.payment_mode);
+
   // Sync amount when editing/re-opening
   useEffect(() => {
     setAmount(expense.amount > 0 ? String(expense.amount) : "");
@@ -655,6 +658,73 @@ const AddExpenseModal = ({
             </Pressable>
           </View>
 
+          {/* Overdraft / Low Balance Warnings */}
+          {selectedAccount && (
+            (() => {
+              const parsedAmt = parseFloat(amount) || 0;
+              const willGoNegative = parsedAmt > selectedAccount.balance;
+              const willGoLow = (selectedAccount.balance - parsedAmt) < 1000;
+
+              if (willGoNegative) {
+                return (
+                  <View
+                    style={{
+                      backgroundColor: "rgba(239, 83, 80, 0.1)",
+                      borderRadius: 16,
+                      padding: 12,
+                      borderWidth: 1.2,
+                      borderColor: "rgba(239, 83, 80, 0.3)",
+                      marginBottom: 16,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 8,
+                    }}
+                  >
+                    <Ionicons name="warning" size={20} color="#EF5350" style={{ marginRight: 10 }} />
+                    <View style={{ flex: 1 }}>
+                      <CustomText style={{ fontSize: 13, fontFamily: "Poppins_Bold", color: "#EF5350" }}>
+                        OVERDRAFT WARNING
+                      </CustomText>
+                      <CustomText style={{ fontSize: 11, fontFamily: "Poppins_Medium", color: colors.text, marginTop: 2, opacity: 0.85 }}>
+                        This transaction exceeds the current balance of {selectedAccount.name} (₹{selectedAccount.balance.toLocaleString("en-IN")}) by ₹{(parsedAmt - selectedAccount.balance).toLocaleString("en-IN")}. The balance will go negative.
+                      </CustomText>
+                    </View>
+                  </View>
+                );
+              }
+
+              if (willGoLow) {
+                return (
+                  <View
+                    style={{
+                      backgroundColor: "rgba(255, 179, 0, 0.1)",
+                      borderRadius: 16,
+                      padding: 12,
+                      borderWidth: 1.2,
+                      borderColor: "rgba(255, 179, 0, 0.3)",
+                      marginBottom: 16,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 8,
+                    }}
+                  >
+                    <Ionicons name="information-circle" size={20} color="#FFB300" style={{ marginRight: 10 }} />
+                    <View style={{ flex: 1 }}>
+                      <CustomText style={{ fontSize: 13, fontFamily: "Poppins_Bold", color: "#FB8C00" }}>
+                        LOW BALANCE WARNING
+                      </CustomText>
+                      <CustomText style={{ fontSize: 11, fontFamily: "Poppins_Medium", color: colors.text, marginTop: 2, opacity: 0.85 }}>
+                        This transaction will leave {selectedAccount.name} with a low balance of ₹{(selectedAccount.balance - parsedAmt).toLocaleString("en-IN")}.
+                      </CustomText>
+                    </View>
+                  </View>
+                );
+              }
+
+              return null;
+            })()
+          )}
+
           {/* Save Button */}
           <Animated.View style={{ transform: [{ scale: saveBtnScale }] }}>
             <Pressable
@@ -909,7 +979,7 @@ const styles = StyleSheet.create({
   titleInput: {
     flex: 1,
     fontSize: 16,
-    fontFamily: "Jost",
+    fontFamily: "Poppins_Medium",
     height: "100%",
     padding: 0,
   },

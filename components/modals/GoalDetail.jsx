@@ -151,7 +151,7 @@ const GoalDetail = ({
                     >
                         ₹{numberWithCommas(Number(selectedGoal.goalSavedMoney))}
                     </CustomText>
-                    <CustomText className="text-sm mt-1 text-gray-500" style={{ fontFamily: "Jost" }}>
+                    <CustomText className="text-sm mt-1 text-gray-500" style={{ fontFamily: "Poppins_Medium" }}>
                         saved of ₹{numberWithCommas(Number(selectedGoal.goalTargetMoney))}
                     </CustomText>
                 </View>
@@ -171,7 +171,7 @@ const GoalDetail = ({
                         backgroundColor: colors.expenseInput,
                         color: colors.text,
                         borderColor: colors.inputBg,
-                        fontFamily: "Jost"
+                        fontFamily: "Poppins_Medium"
                     }}
                 />
 
