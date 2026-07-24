@@ -83,10 +83,10 @@ export default function ExpensesPage() {
     transaction_date: new Date().toISOString().split("T")[0],
     category: "",
     expense_type: "Non-Recurring",
+    items: [],
   });
 
   const [selectedExpense, setSelectedExpense] = useState(null);
-  const [activeTab, setActiveTab] = useState("Non-Recurring");
   const [alertVisible, setAlertVisible] = useState();
   const [hasShownSavingsAlert, setHasShownSavingsAlert] = useState(false);
 
@@ -113,6 +113,7 @@ export default function ExpensesPage() {
       category: "",
       expense_type: "Non-Recurring",
       transaction_date: new Date().toISOString().split("T")[0],
+      items: [],
     });
     setShowModal(null);
     setAlertVisible(null);
@@ -198,13 +199,13 @@ export default function ExpensesPage() {
 
     if (!expense.expense_name || !expense.amount || !expense.payment_mode || !expense.category || !expense.expense_type) {
       Alert.alert("Please fill in all fields");
-      return;
+      return false;
     }
 
     const email = user?.email || user?.user_metadata?.email;
     if (!email || !user?.id) {
       Alert.alert("Error", "User session email or id not found.");
-      return;
+      return false;
     }
 
     const success = await addExpense(
@@ -214,7 +215,8 @@ export default function ExpensesPage() {
       expense.amount,
       expense.payment_mode,
       expense.category,
-      expense.expense_type
+      expense.expense_type,
+      expense.items || []
     );
 
     if (success) {
@@ -226,13 +228,15 @@ export default function ExpensesPage() {
         category: "",
         expense_type: "Non-Recurring",
         transaction_date: new Date().toISOString().split("T")[0],
+        items: [],
       });
 
-      setShowModal(null);
       setNotify("Saved");
       setTimeout(() => setNotify(null), 2500);
+      return true;
     } else {
       Alert.alert("Error saving expense");
+      return false;
     }
   };
 
@@ -257,29 +261,14 @@ export default function ExpensesPage() {
 
   const filteredExpenses = useMemo(() => {
     return expenses.filter((expense) => {
-      if (activeTab === "Non-Recurring") {
-        return (
-          ((filters.date === "" && filters.month === "" && filters.category === "" && expense.expenseDate.includes(month) && expense.expenseDate.includes(year)) ||
-            expense.expenseDate === filters.date ||
-            expense.expenseCategory === filters.category ||
-            expense.expenseDate.slice(0, 3) === filters.month.slice(0, 3)) &&
-          expense.expenseType === activeTab
-        );
-      }
-
-      if (activeTab === "Recurring") {
-        return (
-          ((filters.date === "" && filters.month === "" && filters.category === "") ||
-            expense.expenseDate === filters.date ||
-            expense.expenseCategory === filters.category ||
-            expense.expenseDate.slice(0, 3) === filters.month.slice(0, 3)) &&
-          expense.expenseType === activeTab
-        );
-      }
-
-      return false;
+      return (
+        (filters.date === "" && filters.month === "" && filters.category === "" && expense.expenseDate.includes(month) && expense.expenseDate.includes(year)) ||
+        expense.expenseDate === filters.date ||
+        expense.expenseCategory === filters.category ||
+        expense.expenseDate.slice(0, 3) === filters.month.slice(0, 3)
+      );
     });
-  }, [expenses, filters, activeTab, month, year]);
+  }, [expenses, filters, month, year]);
 
   const alertConfig = {
     lowSavings: {
@@ -326,8 +315,6 @@ export default function ExpensesPage() {
               setDatePickerVisibility={setDatePickerVisibility}
               setShowModal={setShowModal}
               handleConfirm={handleConfirm}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
               isDatePickerVisible={isDatePickerVisible}
               filteredExpenses={filteredExpenses}
             />

@@ -2,6 +2,15 @@ import { create } from "zustand";
 import { supabase } from "../../lib/supabase";
 import { LocalAccount } from "./setupStore";
 
+export interface TransactionItem {
+  id?: string;
+  transaction_id?: string;
+  name: string;
+  amount: number;
+  category?: string;
+  quantity?: number;
+}
+
 export interface Expense {
   id: string;
   expenseId: string;
@@ -21,6 +30,9 @@ export interface Expense {
   transaction_date: string;
   account_id?: string;
   accountId?: string;
+  items_count?: number;
+  itemsCount?: number;
+  items?: TransactionItem[];
 }
 
 export interface Goal {
@@ -72,6 +84,7 @@ interface BudgetState {
     paymentMode: string,
     category: string,
     expenseType: string,
+    items?: Array<{ name: string; amount?: number; price?: number; category?: string; quantity?: number }>,
   ) => Promise<boolean>;
   deleteExpense: (
     email: string,
@@ -262,6 +275,9 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
           expenseCategory: tx.category,
           expenseType: tx.expense_type,
           accountId: tx.account_id,
+          itemsCount: tx.item_count || tx.items_count || 0,
+          item_count: tx.item_count || tx.items_count || 0,
+          items_count: tx.item_count || tx.items_count || 0,
         };
       });
 
@@ -329,6 +345,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
     paymentMode,
     category,
     expenseType,
+    items = [],
   ) => {
     set({ submitting: true });
     try {
@@ -336,6 +353,8 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       const accountId = account ? account.id : null;
 
       const transactionDate = new Date().toISOString().split("T")[0];
+      const itemsCount = Array.isArray(items) ? items.length : 0;
+
       const { data, error } = await supabase
         .from("transactions")
         .insert({
@@ -348,10 +367,36 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
           category,
           expense_type: expenseType,
           transaction_date: transactionDate,
+          item_count: itemsCount,
         })
         .select();
 
       if (error) throw error;
+
+      const tx = data[0];
+
+      // Insert item rows into transaction_items table
+      let createdItems: TransactionItem[] = [];
+      if (items && items.length > 0 && tx?.id) {
+        const itemRows = items.map((it) => ({
+          transaction_id: tx.id,
+          name: it.name,
+          amount: Number(it.amount ?? it.price ?? 0),
+          category: it.category || category || "Other",
+          quantity: Number(it.quantity || 1),
+        }));
+
+        const { data: insertedItemsData, error: itemsError } = await supabase
+          .from("transaction_items")
+          .insert(itemRows)
+          .select();
+
+        if (itemsError) {
+          console.error("Error inserting transaction_items:", itemsError);
+        } else if (insertedItemsData) {
+          createdItems = insertedItemsData;
+        }
+      }
 
       // Find the account matching paymentMode to deduct the balance
       let updatedAccounts = get().accounts;
@@ -378,7 +423,6 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       if (updateError) throw updateError;
 
       // format the new transaction item
-      const tx = data[0];
       const dateParts = transactionDate.split("-");
       const d = new Date(
         parseInt(dateParts[0]),
@@ -397,6 +441,14 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
         expenseCategory: tx.category,
         expenseType: tx.expense_type,
         accountId: tx.account_id,
+        itemsCount: itemsCount,
+        items_count: itemsCount,
+        items: createdItems.length > 0 ? createdItems : items.map((it) => ({
+          name: it.name,
+          amount: Number(it.amount ?? it.price ?? 0),
+          category: it.category || category,
+          quantity: Number(it.quantity || 1),
+        })),
       };
 
       set({

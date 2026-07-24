@@ -19,6 +19,9 @@ import {
 import { useTheme } from "expo-router/react-navigation";
 import CustomText from "../CustomText";
 import { useBudgetStore } from "../globalState/budgetStore";
+import * as ImagePicker from 'expo-image-picker';
+import { supabase } from "../../lib/supabase";
+import ReceiptDetailsModal from "./ReceiptDetailsModal";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -201,7 +204,7 @@ const PaymentModeGridItem = ({ item, isSelected, colors, onPress, itemCount }) =
 // Nested Picker modal helper
 const ThemedPickerModal = ({ visible, title, onClose, children, colors, dark }) => {
   const [fadeAnim] = useState(() => new Animated.Value(0));
-  const [slideAnim] = useState(() => new Animated.Value(SCREEN_HEIGHT * 0.5));
+  const [slideAnim] = useState(() => new Animated.Value(SCREEN_HEIGHT));
 
   useEffect(() => {
     if (visible) {
@@ -229,7 +232,7 @@ const ThemedPickerModal = ({ visible, title, onClose, children, colors, dark }) 
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
-        toValue: SCREEN_HEIGHT * 0.5,
+        toValue: SCREEN_HEIGHT,
         duration: 150,
         useNativeDriver: true,
       })
@@ -325,10 +328,10 @@ const AddExpenseModal = ({
         acc.type === "Bank"
           ? "bank"
           : acc.type === "Cash"
-          ? "money"
-          : acc.type === "Credit Card"
-          ? "credit-card"
-          : "globe",
+            ? "money"
+            : acc.type === "Credit Card"
+              ? "credit-card"
+              : "globe",
     };
   });
 
@@ -347,9 +350,11 @@ const AddExpenseModal = ({
 
   // Initialize local amount state
   const [amount, setAmount] = useState(expense.amount > 0 ? String(expense.amount) : "");
-  const [formType, setFormType] = useState(expense.expense_type || "Non-Recurring");
   const [addExpenseModals, setAddExpenseModals] = useState(null);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
+  const [scanning, setScanning] = useState(false);
+  const [scannedData, setScannedData] = useState(null);
+
 
   // Find the selected account object from props
   const selectedAccount = accounts.find((acc) => acc.name === expense.payment_mode);
@@ -373,12 +378,7 @@ const AddExpenseModal = ({
 
   // Main sheet animation values
   const [fadeAnim] = useState(() => new Animated.Value(0));
-  const [slideAnim] = useState(() => new Animated.Value(SCREEN_HEIGHT * 0.7));
-
-  // Segmented control animation values
-  const containerWidth = SCREEN_WIDTH - 40; // bottomSheet paddingHorizontal is 20
-  const tabWidth = containerWidth / 2;
-  const tabSlideAnim = useRef(new Animated.Value(0)).current;
+  const [slideAnim] = useState(() => new Animated.Value(SCREEN_HEIGHT));
 
   // Save button animation scale
   const saveBtnScale = useRef(new Animated.Value(1)).current;
@@ -400,15 +400,24 @@ const AddExpenseModal = ({
     ]).start();
   }, []);
 
-  // Sliding tab animation
-  useEffect(() => {
-    Animated.spring(tabSlideAnim, {
-      toValue: formType === "Recurring" ? tabWidth : 0,
-      tension: 100,
-      friction: 12,
-      useNativeDriver: true,
-    }).start();
-  }, [formType]);
+
+
+  const animateClose = (callback) => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: SCREEN_HEIGHT,
+        duration: 180,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
+      if (typeof callback === "function") callback();
+    });
+  };
 
   // Main close function (incorporating parent's discard prompt)
   const handleClose = () => {
@@ -417,51 +426,47 @@ const AddExpenseModal = ({
     if (hasInputs && handleInputs) {
       handleInputs();
     } else {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: SCREEN_HEIGHT * 0.7,
-          duration: 180,
-          useNativeDriver: true,
-        })
-      ]).start(() => {
+      animateClose(() => {
         setShowModal(null);
       });
     }
   };
 
-  // Main save function (incorporating exit animation snippet)
-  const handleSave = () => {
-    if (!amount || !expense.expense_name) {
-      Alert.alert("Error", "Please enter an amount and title");
+  // Main save function
+  const handleSave = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      Alert.alert("Missing Amount", "Please enter a valid amount");
       return;
     }
+    if (!expense.expense_name) {
+      Alert.alert("Missing Title", "Please enter an expense name");
+      return;
+    }
+    if (!expense.category) {
+      Alert.alert("Missing Category", "Please select a category");
+      return;
+    }
+    if (!expense.payment_mode) {
+      if (accounts && accounts.length > 0) {
+        handleExpenseChange("payment_mode", accounts[0].name);
+      } else {
+        Alert.alert("Missing Payment Mode", "Please select a payment mode/account");
+        return;
+      }
+    }
 
-    // Snappy tactile response
+    // Button tactile feedback animation
     Animated.sequence([
       Animated.timing(saveBtnScale, { toValue: 0.95, duration: 80, useNativeDriver: true }),
       Animated.timing(saveBtnScale, { toValue: 1, duration: 80, useNativeDriver: true })
-    ]).start(() => {
-      // Slide down sheet first
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: SCREEN_HEIGHT * 0.7,
-          duration: 180,
-          useNativeDriver: true,
-        })
-      ]).start(() => {
-        handleSaveExpense();
+    ]).start();
+
+    const success = await handleSaveExpense();
+    if (success) {
+      animateClose(() => {
+        setShowModal(null);
       });
-    });
+    }
   };
 
   const handleCategorySelect = (categoryVal, modalClose) => {
@@ -475,6 +480,99 @@ const AddExpenseModal = ({
       setSelectedPaymentMode(mode.icon);
       handleExpenseChange("payment_mode", mode.value);
     });
+  };
+
+  const pickReceipt = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert('Permission required', 'Permission to access the media library is required.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 0.8,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      setScanning(true);
+      try {
+        const asset = result.assets[0];
+        const { data, error } = await supabase.functions.invoke("scan-receipt", {
+          body: {
+            image: asset.base64,
+            mimeType: asset.mimeType,
+          },
+        });
+
+        if (error) {
+          console.error("Function Error:", error);
+          Alert.alert("Extraction Error", "Failed to extract details from receipt.");
+        } else if (data?.receipt) {
+          console.log("Extracted Receipt Data:", JSON.stringify(data, null, 2));
+          setScannedData({
+            ...data.receipt,
+            imageUri: asset.uri,
+          });
+          setAddExpenseModals("scannedDetails");
+        } else {
+          Alert.alert("Extraction Error", "No details could be extracted from the receipt.");
+        }
+      } catch (err) {
+        console.error("Failed to invoke scan-receipt:", err);
+        Alert.alert("Connection Error", "Could not reach the scan service.");
+      } finally {
+        setScanning(false);
+      }
+    }
+  };
+
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert('Permission required', 'Permission to access the camera is required.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      quality: 0.8,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      setScanning(true);
+      try {
+        const asset = result.assets[0];
+        const { data, error } = await supabase.functions.invoke("scan-receipt", {
+          body: {
+            image: asset.base64,
+            mimeType: asset.mimeType,
+          },
+        });
+
+        if (error) {
+          console.error("Function Error:", error);
+          Alert.alert("Extraction Error", "Failed to extract details from receipt.");
+        } else if (data?.receipt) {
+          console.log("Extracted Receipt Data:", JSON.stringify(data, null, 2));
+          setScannedData({
+            ...data.receipt,
+            imageUri: asset.uri,
+          });
+          setAddExpenseModals("scannedDetails");
+        } else {
+          Alert.alert("Extraction Error", "No details could be extracted from the receipt.");
+        }
+      } catch (err) {
+        console.error("Failed to invoke scan-receipt:", err);
+        Alert.alert("Connection Error", "Could not reach the scan service.");
+      } finally {
+        setScanning(false);
+      }
+    }
   };
 
   return (
@@ -527,54 +625,66 @@ const AddExpenseModal = ({
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          {/* Segmented Control Selector */}
-          <View style={[styles.segmentedContainer, { backgroundColor: colors.expenseInput, borderColor: colors.inputBg }]}>
-            <Animated.View
-              style={[
-                styles.segmentedPill,
-                {
-                  width: tabWidth - 4,
-                  transform: [{ translateX: tabSlideAnim }],
-                }
-              ]}
-            />
-            <Pressable
-              style={styles.segmentedTab}
-              onPress={() => {
-                setFormType("Non-Recurring");
-                handleExpenseChange("expense_type", "Non-Recurring");
-              }}
-            >
-              <CustomText
-                style={[
-                  styles.segmentedText,
-                  {
-                    color: formType === "Non-Recurring" ? "#FFFFFF" : colors.text + '80',
-                  }
-                ]}
-              >
-                Non-Recurring
-              </CustomText>
-            </Pressable>
-            <Pressable
-              style={styles.segmentedTab}
-              onPress={() => {
-                setFormType("Recurring");
-                handleExpenseChange("expense_type", "Recurring");
-                handleExpenseChange("times", 1);
-              }}
-            >
-              <CustomText
-                style={[
-                  styles.segmentedText,
-                  {
-                    color: formType === "Recurring" ? "#FFFFFF" : colors.text + '80',
-                  }
-                ]}
-              >
-                Recurring
-              </CustomText>
-            </Pressable>
+
+
+          {/* Receipt Auto-fill Banner with Options */}
+          <View style={[styles.scanBanner, { backgroundColor: colors.expenseInput, borderColor: "#57A6A1" }]}>
+            {scanning ? (
+              <View style={styles.scanningLoader}>
+                <ActivityIndicator size="small" color="#57A6A1" style={{ marginRight: 10 }} />
+                <CustomText style={[styles.scanningText, { color: colors.text }]}>
+                  Extracting receipt details...
+                </CustomText>
+              </View>
+            ) : (
+              <>
+                <View style={styles.scanBannerHeader}>
+                  <Ionicons name="scan" size={20} color="#57A6A1" style={{ marginRight: 8 }} />
+                  <CustomText style={[styles.scanTitle, { color: colors.text }]}>
+                    Scan Receipt to Auto-Fill
+                  </CustomText>
+                </View>
+                <CustomText style={[styles.scanSubtitle, { color: colors.text + '80', marginBottom: 12 }]}>
+                  We'll automatically extract amount, title & category from your bill.
+                </CustomText>
+
+                <View style={styles.scanButtonsRow}>
+                  <Pressable
+                    onPress={takePhoto}
+                    style={({ pressed }) => [
+                      styles.scanOptionButton,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.inputBg,
+                        opacity: pressed ? 0.85 : 1,
+                      }
+                    ]}
+                  >
+                    <Ionicons name="camera-outline" size={18} color="#57A6A1" style={{ marginRight: 6 }} />
+                    <CustomText style={[styles.scanOptionText, { color: colors.text }]}>
+                      Take Photo
+                    </CustomText>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={pickReceipt}
+                    style={({ pressed }) => [
+                      styles.scanOptionButton,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.inputBg,
+                        opacity: pressed ? 0.85 : 1,
+                      }
+                    ]}
+                  >
+                    <Ionicons name="images-outline" size={18} color="#57A6A1" style={{ marginRight: 6 }} />
+                    <CustomText style={[styles.scanOptionText, { color: colors.text }]}>
+                      From Library
+                    </CustomText>
+                  </Pressable>
+                </View>
+              </>
+            )}
           </View>
 
           {/* Amount & Mode row */}
@@ -657,6 +767,51 @@ const AddExpenseModal = ({
               <Ionicons name="chevron-down" size={18} color={colors.text + '80'} />
             </Pressable>
           </View>
+
+          {/* Attached Receipt Items Banner */}
+          {expense.items && expense.items.length > 0 && (
+            <View
+              style={{
+                backgroundColor: "rgba(87, 166, 161, 0.12)",
+                borderRadius: 18,
+                padding: 14,
+                borderWidth: 1,
+                borderColor: "rgba(87, 166, 161, 0.3)",
+                marginBottom: 16,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+                <Ionicons name="receipt-outline" size={20} color="#57A6A1" style={{ marginRight: 10 }} />
+                <View style={{ flex: 1 }}>
+                  <CustomText style={{ fontSize: 13, fontFamily: "Poppins_Bold", color: "#57A6A1" }}>
+                    {expense.items.length} Receipt Line Items Attached
+                  </CustomText>
+                  <CustomText style={{ fontSize: 11, fontFamily: "Poppins_Medium", color: colors.text, opacity: 0.8 }} numberOfLines={1}>
+                    {expense.items.map((i) => i.name).join(", ")}
+                  </CustomText>
+                </View>
+              </View>
+              <Pressable
+                onPress={() => setAddExpenseModals("scannedDetails")}
+                style={{
+                  backgroundColor: "#57A6A1",
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 12,
+                  marginLeft: 8,
+                }}
+              >
+                <CustomText style={{ color: "#FFFFFF", fontSize: 12, fontFamily: "Poppins_SemiBold" }}>
+                  View
+                </CustomText>
+              </Pressable>
+            </View>
+          )}
+
+
 
           {/* Overdraft / Low Balance Warnings */}
           {selectedAccount && (
@@ -764,6 +919,43 @@ const AddExpenseModal = ({
         dark={dark}
         accounts={accounts}
       />
+
+      {/* Nested Scanned Receipt Details Modal */}
+      <ReceiptDetailsModal
+        visible={addExpenseModals === "scannedDetails"}
+        onClose={() => setAddExpenseModals(null)}
+        scannedData={scannedData}
+        onApply={(extracted) => {
+          if (extracted.amount > 0) {
+            setAmount(String(extracted.amount));
+            handleExpenseChange("amount", extracted.amount);
+          }
+          if (extracted.merchant) {
+            handleExpenseChange("expense_name", extracted.merchant);
+          }
+          if (extracted.category) {
+            handleExpenseChange("category", extracted.category);
+          }
+          if (extracted.items && extracted.items.length > 0) {
+            handleExpenseChange("items", extracted.items);
+          } else {
+            handleExpenseChange("items", []);
+          }
+          if (!expense.payment_mode && accounts && accounts.length > 0) {
+            handleExpenseChange("payment_mode", accounts[0].name);
+            setSelectedPaymentMode(
+              accounts[0].type === "Bank"
+                ? "bank"
+                : accounts[0].type === "Cash"
+                  ? "money"
+                  : accounts[0].type === "Credit Card"
+                    ? "credit-card"
+                    : "globe"
+            );
+          }
+          setAddExpenseModals(null);
+        }}
+      />
     </View>
   );
 };
@@ -823,10 +1015,10 @@ const PaymentModePickerModal = ({ visible, onClose, onSelect, selectedValue, col
         acc.type === "Bank"
           ? "bank"
           : acc.type === "Cash"
-          ? "money"
-          : acc.type === "Credit Card"
-          ? "credit-card"
-          : "globe",
+            ? "money"
+            : acc.type === "Credit Card"
+              ? "credit-card"
+              : "globe",
     };
   });
 
@@ -1056,6 +1248,53 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 6,
     right: 6,
+  },
+  scanBanner: {
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 20,
+  },
+  scanBannerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  scanTitle: {
+    fontSize: 15,
+    fontFamily: "Poppins_Bold",
+  },
+  scanSubtitle: {
+    fontSize: 12,
+    fontFamily: "Poppins_Medium",
+  },
+  scanButtonsRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  scanOptionButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  scanOptionText: {
+    fontSize: 13,
+    fontFamily: "Poppins_SemiBold",
+  },
+  scanningLoader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+  },
+  scanningText: {
+    fontSize: 14,
+    fontFamily: "Poppins_SemiBold",
   }
 });
 

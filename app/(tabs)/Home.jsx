@@ -8,6 +8,7 @@ import {
   StatusBar,
   View,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import AnimatedHeader from "../../components/AnimatedHeader";
 import { useAuthStore } from "../../components/globalState/authStore";
@@ -19,6 +20,7 @@ import TotalIncome from "../../components/TotalIncome";
 import CustomText from "../../components/CustomText";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AntDesign, Feather } from "@expo/vector-icons";
+import { supabase } from "../../lib/supabase";
 
 const Skeleton = ({ h, w, my, mb, rounded }) => {
   const { colors } = useTheme();
@@ -54,6 +56,7 @@ export default function Home() {
   const { colors, dark } = useTheme();
   const fadeInOpacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(10)).current;
+
 
   useEffect(() => {
     if (isFocused) {
@@ -167,6 +170,7 @@ export default function Home() {
         barStyle={dark ? "light-content" : "dark-content"}
         backgroundColor={colors.header}
       />
+
       <ScrollView
         className="px-5 py-4"
         contentContainerStyle={{ paddingBottom: 60 }}
@@ -348,10 +352,10 @@ export default function Home() {
                         marginLeft: 4,
                       }}
                     >
-                      <Feather 
-                        name={warningAccounts.some(a => a.isNegative) ? "alert-triangle" : "info"} 
-                        size={16} 
-                        color={warningAccounts.some(a => a.isNegative) ? "#FF5252" : "#FFB300"} 
+                      <Feather
+                        name={warningAccounts.some(a => a.isNegative) ? "alert-triangle" : "info"}
+                        size={16}
+                        color={warningAccounts.some(a => a.isNegative) ? "#FF5252" : "#FFB300"}
                       />
                     </View>
 
@@ -600,7 +604,7 @@ export default function Home() {
             />
           ) : (
             <>
-               <MonthChart colors={colors} dark={dark} userData={userData} />
+              <MonthChart colors={colors} dark={dark} userData={userData} />
             </>
           )}
 

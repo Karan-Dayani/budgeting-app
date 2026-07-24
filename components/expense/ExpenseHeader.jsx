@@ -10,7 +10,6 @@ import {
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { numberWithCommas } from "../../lib/utils";
-import ExpenseTypePicker from "./ExpenseTypePicker";
 import CustomText from "../CustomText";
 
 const ExpenseHeader = ({
@@ -19,8 +18,6 @@ const ExpenseHeader = ({
   setDatePickerVisibility,
   setShowModal,
   handleConfirm,
-  activeTab,
-  setActiveTab,
   filteredExpenses,
   isDatePickerVisible
 }) => {
@@ -218,13 +215,6 @@ const ExpenseHeader = ({
         onCancel={() => setDatePickerVisibility(false)}
         date={new Date()}
       />
-
-      <Animated.View>
-        <ExpenseTypePicker
-          setActiveTab={setActiveTab}
-          activeTab={activeTab}
-        />
-      </Animated.View>
     </Animated.View>
   );
 }

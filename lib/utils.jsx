@@ -40,17 +40,10 @@ export const getTotalExpense = (user) => {
     const { monthIndex, day, year } = parseExpenseDate(item.expenseDate);
 
     if (
-      item.expenseType === "Non-Recurring" &&
       monthIndex === currentMonth &&
       year === currentYear
     ) {
       return total + item.expenseAmount;
-    }
-
-    if (item.expenseType === "Recurring") {
-      if (currentDay >= day) {
-        return total + item.expenseAmount;
-      }
     }
 
     return total;

@@ -48,7 +48,7 @@ const MonthChart = ({ colors, dark, userData }) => {
 
     useEffect(() => {
         if (userData.length > 0) {
-            let barData = userData[0]?.expenses?.filter((expense) => expense.expenseType === "Non-Recurring");
+            let barData = userData[0]?.expenses;
             processExpenses(barData);
         }
     }, [userData]);
